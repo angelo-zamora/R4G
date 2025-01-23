@@ -72,7 +72,7 @@ DECLARE
    )
    AND tbl_atena.result_cd < 8;
   
-   rec_main              i_r4g_atena%ROWTYPE;
+   rec_main              dlgrenkei.i_r4g_atena%ROWTYPE;
 
    -- パラメータ取得カーソル
    cur_parameter CURSOR FOR
