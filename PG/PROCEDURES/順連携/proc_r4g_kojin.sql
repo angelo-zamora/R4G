@@ -50,8 +50,9 @@ DECLARE
    lc_err_cd_normal               character varying = '0';        -- 通常
    lc_err_cd_err                  character varying = '9';        -- エラー
 
-  lc_sql                         character varying;              -- SQL文用変数
+   lc_sql                         character varying;              -- SQL文用変数
 
+   -- メインカーソル
    cur_main CURSOR FOR
    SELECT *
    FROM i_r4g_atena AS tbl_atena
@@ -71,6 +72,7 @@ DECLARE
 
    rec_main                       dlgrenkei.i_r4g_atena%ROWTYPE;
 
+   -- パラメータ取得カーソル
    cur_parameter CURSOR FOR
    SELECT *
    FROM f_renkei_parameter
@@ -78,6 +80,7 @@ DECLARE
 
    rec_parameter                  dlgrenkei.f_renkei_parameter%ROWTYPE;
    
+   -- 行ロック用カーソル
    cur_lock CURSOR FOR
    SELECT *
    FROM f_kojin
