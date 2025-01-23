@@ -27,32 +27,32 @@ DECLARE
    rec_f_kojin_mynumber           f_kojin_mynumber%ROWTYPE;
    rec_log                        dlgrenkei.f_renkei_log%ROWTYPE;
 
-   ln_shori_count                 numeric DEFAULT 0;
-   ln_ins_count                   numeric DEFAULT 0;
-   ln_upd_count                   numeric DEFAULT 0;
-   ln_del_count                   numeric DEFAULT 0;
-   ln_err_count                   numeric DEFAULT 0;
-   lc_err_cd                      character varying;
-   lc_err_text                    character varying(100):='';
-   ln_result_cd                   numeric DEFAULT 0;
+   ln_shori_count                 numeric DEFAULT 0;             -- 処理件数用変数
+   ln_ins_count                   numeric DEFAULT 0;             -- 追加件数用変数
+   ln_upd_count                   numeric DEFAULT 0;             -- 更新件数用変数
+   ln_del_count                   numeric DEFAULT 0;             -- 削除件数用変数
+   ln_err_count                   numeric DEFAULT 0;             -- エラー件数用変数
+   lc_err_cd                      character varying;             -- エラーコード用変数
+   lc_err_text                    character varying(100):='';    -- エラー内容用変数
+   ln_result_cd                   numeric DEFAULT 0;             -- 結果区分更新用変数
    ln_para01                      numeric DEFAULT 0;
    ln_para02                      numeric DEFAULT 0;
    ln_para09                      numeric DEFAULT 0;
    ln_para12                      numeric DEFAULT 0;
    ln_del_diag_count              numeric DEFAULT 0;
    
-   ln_result_cd_add               numeric DEFAULT 1; -- 追加
-   ln_result_cd_upd               numeric DEFAULT 2; -- 更新
-   ln_result_cd_del               numeric DEFAULT 3; -- 削除
-   ln_result_cd_warning           numeric DEFAULT 7; -- 警告
-   ln_result_cd_err               numeric DEFAULT 9; -- エラー
+   ln_result_cd_add               numeric DEFAULT 1;              -- 追加
+   ln_result_cd_upd               numeric DEFAULT 2;              -- 更新
+   ln_result_cd_del               numeric DEFAULT 3;              -- 削除
+   ln_result_cd_warning           numeric DEFAULT 7;              -- 警告
+   ln_result_cd_err               numeric DEFAULT 9;              -- エラー
 
-   lc_err_cd_normal               character varying = '0'; -- 通常
-   lc_err_cd_err                  character varying = '9'; -- エラー
+   lc_err_cd_normal               character varying = '0';        -- 通常
+   lc_err_cd_err                  character varying = '9';        -- エラー
 
-   ln_kojin_no_length             numeric DEFAULT 0; 
+   ln_kojin_no_length             numeric DEFAULT 0;              -- 個人番号の文字数用変数
    
-   lc_sql                         character varying;
+   lc_sql                         character varying;              -- SQL文用変数
 
    cur_main CURSOR FOR
    SELECT *
@@ -263,7 +263,7 @@ BEGIN
          WHERE shikuchoson_cd = rec_main.shikuchoson_cd
                AND atena_no = rec_main.atena_no
                AND rireki_no = rec_main.rireki_no;
-               
+
       END LOOP;
    CLOSE cur_main;
    
