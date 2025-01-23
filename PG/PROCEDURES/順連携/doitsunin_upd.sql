@@ -35,11 +35,7 @@ BEGIN
 			CLOSE cur_doitsunin_kojin;
 
 			UPDATE f_kojin
-				SET doitsunin_shimei           = rec_doitsunin_kojin.shimei
-				, doitsunin_shimei_kana      = rec_doitsunin_kojin.shimei_kana
-				, doitsunin_jusho            = rec_doitsunin_kojin.jusho
-				, doitsunin_jusho_katagaki   = rec_doitsunin_kojin.jusho_katagaki
-				, doitsunin_chiku_cd         = rec_doitsunin_kojin.chiku_cd
+				SET doitsunin_chiku_cd       = rec_doitsunin_kojin.chiku_cd
 				, upd_datetime               = CURRENT_TIMESTAMP(0)
 				, upd_tantosha_cd            = 'RENKEI'
 				, upd_tammatsu               = 'SERVER'
