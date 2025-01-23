@@ -146,45 +146,45 @@ BEGIN
          lc_tokusoku_kaijo_ymd := rec_main.shiensochi_kaishi_ymd;
 
          -- 個人番号
-         rec_f_shiensochi.kojin_no = lc_kojin_no;
+         rec_f_shiensochi.kojin_no := lc_kojin_no;
          -- 期間開始日
-         rec_f_shiensochi.kaishi_ymd = ln_kaishi_ymd;
+         rec_f_shiensochi.kaishi_ymd := ln_kaishi_ymd;
          -- 支援措置区分
-         rec_f_shiensochi.shiensochi_kbn = rec_main.shikuchoson_cd;
+         rec_f_shiensochi.shiensochi_kbn := rec_main.shikuchoson_cd;
          -- 期間終了日
-         rec_f_shiensochi.shuryo_ymd = CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE get_date_to_num(to_date(rec_main.shiensochi_shuryo_ymd, 'yyyy-mm-dd')) END;
+         rec_f_shiensochi.shuryo_ymd := CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE get_date_to_num(to_date(rec_main.shiensochi_shuryo_ymd, 'yyyy-mm-dd')) END;
          -- 一時解除（照会）フラグ
-         rec_f_shiensochi.kaijo_shokai_flg = 0;
+         rec_f_shiensochi.kaijo_shokai_flg := 0;
          -- 一時解除（照会）開始日時
-         rec_f_shiensochi.kaijo_shokai_kaishi_datetime = NULL;
+         rec_f_shiensochi.kaijo_shokai_kaishi_datetime := NULL;
          -- 一時解除（照会）終了日時
-         rec_f_shiensochi.kaijo_shokai_shuryo_datetime = NULL;
+         rec_f_shiensochi.kaijo_shokai_shuryo_datetime := NULL;
          -- 一時解除（発行）フラグ
-         rec_f_shiensochi.kaijo_hakko_flg = 0;
+         rec_f_shiensochi.kaijo_hakko_flg := 0;
          -- 一時解除（発行）開始日時
-         rec_f_shiensochi.kaijo_hakko_kaishi_datetime = NULL;
+         rec_f_shiensochi.kaijo_hakko_kaishi_datetime := NULL;
          -- 一時解除（発行）終了日時
-         rec_f_shiensochi.kaijo_hakko_shuryo_datetime = NULL;
+         rec_f_shiensochi.kaijo_hakko_shuryo_datetime := NULL;
          -- 一時解除（発行）回数
-         rec_f_shiensochi.kaijo_hakko_kaisu = 1;
+         rec_f_shiensochi.kaijo_hakko_kaisu := 1;
          -- 異動フラグ									
-         rec_f_shiensochi.ido_flg = 0;
+         rec_f_shiensochi.ido_flg := 0;
          -- 終了フラグ				
-         rec_f_shiensochi.shuryo_flg = 0;
+         rec_f_shiensochi.shuryo_flg := 0;
          -- 備考										
-         rec_f_shiensochi.biko = NULL;
+         rec_f_shiensochi.biko := NULL;
          -- 履歴番号										
-         rec_f_shiensochi.rireki_no = rireki_no::numeric;
+         rec_f_shiensochi.rireki_no := rireki_no::numeric;
          -- データ作成日時							
-         rec_f_shiensochi.ins_datetime = concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+         rec_f_shiensochi.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- データ更新日時									
-         rec_f_shiensochi.upd_datetime = concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+         rec_f_shiensochi.upd_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- 更新担当者コード									
-         rec_f_shiensochi.upd_tantosha_cd = sosasha_cd;
+         rec_f_shiensochi.upd_tantosha_cd := sosasha_cd;
          -- 更新端末名称									
-         rec_f_shiensochi.upd_tammatsu = 'SERVER';
+         rec_f_shiensochi.upd_tammatsu := 'SERVER';
          -- 削除フラグ									
-         rec_f_shiensochi.del_flg = rec_main.del_flg;								
+         rec_f_shiensochi.del_flg := rec_main.del_flg;								
 
          OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;

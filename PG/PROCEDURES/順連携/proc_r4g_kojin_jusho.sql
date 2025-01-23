@@ -13,14 +13,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : 督促停止情報（統合収滞納）                                                                              */
-/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
-/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
-/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
-/*      OUT : io_c_err_code     … 例外エラー発生時のエラーコード                                                  */
-/*            io_c_err_text      … 例外エラー発生時のエラー内容                                                      */
+/* 処理概要 : f_個人_住所（f_kojin_jusho）の追加／更新／削除を実施する                                                    */
+/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                   */
+/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
+/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                               */
+/*      OUT : io_c_err_code     … 例外エラー発生時のエラーコード                                                        */
+/*            io_c_err_text      … 例外エラー発生時のエラー内容                                                         */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/22  CRESS-INFO.Angelo   001o006「住民情報（個人番号あり）」の取込を行う                           */
+/* 履歴     : 2025/01/22  CRESS-INFO.Angelo   001o006「住民情報（個人番号あり）」の取込を行う                             */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -131,183 +131,183 @@ BEGIN
          lc_kojin_no := rec_main.atena_no;
 
           -- 個人番号
-         rec_f_kojin_jusho.kojin_no = rec_main.atena_no;
+         rec_f_kojin_jusho.kojin_no := rec_main.atena_no;
           -- 住所_市区町村コード
-         rec_f_kojin_jusho.adr_shikuchoson_cd = rec_main.jusho_shikuchoson_cd;
+         rec_f_kojin_jusho.adr_shikuchoson_cd := rec_main.jusho_shikuchoson_cd;
           -- 住所_町字コード
-         rec_f_kojin_jusho.adr_machiaza_cd = rec_main.jusho_machiaza_cd;
+         rec_f_kojin_jusho.adr_machiaza_cd := rec_main.jusho_machiaza_cd;
           -- 住所_都道府県
-         rec_f_kojin_jusho.adr_todofuken = get_trimmed_space(rec_main.jusho_todofuken);
+         rec_f_kojin_jusho.adr_todofuken := get_trimmed_space(rec_main.jusho_todofuken);
           -- 住所_市区郡町村名
-         rec_f_kojin_jusho.adr_shikugunchoson = get_trimmed_space(rec_main.jusho_shikugunchoson);
+         rec_f_kojin_jusho.adr_shikugunchoson := get_trimmed_space(rec_main.jusho_shikugunchoson);
           -- 住所_町字
-         rec_f_kojin_jusho.adr_machiaza = get_trimmed_space(rec_main.jusho_machiaza);
+         rec_f_kojin_jusho.adr_machiaza := get_trimmed_space(rec_main.jusho_machiaza);
           -- 住所_番地号表記
-         rec_f_kojin_jusho.adr_banchigohyoki = get_trimmed_space(rec_main.jusho_banchigohyoki);
+         rec_f_kojin_jusho.adr_banchigohyoki := get_trimmed_space(rec_main.jusho_banchigohyoki);
           -- 住所_番地枝番数値
-         rec_f_kojin_jusho.adr_banchi_eda = get_trimmed_space(rec_main.jusho_banchi_eda);
+         rec_f_kojin_jusho.adr_banchi_eda := get_trimmed_space(rec_main.jusho_banchi_eda);
           -- 住所_方書コード
-         rec_f_kojin_jusho.adr_jusho_katagaki_cd = rec_main.jusho_katagaki_cd;
+         rec_f_kojin_jusho.adr_jusho_katagaki_cd := rec_main.jusho_katagaki_cd;
           -- 住所_方書
-         rec_f_kojin_jusho.adr_jusho_katagaki = get_trimmed_space(rec_main.jusho_katagaki);
+         rec_f_kojin_jusho.adr_jusho_katagaki := get_trimmed_space(rec_main.jusho_katagaki);
           -- 住所_方書_フリガナ
-         rec_f_kojin_jusho.adr_jusho_katagaki_kana = get_trimmed_space(rec_main.jusho_katagaki_kana);
+         rec_f_kojin_jusho.adr_jusho_katagaki_kana := get_trimmed_space(rec_main.jusho_katagaki_kana);
           -- 住所_郵便番号
-         rec_f_kojin_jusho.adr_yubin_no = rec_main.jusho_yubin_no;
+         rec_f_kojin_jusho.adr_yubin_no := rec_main.jusho_yubin_no;
           -- 住所_確定住所
-         rec_f_kojin_jusho.adr_kakutei_jusho = CONCAT(
+         rec_f_kojin_jusho.adr_kakutei_jusho := CONCAT(
                         rec_main.jusho_todofuken
                         , ' ', rec_main.jusho_shikugunchoson
                         , ' ', rec_main.jusho_machiaza
                         , ' ', rec_main.jusho_banchigohyoki
                      );
           -- 住所_国名コード            
-         rec_f_kojin_jusho.adr_kokumei_cd = NULL;
+         rec_f_kojin_jusho.adr_kokumei_cd := NULL;
           -- 住所_国名等
-         rec_f_kojin_jusho.adr_kokumeito = NULL;
+         rec_f_kojin_jusho.adr_kokumeito := NULL;
           -- 住所_国外住所
-         rec_f_kojin_jusho.adr_kokugai_jusho = NULL;
+         rec_f_kojin_jusho.adr_kokugai_jusho := NULL;
           -- 転入前住所_市区町村コード
-         rec_f_kojin_jusho.tennyumae_shikuchoson_cd = rec_main.tennyumae_shikuchoson_cd;
+         rec_f_kojin_jusho.tennyumae_shikuchoson_cd := rec_main.tennyumae_shikuchoson_cd;
           -- 転入前住所_町字コード
-         rec_f_kojin_jusho.tennyumae_machiaza_cd = rec_main.tennyumae_machiaza_cd;
+         rec_f_kojin_jusho.tennyumae_machiaza_cd := rec_main.tennyumae_machiaza_cd;
           --転入前住所_都道府県
-         rec_f_kojin_jusho.tennyumae_todofuken = get_trimmed_space(rec_main.tennyumae_todofuken);
+         rec_f_kojin_jusho.tennyumae_todofuken := get_trimmed_space(rec_main.tennyumae_todofuken);
           -- 転入前住所_市区郡町村名
-         rec_f_kojin_jusho.tennyumae_shikugunchoson = get_trimmed_space(rec_main.tennyumae_shikugunchoson);
+         rec_f_kojin_jusho.tennyumae_shikugunchoson := get_trimmed_space(rec_main.tennyumae_shikugunchoson);
           -- 転入前住所_町字
-         rec_f_kojin_jusho.tennyumae_machiaza = get_trimmed_space(rec_main.tennyumae_machiaza);
+         rec_f_kojin_jusho.tennyumae_machiaza := get_trimmed_space(rec_main.tennyumae_machiaza);
           -- 転入前住所_番地号表記
-         rec_f_kojin_jusho.tennyumae_banchigohyoki = get_trimmed_space(rec_main.tennyumae_banchigohyoki);
+         rec_f_kojin_jusho.tennyumae_banchigohyoki := get_trimmed_space(rec_main.tennyumae_banchigohyoki);
           -- 転入前住所_方書
-         rec_f_kojin_jusho.tennyumae_jusho_katagaki = get_trimmed_space(rec_main.tennyumae_jusho_katagaki);
+         rec_f_kojin_jusho.tennyumae_jusho_katagaki := get_trimmed_space(rec_main.tennyumae_jusho_katagaki);
           -- 転入前住所_郵便番号
-         rec_f_kojin_jusho.tennyumae_yubin_no = rec_main.tennyumae_yubin_no;
+         rec_f_kojin_jusho.tennyumae_yubin_no := rec_main.tennyumae_yubin_no;
           -- 転入前住所_確定住所
-         rec_f_kojin_jusho.tennyumae_kakutei_jusho = CONCAT(
+         rec_f_kojin_jusho.tennyumae_kakutei_jusho := CONCAT(
                         rec_main.tennyumae_todofuken
                         , ' ', rec_main.tennyumae_shikugunchoson
                         , ' ', rec_main.tennyumae_machiaza
                         , ' ', rec_main.tennyumae_banchigohyoki
                      );
           -- 転入前住所_国名コード
-         rec_f_kojin_jusho.tennyumae_kokumei_cd = rec_main.tennyumae_kokumei_cd;
+         rec_f_kojin_jusho.tennyumae_kokumei_cd := rec_main.tennyumae_kokumei_cd;
           -- 転入前住所_国名等
-         rec_f_kojin_jusho.tennyumae_kokumeito = get_trimmed_space(rec_main.tennyumae_kokumeito);
+         rec_f_kojin_jusho.tennyumae_kokumeito := get_trimmed_space(rec_main.tennyumae_kokumeito);
           -- 転入前住所_国外住所
-         rec_f_kojin_jusho.tennyumae_kokugai_jusho = get_trimmed_space(rec_main.tennyumae_kokugai_jusho);
+         rec_f_kojin_jusho.tennyumae_kokugai_jusho := get_trimmed_space(rec_main.tennyumae_kokugai_jusho);
           -- 最終登録住所_市区町村コード
-         rec_f_kojin_jusho.saishu_shikuchoson_cd = rec_main.saishu_shikuchoson_cd;
+         rec_f_kojin_jusho.saishu_shikuchoson_cd := rec_main.saishu_shikuchoson_cd;
           -- 最終登録住所_町字コード
-         rec_f_kojin_jusho.saishu_machiaza_cd = rec_main.saishu_machiaza_cd;
+         rec_f_kojin_jusho.saishu_machiaza_cd := rec_main.saishu_machiaza_cd;
           -- 最終登録住所_都道府県
-         rec_f_kojin_jusho.saishu_todofuken = get_trimmed_space(rec_main.saishu_todofuken);
+         rec_f_kojin_jusho.saishu_todofuken := get_trimmed_space(rec_main.saishu_todofuken);
           -- 最終登録住所_市区郡町村名
-         rec_f_kojin_jusho.saishu_shikugunchoson = get_trimmed_space(rec_main.saishu_shikugunchoson);
+         rec_f_kojin_jusho.saishu_shikugunchoson := get_trimmed_space(rec_main.saishu_shikugunchoson);
           -- 最終登録住所_町字
-         rec_f_kojin_jusho.saishu_machiaza = get_trimmed_space(rec_main.saishu_machiaza);
+         rec_f_kojin_jusho.saishu_machiaza := get_trimmed_space(rec_main.saishu_machiaza);
           -- 最終登録住所_番地号表記
-         rec_f_kojin_jusho.saishu_banchigohyoki = get_trimmed_space(rec_main.saishu_banchigohyoki);
+         rec_f_kojin_jusho.saishu_banchigohyoki := get_trimmed_space(rec_main.saishu_banchigohyoki);
           -- 最終登録住所_方書
-         rec_f_kojin_jusho.saishu_jusho_katagaki = get_trimmed_space(rec_main.saishu_jusho_katagaki);
+         rec_f_kojin_jusho.saishu_jusho_katagaki := get_trimmed_space(rec_main.saishu_jusho_katagaki);
           -- 最終登録住所_郵便番号
-         rec_f_kojin_jusho.saishu_yubin_no = rec_main.saishu_yubin_no;
+         rec_f_kojin_jusho.saishu_yubin_no := rec_main.saishu_yubin_no;
           -- 最終登録住所_確定住
-         rec_f_kojin_jusho.saishu_kakutei_jusho = CONCAT(
+         rec_f_kojin_jusho.saishu_kakutei_jusho := CONCAT(
                         rec_main.saishu_todofuken
                         , ' ', rec_main.saishu_shikugunchoson
                         , ' ', rec_main.saishu_machiaza
                         , ' ', rec_main.saishu_banchigohyoki
                      );
           -- 転居前住所_市区町村コード
-         rec_f_kojin_jusho.tenkyomae_shikuchoson_cd = rec_main.tenkyomae_shikuchoson_cd;
+         rec_f_kojin_jusho.tenkyomae_shikuchoson_cd := rec_main.tenkyomae_shikuchoson_cd;
           -- 転居前住所_町字コード
-         rec_f_kojin_jusho.tenkyomae_machiaza_cd = rec_main.tenkyomae_machiaza_cd;
+         rec_f_kojin_jusho.tenkyomae_machiaza_cd := rec_main.tenkyomae_machiaza_cd;
           -- 転居前住所_都道府県
-         rec_f_kojin_jusho.tenkyomae_todofuken = get_trimmed_space(rec_main.tenkyomae_todofuken);
+         rec_f_kojin_jusho.tenkyomae_todofuken := get_trimmed_space(rec_main.tenkyomae_todofuken);
           -- 転居前住所_市区郡町村名
-         rec_f_kojin_jusho.tenkyomae_shikugunchoson = get_trimmed_space(rec_main.tenkyomae_shikugunchoson);
+         rec_f_kojin_jusho.tenkyomae_shikugunchoson := get_trimmed_space(rec_main.tenkyomae_shikugunchoson);
           -- 転居前住所_町字
-         rec_f_kojin_jusho.tenkyomae_machiaza = get_trimmed_space(rec_main.tenkyomae_machiaza);
+         rec_f_kojin_jusho.tenkyomae_machiaza := get_trimmed_space(rec_main.tenkyomae_machiaza);
           -- 転居前住所_番地号表記
-         rec_f_kojin_jusho.tenkyomae_banchigohyoki = get_trimmed_space(rec_main.tenkyomae_banchigohyoki);
+         rec_f_kojin_jusho.tenkyomae_banchigohyoki := get_trimmed_space(rec_main.tenkyomae_banchigohyoki);
           -- 転居前住所_方書コード
-         rec_f_kojin_jusho.tenkyomae_jusho_katagaki_cd = rec_main.tenkyomae_jusho_katagaki_cd;
+         rec_f_kojin_jusho.tenkyomae_jusho_katagaki_cd := rec_main.tenkyomae_jusho_katagaki_cd;
           -- 転居前住所_方書
-         rec_f_kojin_jusho.tenkyomae_jusho_katagaki = get_trimmed_space(rec_main.tenkyomae_jusho_katagaki);
+         rec_f_kojin_jusho.tenkyomae_jusho_katagaki := get_trimmed_space(rec_main.tenkyomae_jusho_katagaki);
           -- 転居前住所_方書_フリガナ
-         rec_f_kojin_jusho.tenkyomae_jusho_katagaki_kana = get_trimmed_space(rec_main.tenkyomae_jusho_katagaki_kana);
+         rec_f_kojin_jusho.tenkyomae_jusho_katagaki_kana := get_trimmed_space(rec_main.tenkyomae_jusho_katagaki_kana);
           -- 転居前住所_郵便番号
-         rec_f_kojin_jusho.tenkyomae_yubin_no = rec_main.tenkyomae_yubin_no;
+         rec_f_kojin_jusho.tenkyomae_yubin_no := rec_main.tenkyomae_yubin_no;
           -- 転居前住所_確定住所
-         rec_f_kojin_jusho.tenkyomae_kakutei_jusho = CONCAT(
+         rec_f_kojin_jusho.tenkyomae_kakutei_jusho := CONCAT(
                         rec_main.tenkyomae_todofuken
                         , ' ', rec_main.tenkyomae_shikugunchoson
                         , ' ', rec_main.tenkyomae_machiaza
                         , ' ', rec_main.tenkyomae_banchigohyoki
                      );
           -- 転出先住所（予定）_市区町村コード
-         rec_f_kojin_jusho.tenshutsu_yotei_shikuchoson_cd = rec_main.tenshutsusaki_yotei_shikuchoson_cd;
+         rec_f_kojin_jusho.tenshutsu_yotei_shikuchoson_cd := rec_main.tenshutsusaki_yotei_shikuchoson_cd;
           -- 転出先住所（予定）_町字コード
-         rec_f_kojin_jusho.tenshutsu_yotei_machiaza_cd = rec_main.tenshutsusaki_yotei_machiaza_cd;
+         rec_f_kojin_jusho.tenshutsu_yotei_machiaza_cd := rec_main.tenshutsusaki_yotei_machiaza_cd;
           -- 転出先住所（予定）_都道府県
-         rec_f_kojin_jusho.tenshutsu_yotei_todofuken = get_trimmed_space(rec_main.tenshutsusaki_yotei_todofuken);
+         rec_f_kojin_jusho.tenshutsu_yotei_todofuken := get_trimmed_space(rec_main.tenshutsusaki_yotei_todofuken);
           -- 転出先住所（予定）_市区郡町村名
-         rec_f_kojin_jusho.tenshutsu_yotei_shikugunchoson = get_trimmed_space(rec_main.tenshutsusaki_yotei_shikugunchoson);
+         rec_f_kojin_jusho.tenshutsu_yotei_shikugunchoson := get_trimmed_space(rec_main.tenshutsusaki_yotei_shikugunchoson);
           -- 転出先住所（予定）_町字
-         rec_f_kojin_jusho.tenshutsu_yotei_machiaza = get_trimmed_space(rec_main.tenshutsusaki_yotei_machiaza);
+         rec_f_kojin_jusho.tenshutsu_yotei_machiaza := get_trimmed_space(rec_main.tenshutsusaki_yotei_machiaza);
           -- 転出先住所（予定）_番地号表記
-         rec_f_kojin_jusho.tenshutsu_yotei_banchigohyoki = get_trimmed_space(rec_main.tenshutsusaki_yotei_banchigohyoki);
+         rec_f_kojin_jusho.tenshutsu_yotei_banchigohyoki := get_trimmed_space(rec_main.tenshutsusaki_yotei_banchigohyoki);
           -- 転出先住所（予定）_方書
-         rec_f_kojin_jusho.tenshutsu_yotei_jusho_katagaki = get_trimmed_space(rec_main.tenshutsusaki_yotei_jusho_katagaki);
+         rec_f_kojin_jusho.tenshutsu_yotei_jusho_katagaki := get_trimmed_space(rec_main.tenshutsusaki_yotei_jusho_katagaki);
           -- 転出先住所（予定）_郵便番号
-         rec_f_kojin_jusho.tenshutsu_yotei_yubin_no = rec_main.tenshutsusaki_yotei_yubin_no;
+         rec_f_kojin_jusho.tenshutsu_yotei_yubin_no := rec_main.tenshutsusaki_yotei_yubin_no;
           -- 転出先住所（予定）_確定住所
-         rec_f_kojin_jusho.tenshutsu_yotei_kakutei_jusho = CONCAT(
+         rec_f_kojin_jusho.tenshutsu_yotei_kakutei_jusho := CONCAT(
                         rec_main.tenshutsusaki_yotei_todofuken
                         , ' ', rec_main.tenshutsusaki_yotei_shikugunchoson
                         , ' ', rec_main.tenshutsusaki_yotei_machiaza
                         , ' ', rec_main.tenshutsusaki_yotei_banchigohyoki
                      );
           -- 転出先住所（予定）_国名コード
-         rec_f_kojin_jusho.tenshutsu_yotei_kokumei_cd = rec_main.tenshutsusaki_yotei_kokumei_cd;
+         rec_f_kojin_jusho.tenshutsu_yotei_kokumei_cd := rec_main.tenshutsusaki_yotei_kokumei_cd;
           -- 転出先住所（予定）_国名等
-         rec_f_kojin_jusho.tenshutsu_yotei_kokumei = get_trimmed_space(rec_main.tenshutsusaki_yotei_kokumei);
+         rec_f_kojin_jusho.tenshutsu_yotei_kokumei := get_trimmed_space(rec_main.tenshutsusaki_yotei_kokumei);
           -- 転出先住所（予定）_国外住所
-         rec_f_kojin_jusho.tenshutsu_yotei_kokugai_jusho = get_trimmed_space(rec_main.tenshutsusaki_yotei_kokugai_jusho);
+         rec_f_kojin_jusho.tenshutsu_yotei_kokugai_jusho := get_trimmed_space(rec_main.tenshutsusaki_yotei_kokugai_jusho);
           -- 転出先住所（確定）_市区町村コード
-         rec_f_kojin_jusho.tenshutsusaki_shikuchoson_cd = rec_main.tenshutsusaki_shikuchoson_cd;
+         rec_f_kojin_jusho.tenshutsusaki_shikuchoson_cd := rec_main.tenshutsusaki_shikuchoson_cd;
           -- 転出先住所（確定）_町字コード
-         rec_f_kojin_jusho.tenshutsusaki_machiaza_cd = rec_main.tenshutsusaki_machiaza_cd;
+         rec_f_kojin_jusho.tenshutsusaki_machiaza_cd := rec_main.tenshutsusaki_machiaza_cd;
           -- 転出先住所（確定）_都道府県
-         rec_f_kojin_jusho.tenshutsusaki_todofuken = get_trimmed_space(rec_main.tenshutsusaki_todofuken);
+         rec_f_kojin_jusho.tenshutsusaki_todofuken := get_trimmed_space(rec_main.tenshutsusaki_todofuken);
           -- 転出先住所（確定）_市区郡町村名
-         rec_f_kojin_jusho.tenshutsusaki_shikugunchoson = get_trimmed_space(rec_main.tenshutsusaki_shikugunchoson);
+         rec_f_kojin_jusho.tenshutsusaki_shikugunchoson := get_trimmed_space(rec_main.tenshutsusaki_shikugunchoson);
           -- 転出先住所（確定）_町字
-         rec_f_kojin_jusho.tenshutsusaki_machiaza = get_trimmed_space(rec_main.tenshutsusaki_machiaza);
+         rec_f_kojin_jusho.tenshutsusaki_machiaza := get_trimmed_space(rec_main.tenshutsusaki_machiaza);
           -- 転出先住所（確定）_番地号表記
-         rec_f_kojin_jusho.tenshutsusaki_banchigohyoki = get_trimmed_space(rec_main.tenshutsusaki_banchigohyoki);
+         rec_f_kojin_jusho.tenshutsusaki_banchigohyoki := get_trimmed_space(rec_main.tenshutsusaki_banchigohyoki);
           -- 転出先住所（確定）_方書
-         rec_f_kojin_jusho.tenshutsusaki_jusho_katagaki = get_trimmed_space(rec_main.tenshutsusaki_jusho_katagaki);
+         rec_f_kojin_jusho.tenshutsusaki_jusho_katagaki := get_trimmed_space(rec_main.tenshutsusaki_jusho_katagaki);
           -- 転出先住所（確定）_郵便番号
-         rec_f_kojin_jusho.tenshutsusaki_yubin_no = rec_main.tenshutsusaki_yubin_no;
+         rec_f_kojin_jusho.tenshutsusaki_yubin_no := rec_main.tenshutsusaki_yubin_no;
           -- 転出先住所（確定）_確定住所
-         rec_f_kojin_jusho.tenshutsusaki_kakutei_jusho = CONCAT(
+         rec_f_kojin_jusho.tenshutsusaki_kakutei_jusho := CONCAT(
                         rec_main.tenshutsusaki_todofuken
                         , ' ', rec_main.tenshutsusaki_shikugunchoson
                         , ' ', rec_main.tenshutsusaki_machiaza
                         , ' ', rec_main.tenshutsusaki_banchigohyoki
                      );
           -- データ作成日時
-         rec_f_kojin_jusho.ins_datetime = concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+         rec_f_kojin_jusho.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
           -- データ更新日時
-         rec_f_kojin_jusho.upd_datetime = concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+         rec_f_kojin_jusho.upd_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
           -- 更新担当者コード
-         rec_f_kojin_jusho.upd_tantosha_cd = rec_main.upd_tantosha_cd;
+         rec_f_kojin_jusho.upd_tantosha_cd := rec_main.upd_tantosha_cd;
          -- 更新端末名称
-         rec_f_kojin_jusho.upd_tammatsu = 'SERVER';
+         rec_f_kojin_jusho.upd_tammatsu := 'SERVER';
           -- 削除フラグ
-         rec_f_kojin_jusho.del_flg = 0;
+         rec_f_kojin_jusho.del_flg := 0;
 
          OPEN cur_lock;
             FETCH cur_lock INTO rec_lock;
