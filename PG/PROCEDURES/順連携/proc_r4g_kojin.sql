@@ -54,24 +54,20 @@ DECLARE
 
    cur_main CURSOR FOR
    SELECT *
-   FROM dlgrenkei.i_r4g_atena AS atena1
-   LEFT JOIN (
-      SELECT
-         shikuchoson_cd,
-         atena_no,
-         MAX(rireki_no) AS max_rireki_no,
-         MAX(rireki_no_eda) AS max_rireki_no_eda
-      FROM dlgrenkei.i_r4g_atena
-      GROUP BY
-         shikuchoson_cd,
-         atena_no 
-   ) AS atena2
-   ON atena1.shikuchoson_cd = atena2.shikuchoson_cd
-      AND atena1.atena_no = atena2.atena_no
-      AND atena1.rireki_no = atena2.max_rireki_no
-      AND atena1.rireki_no_eda = atena2.max_rireki_no_eda
-   WHERE saishin_flg = '1'
-      AND result_cd < 8;
+   FROM i_r4g_atena AS tbl_atena
+   WHERE tbl_atena.saishin_flg = '1'
+   AND tbl_atena.rireki_no = (
+      SELECT MAX(rireki_no)
+      FROM i_r4g_atena
+      WHERE atena_no = tbl_atena.atena_no
+   )
+   AND tbl_atena.rireki_no_eda = (
+      SELECT MAX(rireki_no_eda)
+      FROM i_r4g_atena
+      WHERE atena_no = tbl_atena.atena_no
+        AND rireki_no = tbl_atena.rireki_no
+   )
+   AND tbl_atena.result_cd < 8;
 
    rec_main                       dlgrenkei.i_r4g_atena%ROWTYPE;
 
@@ -373,6 +369,7 @@ BEGIN
             FETCH cur_lock INTO rec_lock;
          CLOSE cur_lock;
          
+         -- 削除フラグが「1」の場合は対象データを物理削除する
          IF rec_kojin.del_flg = 1 THEN
             BEGIN 
                DELETE FROM f_kojin
