@@ -104,7 +104,7 @@ BEGIN
          IF rec_parameter.parameter_no = 2 THEN ln_para02 := rec_parameter.parameter_value; END IF;    --マイナンバー同一人取得区分
          IF rec_parameter.parameter_no = 9 THEN ln_para09 := rec_parameter.parameter_value; END IF;    --検索用カナ設定区分
          IF rec_parameter.parameter_no = 12 THEN ln_para12 := rec_parameter.parameter_value; END IF;   --同一人情報
-         
+
       END LOOP;
    CLOSE cur_parameter;
 
@@ -174,8 +174,7 @@ BEGIN
          rec_f_kojin_mynumber.upd_tammatsu := 'SERVER';
          -- 削除フラグ
          rec_f_kojin_mynumber.del_flg := 0;
-
-
+         
          -- 削除フラグが「1」の場合は対象データを物理削除する。
          IF rec_main.del_flg = 1 THEN
             BEGIN
