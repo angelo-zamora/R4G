@@ -1,7 +1,7 @@
 --------------------------------------------------------
 --  DDL for Procedure proc_r4g_mynumber
 --------------------------------------------------------
-CREATE OR REPLACE PROCEDURE proc_r4g_mynumber(
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_mynumber(
    in_n_renkei_data_cd IN numeric, 
    in_n_renkei_seq IN numeric, 
    in_n_shori_ymd IN numeric, 
@@ -24,17 +24,35 @@ AS $$
 /**********************************************************************************************************************/
 DECLARE
 
-	ln_shori_count                 numeric DEFAULT 0;
-	ln_ins_count                   numeric DEFAULT 0;
-	ln_upd_count                   numeric DEFAULT 0;
-	ln_del_count                   numeric DEFAULT 0;
-	ln_err_count                   numeric DEFAULT 0;
-	lc_err_cd                      character varying;
-	lc_err_text                    character varying(100);
-	ln_result_cd                   numeric DEFAULT 0;
+   rec_f_kojin_mynumber           f_kojin_mynumber%ROWTYPE;
+   rec_log                        dlgrenkei.f_renkei_log%ROWTYPE;
 
-	lc_sql                        character varying;
-	rec_log                        f_renkei_log%ROWTYPE;
+   ln_shori_count                 numeric DEFAULT 0;
+   ln_ins_count                   numeric DEFAULT 0;
+   ln_upd_count                   numeric DEFAULT 0;
+   ln_del_count                   numeric DEFAULT 0;
+   ln_err_count                   numeric DEFAULT 0;
+   lc_err_cd                      character varying;
+   lc_err_text                    character varying(100):='';
+   ln_result_cd                   numeric DEFAULT 0;
+   ln_para01                      numeric DEFAULT 0;
+   ln_para02                      numeric DEFAULT 0;
+   ln_para09                      numeric DEFAULT 0;
+   ln_para12                      numeric DEFAULT 0;
+   ln_del_diag_count              numeric DEFAULT 0;
+   
+   ln_result_cd_add               numeric DEFAULT 1; -- 追加
+   ln_result_cd_upd               numeric DEFAULT 2; -- 更新
+   ln_result_cd_del               numeric DEFAULT 3; -- 削除
+   ln_result_cd_warning           numeric DEFAULT 7; -- 警告
+   ln_result_cd_err               numeric DEFAULT 9; -- エラー
+
+   lc_err_cd_normal               character varying = '0'; -- 通常
+   lc_err_cd_err                  character varying = '9'; -- エラー
+
+   ln_kojin_no_length             numeric DEFAULT 0; 
+   
+   lc_sql                         character varying;
 
    cur_main CURSOR FOR
    SELECT *
@@ -56,32 +74,20 @@ DECLARE
          AND atena1.rireki_no_eda = atena2.max_rireki_no_eda
    WHERE saishin_flg = '1'
       AND result_cd < 8;
-   /*SELECT *
-   FROM i_r4g_jutogai_atena t1
-   WHERE t1.saishin_flg = '1'
-   AND t1.result_cd < 8
-   AND t1.rireki_no = (
-         SELECT MAX(t2.rireki_no)
-         FROM i_r4g_jutogai_atena t2
-         WHERE t2.atena_no = t1.atena_no
-            AND t2.result_cd < 8
-            AND t2.saishin_flg = '1'
-   )
-   AND t1.seq_no_renkei = (
-         SELECT MAX(t3.seq_no_renkei)
-         FROM i_r4g_jutogai_atena t3
-         WHERE t3.atena_no = t1.atena_no
-            AND t3.rireki_no = t1.rireki_no
-            AND t3.result_cd < 8
-            AND t3.saishin_flg = '1'
-   );*/
+  
+   rec_main              i_r4g_atena%ROWTYPE;
 
-   rec_main              i_r4g_jutogai_atena%ROWTYPE;
+   cur_parameter CURSOR FOR
+   SELECT *
+   FROM f_renkei_parameter
+   WHERE renkei_data_cd = in_n_renkei_data_cd;
+
+   rec_parameter                  dlgrenkei.f_renkei_parameter%ROWTYPE;
    
    cur_lock CURSOR FOR
    SELECT *
    FROM f_kojin_mynumber
-   WHERE kojin_no = lc_kojin_no;
+   WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
 
    rec_lock                       f_kojin_mynumber%ROWTYPE;
  
@@ -121,132 +127,161 @@ BEGIN
    -- r4gでは不要
    
    -- 5. 連携データの作成・更新
+
+   -- 個人番号桁数の取得
+   BEGIN
+      SELECT kojin_no_length
+          INTO ln_kojin_no_length
+       FROM f_data_kanri_kojin
+       WHERE data_kanri_no = 1;
+
+      IF ln_kojin_no_length IS NULL OR ln_kojin_no_length = 0 OR ln_kojin_no_length > 15 THEN
+         ln_kojin_no_length := 15;
+      END IF;
+
+   EXCEPTION
+      WHEN OTHERS THEN
+         ln_kojin_no_length := 15;
+   END;
    ln_shori_count := 0;
+   
+   -- メイン処理
    OPEN cur_main;
       LOOP
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
 
-         ln_shori_count                 := ln_shori_count + 1;
-         lc_err_cd                      := '0';
-         ln_result_cd                   := 0;
-         lc_err_text                    := NULL;
-         rec_lock                       := NULL;
-		 
-         lc_kojin_no := rec_main.atena_no;
+         ln_shori_count := ln_shori_count + 1;
+
+         -- 個人番号
+         IF ln_para02 = 0 THEN
+            rec_f_kojin_mynumber.kojin_no  := SUBSTR( LPAD( rec_main.atena_no, 15, 0 ), - ln_kojin_no_length );
+         ELSE
+            rec_f_kojin_mynumber.kojin_no  :=  get_doitsunin_main( SUBSTR( LPAD( rec_main.atena_no, 15, 0 ), - ln_kojin_no_length ) );
+         END IF;
+
+         -- マイナンバー
+         rec_f_kojin_mynumber.mynumber := CASE WHEN rec_main.mynumber = '0' THEN NULL ELSE rec_main.mynumber END;
+         -- 法人番号
+         rec_f_kojin_mynumber.hojin_no := NULL;
+         -- データ作成日時
+         rec_f_kojin_mynumber.ins_datetime := CONCAT(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+         -- データ更新日時
+         rec_f_kojin_mynumber.upd_datetime := CONCAT(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+         -- 更新担当者コード
+         rec_f_kojin_mynumber.upd_tantosha_cd := rec_main.sosasha_cd;
+         -- 更新端末名称
+         rec_f_kojin_mynumber.upd_tammatsu := 'SERVER';
+         -- 削除フラグ
+         rec_f_kojin_mynumber.del_flg := 0;
+
+         OPEN cur_lock;
+            FETCH cur_lock INTO rec_lock;
+         CLOSE cur_lock;
  
          IF rec_main.del_flg = 1 THEN
             BEGIN
                DELETE FROM f_kojin_number
-               WHERE kojin_no = lc_kojin_no;
+               WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
+               GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
+               ln_del_count = ln_del_count + ln_del_diag_count;
 
-               GET DIAGNOSIS ln_del_count := ln_del_count + ROW_COUNT;
                lc_err_text := '';
-               lc_err_cd := '0';
-               ln_result_cd := 3;
+               lc_err_cd := lc_err_cd_normal;
+               ln_result_cd := ln_result_cd_del; 
 
             EXCEPTION WHEN OTHERS THEN
                ln_err_count := ln_err_count + 1;
                lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-               lc_err_cd := '9';
-               ln_result_cd := 9;
+               lc_err_cd := lc_err_cd_err;
+               ln_result_cd := ln_result_cd_err;
             END;
-         ELSE
-            BEGIN
-               OPEN cur_lock;
-                  FETCH cur_lock INTO rec_lock; 
-               CLOSE cur_lock;
-               
-               IF NOT FOUND THEN
-                  INSERT INTO f_kojin_number (
-                     kojin_no
-                     , mynumber
-					 , hojin_no
-                     , ins_datetime											
-                     , upd_datetime											
-                     , upd_tantosha_cd											
-                     , upd_tammatsu											
-                     , del_flg											
-                  ) VALUES (
-                     rec_main.atena_no
-                     , rec_main.mynumber
-					 , NULL
-                     , concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
-                     , concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
-                     , rec_main.sosasha_cd
-                     , 'SERVER'
-                     , rec_main.del_flg
-                  );
+         ELSE               
+               IF rec_lock IS NULL THEN
+                  BEGIN
+                     INSERT INTO f_kojin_number (
+                        kojin_no
+                        , mynumber
+                        , hojin_no
+                        , ins_datetime                                            
+                        , upd_datetime                                            
+                        , upd_tantosha_cd                                            
+                        , upd_tammatsu                                            
+                        , del_flg                                            
+                     ) VALUES (
+                        rec_f_kojin_mynumber.kojin_no
+                        , rec_f_kojin_mynumber.mynumber
+                        , rec_f_kojin_mynumber.hojin_no
+                        , rec_f_kojin_mynumber.ins_datetime
+                        , rec_f_kojin_mynumber.upd_datetime
+                        , rec_f_kojin_mynumber.upd_tantosha_cd
+                        , rec_f_kojin_mynumber.upd_tammatsu
+                        , rec_f_kojin_mynumber.del_flg
+                     );
+                        ln_ins_count := ln_ins_count + 1;
+                        lc_err_text := '';
+                        lc_err_cd := lc_err_cd_normal;
+                        ln_result_cd := ln_result_cd_add;
 
-                  ln_ins_count := ln_ins_count + 1;
-                  lc_err_text := '';
-                  lc_err_cd := '0';
-                  ln_result_cd := 1;
-
-                  EXCEPTION
-                  WHEN OTHERS THEN
-                     ln_err_count := ln_err_count + 1;
-                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                     lc_err_cd := '9';
-                     ln_result_cd := 9;
+                     EXCEPTION WHEN OTHERS THEN
+                        ln_ins_count := ln_ins_count + 1;
+                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                        lc_err_cd := lc_err_cd_err;
+                        ln_result_cd := ln_result_cd_err;
+                     END;
                ELSE
-                  UPDATE f_kojin_number
-                  SET
-                     mynumber = rec_main.mynumber
-                     , upd_datetime = concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
-                     , upd_tantosha_cd = rec_main.sosasha_cd
-                     , upd_tammatsu = 'SERVER'
-                     , del_flg = rec_main.del_flg
-                     WHERE kojin_no = lc_kojin_no;
+                  BEGIN
+                     UPDATE f_kojin_number
+                     SET
+                        kojin_no = rec_f_kojin_mynumber.kojin_no
+                        ,mynumber = rec_f_kojin_mynumber.mynumber
+                        , upd_datetime = rec_f_kojin_mynumber.upd_datetime
+                        , upd_tantosha_cd = rec_f_kojin_mynumber.upd_tantosha_cd
+                        , upd_tammatsu = rec_f_kojin_mynumber.upd_tammatsu
+                        , del_flg = rec_f_kojin_mynumber.del_flg
+                        WHERE kojin_no = lc_kojin_no;
 
-                     ln_upd_count := ln_upd_count + 1;
-                     lc_err_text := '';
-                     lc_err_cd := '0';
-                     ln_result_cd := 2;
+                        ln_upd_count := ln_upd_count + 1;
+                        lc_err_text := '';
+                        lc_err_cd := lc_err_cd_normal;
+                        ln_result_cd := ln_result_cd_upd;
 
-                     EXCEPTION
-                     WHEN OTHERS THEN
-                     ln_err_count := ln_err_count + 1;
-                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                     lc_err_cd := '9';
-                     ln_result_cd := 9;
-               END IF;
-
-            END;      
+                        EXCEPTION WHEN OTHERS THEN
+                           ln_err_count := ln_err_count + 1;
+                           lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                           lc_err_cd := lc_err_cd_err;
+                           ln_result_cd := ln_result_cd_err;
+                        END;
+               END IF;   
          END IF;
-		-- 中間テーブル更新
-         UPDATE i_r4g_jutogai_atena
+        -- 中間テーブル更新
+         UPDATE i_r4g_atena
          SET result_cd = ln_result_cd
             , error_cd = lc_err_cd
             , error_text = lc_err_text
          WHERE shikuchoson_cd = rec_main.shikuchoson_cd
-               atena_no = rec_main.atena_no
-               rireki_no = rec_main.rireki_no;
+               AND atena_no = rec_main.atena_no
+               AND rireki_no = rec_main.rireki_no;
       END LOOP;
    CLOSE cur_main;
    
-	rec_log.seq_no_renkei := in_n_renkei_seq;
-	rec_log.proc_shuryo_datetime := CURRENT_TIMESTAMP;
-	rec_log.proc_shori_count := ln_shori_count;
-	rec_log.proc_ins_count := ln_ins_count;
-	rec_log.proc_upd_count := ln_upd_count;
-	rec_log.proc_del_count := ln_del_count;
-	/*   rec_log.proc_jogai_count := ln_jogai_count;
-	rec_log.proc_alert_count := ln_alert_count;*/
-	rec_log.proc_err_count := ln_err_count;
+    rec_log.seq_no_renkei := in_n_renkei_seq;
+    rec_log.proc_shuryo_datetime := CURRENT_TIMESTAMP;
+    rec_log.proc_shori_count := ln_shori_count;
+    rec_log.proc_ins_count := ln_ins_count;
+    rec_log.proc_upd_count := ln_upd_count;
+    rec_log.proc_del_count := ln_del_count;
+    rec_log.proc_err_count := ln_err_count;
    
-   -- 更新内容は連携ツールの連携処理クラス（RenkeiProcess）の処理：insertRenkeiKekkaを参照
+   -- データ連携ログ更新
    CALL proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-   COMMIT;
 
    EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;
       io_c_err_text := SQLERRM;
-      ROLLBACK;
       RETURN;
-
 END;
 $$;
