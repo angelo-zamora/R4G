@@ -41,14 +41,14 @@ DECLARE
    ln_para12                      numeric DEFAULT 0;
    ln_del_diag_count              numeric DEFAULT 0;
    
-   ln_result_cd_add               numeric DEFAULT 1;              -- 追加
-   ln_result_cd_upd               numeric DEFAULT 2;              -- 更新
-   ln_result_cd_del               numeric DEFAULT 3;              -- 削除
-   ln_result_cd_warning           numeric DEFAULT 7;              -- 警告
-   ln_result_cd_err               numeric DEFAULT 9;              -- エラー
+   ln_result_cd_add               numeric DEFAULT 1;              -- 追加フラグ
+   ln_result_cd_upd               numeric DEFAULT 2;              -- 更新フラグ
+   ln_result_cd_del               numeric DEFAULT 3;              -- 削除フラグ
+   ln_result_cd_warning           numeric DEFAULT 7;              -- 警告フラグ
+   ln_result_cd_err               numeric DEFAULT 9;              -- エラーフラグ
 
-   lc_err_cd_normal               character varying = '0';        -- 通常
-   lc_err_cd_err                  character varying = '9';        -- エラー
+   lc_err_cd_normal               character varying = '0';        -- 通常フラグ
+   lc_err_cd_err                  character varying = '9';        -- エラーフラグ
 
    ln_kojin_no_length             numeric DEFAULT 0;              -- 個人番号の文字数用変数
    
