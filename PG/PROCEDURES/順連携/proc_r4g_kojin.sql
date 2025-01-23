@@ -133,12 +133,7 @@ BEGIN
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
 
-            ln_shori_count                 := ln_shori_count + 1;
-            lc_err_cd                      := '0';
-            lc_err_text                    := '';
-            ln_result_cd                   := 0;
-            rec_kojin                      := NULL;
-            rec_lock                       := NULL;
+            ln_shori_count := ln_shori_count + 1;
             
             -- 個人番号
             rec_kojin.kojin_no := rec_main.atena_no;
@@ -392,6 +387,7 @@ BEGIN
          ELSE
             IF rec_lock IS NULL THEN
                BEGIN
+                  --データ登録処理
                   INSERT INTO f_kojin(
                      kojin_no
                      , setai_no
@@ -633,6 +629,7 @@ BEGIN
                END;
             ELSE
                BEGIN
+                  --データ更新処理
                   UPDATE f_kojin
                   SET 
                      kojin_no = rec_kojin.kojin_no

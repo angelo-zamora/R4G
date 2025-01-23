@@ -197,6 +197,7 @@ BEGIN
 
                IF rec_lock IS NULL THEN
                   BEGIN
+                     --データ登録処理
                      INSERT INTO f_kojin_number (
                         kojin_no
                         , mynumber
@@ -229,6 +230,7 @@ BEGIN
                      END;
                ELSE
                   BEGIN
+                     --データ更新処理
                      UPDATE f_kojin_number
                      SET
                         kojin_no = rec_f_kojin_mynumber.kojin_no
@@ -252,6 +254,7 @@ BEGIN
                         END;
                END IF;   
          END IF;
+
         -- 中間テーブル更新
          UPDATE i_r4g_atena
          SET result_cd = ln_result_cd
@@ -260,6 +263,7 @@ BEGIN
          WHERE shikuchoson_cd = rec_main.shikuchoson_cd
                AND atena_no = rec_main.atena_no
                AND rireki_no = rec_main.rireki_no;
+               
       END LOOP;
    CLOSE cur_main;
    
