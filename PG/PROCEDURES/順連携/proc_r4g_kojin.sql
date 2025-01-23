@@ -2,11 +2,13 @@
 --  DDL for Procedure  proc_r4g_kojin
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kojin ( in_n_renkei_data_cd IN numeric, 
-                                                       in_n_renkei_seq IN numeric, 
-                                                       in_n_shori_ymd IN numeric, 
-                                                       io_c_err_code INOUT character varying, 
-                                                       io_c_err_text INOUT character varying )
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kojin ( 
+    in_n_renkei_data_cd IN numeric, 
+    in_n_renkei_seq IN numeric, 
+    in_n_shori_ymd IN numeric, 
+    io_c_err_code INOUT character varying, 
+    io_c_err_text INOUT character varying
+)
 LANGUAGE plpgsql
 AS $$
 
@@ -18,7 +20,7 @@ AS $$
 /*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                       */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/22  CRESS-INFO.Drexler   001o006「住民情報（個人番号あり）」の取込を行う                            */
+/* 履歴     : 2025/01/23  CRESS-INFO.Drexler     新規作成     001o006「住民情報（個人番号あり）」の取込を行う              */
 /**********************************************************************************************************************/
 
 DECLARE
