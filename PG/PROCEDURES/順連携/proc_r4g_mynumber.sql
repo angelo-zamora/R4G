@@ -65,8 +65,8 @@ DECLARE
             MAX(rireki_no_eda) AS max_rireki_no_eda
          FROM i_r4g_atena
          GROUP BY
-            atena_no,
-         rireki_no
+         shikuchoson_cd,
+         atena_no
       ) AS atena2
       ON atena1.shikuchoson_cd = atena2.shikuchoson_cd
          AND atena1.atena_no = atena2.atena_no
