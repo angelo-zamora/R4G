@@ -55,7 +55,7 @@ DECLARE
    -- メインカーソル
    cur_main CURSOR FOR
    SELECT *
-   FROM i_r4g_atena AS tbl_atena
+   FROM dlgrenkei.i_r4g_atena AS tbl_atena
    WHERE tbl_atena.saishin_flg = '1'
    AND tbl_atena.rireki_no = (
       SELECT MAX(rireki_no)
@@ -75,7 +75,7 @@ DECLARE
    -- パラメータ取得カーソル
    cur_parameter CURSOR FOR
    SELECT *
-   FROM f_renkei_parameter
+   FROM dlgrenkei.f_renkei_parameter
    WHERE renkei_data_cd = in_n_renkei_data_cd;
 
    rec_parameter                  dlgrenkei.f_renkei_parameter%ROWTYPE;
@@ -102,7 +102,7 @@ BEGIN
          IF rec_parameter.parameter_no = 2 THEN ln_para02 := rec_parameter.parameter_value; END IF;    --マイナンバー同一人取得区分
          IF rec_parameter.parameter_no = 9 THEN ln_para09 := rec_parameter.parameter_value; END IF;    --検索用カナ設定区分
          IF rec_parameter.parameter_no = 12 THEN ln_para12 := rec_parameter.parameter_value; END IF;   --同一人情報
-         
+
       END LOOP;
    CLOSE cur_parameter;
 
