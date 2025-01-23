@@ -100,10 +100,11 @@ BEGIN
          FETCH cur_parameter INTO rec_parameter;
          EXIT WHEN NOT FOUND;
 
-         IF rec_parameter.parameter_no = 1 THEN ln_para01 := rec_parameter.parameter_value; END IF;
-         IF rec_parameter.parameter_no = 2 THEN ln_para02 := rec_parameter.parameter_value; END IF;--マイナンバー同一人取得区分
-         IF rec_parameter.parameter_no = 9 THEN ln_para09 := rec_parameter.parameter_value; END IF;--検索用カナ設定区分
-         IF rec_parameter.parameter_no = 12 THEN ln_para12 := rec_parameter.parameter_value; END IF;--同一人情報
+         IF rec_parameter.parameter_no = 1 THEN ln_para01 := rec_parameter.parameter_value; END IF;    --全件削除区分
+         IF rec_parameter.parameter_no = 2 THEN ln_para02 := rec_parameter.parameter_value; END IF;    --マイナンバー同一人取得区分
+         IF rec_parameter.parameter_no = 9 THEN ln_para09 := rec_parameter.parameter_value; END IF;    --検索用カナ設定区分
+         IF rec_parameter.parameter_no = 12 THEN ln_para12 := rec_parameter.parameter_value; END IF;   --同一人情報
+         
       END LOOP;
    CLOSE cur_parameter;
 
