@@ -56,21 +56,20 @@ DECLARE
    cur_main CURSOR FOR
    SELECT DISTINCT ON (atena_no) 
       *
-   FROM dlgrenkei.i_r4g_atena
-   WHERE 
-      saishin_flg = '1' 
-      AND result_cd < 8
-   ORDER BY 
-      atena_no, 
-      rireki_no DESC, 
-      rireki_no_eda DESC;
-
-   rec_main            dlgrenkei.i_r4g_atena%ROWTYPE;
-    
-   cur_lock CURSOR FOR
-   SELECT *
-   FROM f_kojin_jusho
-   WHERE kojin_no = lc_kojin_no;
+   FROM dlgrenkei.i_r4g_atena AS tbl_atena
+   WHERE tbl_atena.saishin_flg = '1' 
+   AND tbl_atena.rireki_no = (
+      SELECT MAX(rireki_no)
+      FROM i_r4g_atena
+      WHERE atena_no = tbl_atena.atena_no
+   )
+   AND tbl_atena.rireki_no_eda = (
+      SELECT MAX(rireki_no_eda)
+      FROM i_r4g_atena
+      WHERE atena_no = tbl_atena.atena_no
+        AND rireki_no = tbl_atena.rireki_no
+   )
+   AND tbl_atena.result_cd < 8;
     
    rec_lock             f_kojin_jusho%ROWTYPE;
 

@@ -296,7 +296,7 @@ BEGIN
       END LOOP;
    CLOSE cur_main;
 
-   CALL proc_r4g_tochi_shokai(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
+   CALL dlgrenkei.proc_r4g_tochi_shokai(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
 
    rec_log.seq_no_renkei := in_n_renkei_seq;
    rec_log.proc_shuryo_datetime := CURRENT_TIMESTAMP;
@@ -307,7 +307,7 @@ BEGIN
    rec_log.proc_err_count := ln_err_count;
 
    -- データ連携ログ更新
-   CALL proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
