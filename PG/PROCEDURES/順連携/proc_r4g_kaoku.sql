@@ -40,7 +40,7 @@ DECLARE
    lc_err_text                    character varying(100):='';    -- エラー内容用変数
    ln_result_cd                   numeric DEFAULT 0;             -- 結果区分更新用変数
 
-    lc_sql                        character varying;             -- SQL文用変数
+   lc_sql                        character varying;             -- SQL文用変数
 
    ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
    ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
@@ -171,7 +171,7 @@ BEGIN
             -- 更新端末名称
             rec_f_kaokukihon_renkei.upd_tammatsu := 'SERVER';
             -- 削除フラグ
-            rec_f_kaokukihon_renkei.del_flg :=
+            rec_f_kaokukihon_renkei.del_flg := rec_main.del_flg::numeric;
 
             OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
