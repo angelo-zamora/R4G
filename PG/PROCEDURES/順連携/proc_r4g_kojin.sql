@@ -627,8 +627,8 @@ BEGIN
                   EXCEPTION WHEN OTHERS THEN
                      ln_err_count := ln_err_count + 1;
                      lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                     lc_err_cd := '9';
-                     ln_result_cd := 9;
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
                END;
             ELSE
                BEGIN

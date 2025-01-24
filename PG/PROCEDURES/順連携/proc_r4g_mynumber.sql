@@ -236,13 +236,12 @@ BEGIN
                      --データ更新処理
                      UPDATE f_kojin_number
                      SET
-                        kojin_no = rec_f_kojin_mynumber.kojin_no
-                        ,mynumber = rec_f_kojin_mynumber.mynumber
+                        mynumber = rec_f_kojin_mynumber.mynumber
                         , upd_datetime = rec_f_kojin_mynumber.upd_datetime
                         , upd_tantosha_cd = rec_f_kojin_mynumber.upd_tantosha_cd
                         , upd_tammatsu = rec_f_kojin_mynumber.upd_tammatsu
                         , del_flg = rec_f_kojin_mynumber.del_flg
-                        WHERE kojin_no = lc_kojin_no;
+                        WHERE kojin_no = rec_f_kojin_mynumber.kojin_no;
 
                         ln_upd_count := ln_upd_count + 1;
                         lc_err_text := '';
