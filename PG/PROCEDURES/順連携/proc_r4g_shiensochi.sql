@@ -55,7 +55,7 @@ DECLARE
    rec_parameter dlgrenkei.f_renkei_parameter%ROWTYPE;
 
    cur_main CURSOR FOR
-   SELECT DISTINCT ON (atena_no) 
+   SELECT
       *
    FROM dlgrenkei.i_r4g_shiensochi AS tbl_shiensochi
    WHERE tbl_shiensochi.saishin_flg = '1' 
