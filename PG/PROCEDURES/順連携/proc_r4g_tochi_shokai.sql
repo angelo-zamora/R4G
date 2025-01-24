@@ -56,8 +56,6 @@ DECLARE
    lc_err_cd_normal               character varying = '0';        -- 通常フラグ
    lc_err_cd_err                  character varying = '9';        -- エラーフラグ
 
-   ln_commit_count                numeric DEFAULT 10000;
-
    -- メインカーソル
    cur_main CURSOR FOR
    SELECT *
@@ -455,7 +453,7 @@ BEGIN
           AND tochi_kihon_rireki_no = rec_main.tochi_kihon_rireki_no;
 
       -- 他処理と合わせてコミットのタイミングは「10,000件ごと」に固定とする
-      IF MOD( ln_shori_count, ln_commit_count ) = 0 THEN
+      IF MOD( ln_shori_count, 10000 ) = 0 THEN
             COMMIT;
       END IF;
 
