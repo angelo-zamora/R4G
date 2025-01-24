@@ -2,7 +2,7 @@
 --  DDL for Procedure proc_r4g_shiensochi
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE proc_r4g_shiensochi(
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_shiensochi(
 	in_n_renkei_data_cd numeric,
 	in_n_renkei_seq numeric,
 	in_n_shori_ymd numeric,
@@ -34,7 +34,12 @@ DECLARE
    lc_err_cd                      character varying;
    ln_result_cd_add               numeric DEFAULT 1; -- 追加
    ln_result_cd_upd               numeric DEFAULT 2; -- 更新
+   ln_result_cd_del               numeric DEFAULT 3; -- 削除
+   ln_result_cd_warning           numeric DEFAULT 7; -- 警告
    ln_result_cd_err               numeric DEFAULT 9; -- エラー
+
+   lc_err_cd_normal               character varying = '0'; -- 通常
+   lc_err_cd_err                  character varying = '9'; -- エラー
 
    ln_para01 numeric DEFAULT 0;
    lc_kojin_no character varying;
@@ -50,26 +55,16 @@ DECLARE
    rec_parameter dlgrenkei.f_renkei_parameter%ROWTYPE;
 
    cur_main CURSOR FOR
-   SELECT *
-   FROM dlgrenkei.i_r4g_shiensochi AS shiensochi1
-      LEFT JOIN(
-         SELECT
-            shikuchoson_cd,
-            atena_no,
-            shiensochi_kaishi_ymd,
-            MAX(rireki_no) AS max_rireki_no
-         FROM dlgrenkei.i_r4g_shiensochi
-         GROUP BY
-            shikuchoson_cd,
-            atena_no,
-            shiensochi_kaishi_ymd
-      ) AS shiensochi2
-      ON shiensochi1.shikuchoson_cd = shiensochi2.shikuchoson_cd
-         AND shiensochi1.atena_no = shiensochi2.atena_no
-         AND shiensochi1.shiensochi_kaishi_ymd = shiensochi2.shiensochi_kaishi_ymd
-         AND shiensochi1.rireki_no = shiensochi2.max_rireki_no
-   WHERE saishin_flg = '1'
-      AND result_cd < 8;
+   SELECT
+      *
+   FROM dlgrenkei.i_r4g_shiensochi AS tbl_shiensochi
+   WHERE tbl_shiensochi.saishin_flg = '1' 
+   AND tbl_shiensochi.rireki_no = (
+      SELECT MAX(rireki_no)
+      FROM i_r4g_shiensochi
+      WHERE atena_no = tbl_shiensochi.atena_no
+   )
+   AND tbl_shiensochi.result_cd < 8;
 
    rec_main dlgrenkei.i_r4g_shiensochi%ROWTYPE;
 
@@ -87,7 +82,7 @@ DECLARE
    ORDER BY busho_cd;
 
    rec_busho            t_busho%ROWTYPE;
-   rec_log         f_renkei_log%ROWTYPE;
+   rec_log         dlgrenkei.f_renkei_log%ROWTYPE;
 
 BEGIN
 	
@@ -109,7 +104,7 @@ BEGIN
    IF ln_para01 = 1 THEN
       BEGIN
          SELECT COUNT(*) INTO ln_del_count FROM f_shiensochi;
-         lc_sql := 'TRUNCATE TABLE dlgmain.f_shiensochi;';
+         lc_sql := 'TRUNCATE TABLE dlgmain.f_shiensochi';
          EXECUTE lc_sql;
 
       EXCEPTION
@@ -129,14 +124,14 @@ BEGIN
    END IF;
 
    ln_shori_count := 0;
-   -- 連携データの作成・更新
+   -- メイン処理
    OPEN cur_main;
       LOOP
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
 		 
          ln_shori_count                 := ln_shori_count + 1;
-         lc_err_cd                      := '0';
+         lc_err_cd                      := lc_err_cd_normal;
          ln_result_cd                   := 0;
          rec_busho                      := NULL;
          rec_lock                       := NULL;
@@ -174,7 +169,7 @@ BEGIN
          -- 備考										
          rec_f_shiensochi.biko := NULL;
          -- 履歴番号										
-         rec_f_shiensochi.rireki_no := rireki_no::numeric;
+         rec_f_shiensochi.rireki_no := rec_main.rireki_no::numeric;
          -- データ作成日時							
          rec_f_shiensochi.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- データ更新日時									
@@ -184,7 +179,7 @@ BEGIN
          -- 更新端末名称									
          rec_f_shiensochi.upd_tammatsu := 'SERVER';
          -- 削除フラグ									
-         rec_f_shiensochi.del_flg := rec_main.del_flg;								
+         rec_f_shiensochi.del_flg := rec_main.del_flg::numeric;								
 
          OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
@@ -238,14 +233,14 @@ BEGIN
 
                      ln_ins_count := ln_ins_count + 1;
                      lc_err_text := '';
-                     lc_err_cd := '0';
+                     lc_err_cd := lc_err_cd_normal;
                      ln_result_cd := ln_result_cd_add;
 
                      EXCEPTION
                         WHEN OTHERS THEN
                            ln_err_count := ln_err_count + 1;
                            lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                           lc_err_cd := '9';
+                           lc_err_cd := lc_err_cd_err;
                            ln_result_cd := ln_result_cd_err;
                   END;
                ELSE
@@ -264,14 +259,14 @@ BEGIN
 
                      ln_upd_count := ln_upd_count + 1;
                      lc_err_text := '';
-                     lc_err_cd := '0';
+                     lc_err_cd := lc_err_cd_normal;
                      ln_result_cd := ln_result_cd_upd;
 
                      EXCEPTION
                         WHEN OTHERS THEN
                            ln_err_count := ln_err_count + 1;
                            lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                           lc_err_cd := '9';
+                           lc_err_cd := lc_err_cd_err;
                            ln_result_cd := ln_result_cd_err;
                   END;
                END IF;
@@ -357,6 +352,11 @@ BEGIN
             CLOSE cur_busho;
          END IF;
 
+         -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
+         IF rec_main.del_flg = 1 THEN
+            ln_result_cd = ln_result_cd_del;
+         END IF;
+
          BEGIN
             -- 中間テーブル更新
             UPDATE dlgrenkei.i_r4g_shiensochi
@@ -371,7 +371,7 @@ BEGIN
             WHEN OTHERS THEN
                ln_err_count := ln_err_count + 1;
                lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-               lc_err_cd := '9';
+               lc_err_cd := lc_err_cd_err;
                ln_result_cd := ln_result_cd_err;
          END;
 
