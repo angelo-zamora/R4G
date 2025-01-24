@@ -635,8 +635,7 @@ BEGIN
                   --データ更新処理
                   UPDATE f_kojin
                   SET 
-                     kojin_no = rec_kojin.kojin_no
-                     ,setai_no = rec_kojin.setai_no
+                     setai_no = rec_kojin.setai_no
                      ,shimei_kbn = rec_kojin.shimei_kbn
                      ,setai_no = rec_kojin.setai_no
                      ,jumin_shubetsu_cd = rec_kojin.jumin_shubetsu_cd
