@@ -37,14 +37,14 @@ DECLARE
    ln_result_cd_warning                numeric DEFAULT 7; -- 警告
    ln_result_cd_err                    numeric DEFAULT 9; -- エラー
 
-   lc_err_cd_normal               character varying = '0'; -- 通常
-   lc_err_cd_err                  character varying = '9'; -- エラー
+   lc_err_cd_normal                    character varying = '0'; -- 通常
+   lc_err_cd_err                       character varying = '9'; -- エラー
 
-   lc_bukken_no                      character varying;
+   lc_bukken_no                        character varying;
    ln_kazeinendo                       numeric;
    ln_rireki_no                        numeric;
 
-   rec_log                           dlgrenkei.f_renkei_log%ROWTYPE;
+   rec_log                             dlgrenkei.f_renkei_log%ROWTYPE;
 
    cur_main CURSOR FOR
    SELECT *
@@ -52,14 +52,14 @@ DECLARE
    WHERE saishin_flg = '1'
    AND result_cd < 8 ;
 
-   rec_main                          dlgrenkei.i_r4g_tochi%ROWTYPE;
+   rec_main                            dlgrenkei.i_r4g_tochi%ROWTYPE;
 
    cur_parameter CURSOR FOR
    SELECT *
    FROM dlgrenkei.f_renkei_parameter
    WHERE renkei_data_cd = in_n_renkei_data_cd;
 
-   rec_parameter                     dlgrenkei.f_renkei_parameter%ROWTYPE;
+   rec_parameter                       dlgrenkei.f_renkei_parameter%ROWTYPE;
 
    cur_lock CURSOR FOR
    SELECT *
@@ -68,7 +68,7 @@ DECLARE
    AND kazeinendo = ln_kazeinendo
    AND rireki_no = ln_rireki_no;
 
-   rec_lock                       f_tochikihon_renkei%ROWTYPE;
+   rec_lock                            f_tochikihon_renkei%ROWTYPE;
 
 BEGIN
    rec_log.proc_kaishi_datetime := CURRENT_TIMESTAMP;
@@ -120,9 +120,11 @@ BEGIN
          ln_shori_count   := ln_shori_count + 1;
 
          -- 物件番号
-         rec_f_tochikihon_renkei.kazei_nendo := ln_kazeinendo;
+         rec_f_tochikihon_renkei.bukken_no := lc_bukken_no;
          -- 課税年度
-         rec_f_tochikihon_renkei.rireki_no := rec_main.rireki_no::numeric;
+         rec_f_tochikihon_renkei.kazei_nendo := ln_kazeinendo;
+         -- 土地基本_履歴番号
+         rec_f_tochikihon_renkei.rireki_no := ln_rireki_no;
          -- 土地_登記所在地
          rec_f_tochikihon_renkei.toki_shozai := get_trimmed_space(rec_main.tochi_toki_jusho);
          -- 登記地目
@@ -197,8 +199,8 @@ BEGIN
                   , del_flg											
                   )
                   VALUES (
-                  lc_bukken_no											
-                  , ln_kazeinendo											
+                  rec_f_tochikihon_renkei.bukken_no											
+                  , rec_f_tochikihon_renkei.kazei_nendo											
                   , rec_f_tochikihon_renkei.rireki_no									
                   , rec_f_tochikihon_renkei.toki_shozai											
                   , rec_f_tochikihon_renkei.chimoku											
