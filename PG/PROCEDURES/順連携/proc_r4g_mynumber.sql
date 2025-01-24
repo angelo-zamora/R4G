@@ -173,7 +173,7 @@ BEGIN
          -- 更新端末名称
          rec_f_kojin_mynumber.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_f_kojin_mynumber.del_flg := 0;
+         rec_f_kojin_mynumber.del_flg := rec_main.del_flg::numeric;
          
          -- 削除フラグが「1」の場合は対象データを物理削除する。
          IF rec_main.del_flg = 1 THEN

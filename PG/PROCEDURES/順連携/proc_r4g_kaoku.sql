@@ -122,31 +122,55 @@ BEGIN
       LOOP
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
-
+            -- 物件番号
             rec_f_kaokukihon_renkei.bukken_no := rec_main.bukken_no;
+            -- 課税年度
             rec_f_kaokukihon_renkei.kazei_nendo := rec_main.kazei_nendo::numeric;
+            -- 家屋基本_履歴番号
             rec_f_kaokukihon_renkei.kaoku_kihon_rireki_no := kaoku_kihon_rireki_no::numeric;
+            -- 家屋_登記所在地
             rec_f_kaokukihon_renkei.kaoku_toki_jusho := get_trimmed_space(rec_main.kaoku_toki_jusho);
+            -- 家屋番号
             rec_f_kaokukihon_renkei.kaoku_no := get_trimmed_space(rec_main.kaoku_no);
+            -- 登記種類区分
             rec_f_kaokukihon_renkei.toki_shurui_kbn := rec_main.toki_shurui_kbn;
+            -- 床面積
             rec_f_kaokukihon_renkei.yuka_menseki := rec_main.yuka_menseki::numeric;
+            -- 登記建築年月日
             rec_f_kaokukihon_renkei.toki_kenchiku_ymd := get_trimmed_date(rec_main.toki_kenchiku_ymd);
+            -- 登記建築年月日_不詳表記
             rec_f_kaokukihon_renkei.toki_kenchiku_ymd_fusho := rec_main.toki_kenchiku_ymd_fusho;
+            -- 義務者_宛名番号
             rec_f_kaokukihon_renkei.gimusha_atena_no := rec_main.gimusha_atena_no;
+            -- 現況建築年月日
             rec_f_kaokukihon_renkei.genkyo_kenchiku_ymd :=get_trimmed_date(rec_main.genkyo_kenchiku_ymd);
-            rec_f_kaokukihon_renkei.genkyo_syurui_kbn :=
-            rec_f_kaokukihon_renkei.yoto_kbn :=
-            rec_f_kaokukihon_renkei.genkyo_yoto_kbn2 :=
-            rec_f_kaokukihon_renkei.genkyo_yoto_kbn3 :=
-            rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki :=
-            rec_f_kaokukihon_renkei.kaoku_genkyo_jusho :=
-            rec_f_kaokukihon_renkei.genin_kbn :=
-            rec_f_kaokukihon_renkei.to_bukken_no :=
-            rec_f_kaokukihon_renkei.to_bukken_rireki_no :=
-            rec_f_kaokukihon_renkei.ins_datetime :=
-            rec_f_kaokukihon_renkei.upd_datetime :=
-            rec_f_kaokukihon_renkei.upd_tantosha_cd :=
-            rec_f_kaokukihon_renkei.upd_tammatsu :=
+            -- 現況種類区分
+            rec_f_kaokukihon_renkei.genkyo_syurui_kbn := rec_main.genkyo_syurui_kbn;
+            -- 主たる用途区分
+            rec_f_kaokukihon_renkei.yoto_kbn := rec_main.yoto_kbn;
+            -- 現況用途区分2
+            rec_f_kaokukihon_renkei.genkyo_yoto_kbn2 := rec_main.genkyo_yoto_kbn2;
+            -- 現況用途区分3
+            rec_f_kaokukihon_renkei.genkyo_yoto_kbn3 := rec_main.genkyo_yoto_kbn3;
+            -- 合計現況床面積
+            rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki := rec_main.gokei_genkyo_yuka_menseki::numeric;
+            -- 家屋_現況所在地
+            rec_f_kaokukihon_renkei.kaoku_genkyo_jusho := get_trimmed_space(rec_main.kaoku_genkyo_jusho);
+            -- 分棟・合棟原因区分
+            rec_f_kaokukihon_renkei.genin_kbn := rec_main.genin_kbn::numeric;
+            -- 分棟元・合棟先_物件番号
+            rec_f_kaokukihon_renkei.to_bukken_no := rec_main.buntomoto_bukken_no;
+            -- 分棟元・合棟先_履歴番号
+            rec_f_kaokukihon_renkei.to_bukken_rireki_no := rec_main.buntomoto_bukken_rireki_no;
+            -- データ作成日時
+            rec_f_kaokukihon_renkei.ins_datetime := CONCAT(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+            -- データ更新日時
+            rec_f_kaokukihon_renkei.upd_datetime := CONCAT(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
+            -- 更新担当者コード
+            rec_f_kaokukihon_renkei.upd_tantosha_cd := rec_main.sosasha_cd;
+            -- 更新端末名称
+            rec_f_kaokukihon_renkei.upd_tammatsu := 'SERVER';
+            -- 削除フラグ
             rec_f_kaokukihon_renkei.del_flg :=
 
             OPEN cur_lock;
@@ -156,7 +180,7 @@ BEGIN
             IF rec_lock IS NULL THEN
                BEGIN
                   -- 登録処理
-                  INSERT INTO f_kaokukihon_renkei(			
+                  INSERT INTO f_kaokukihon_renkei(
                      bukken_no
                      ,kazei_nendo
                      ,kaoku_kihon_rireki_no
@@ -184,6 +208,31 @@ BEGIN
                      ,del_flg
                   )
                   VALUES (
+                     rec_f_kaokukihon_renkei.bukken_no
+                     ,rec_f_kaokukihon_renkei.kazei_nendo
+                     ,rec_f_kaokukihon_renkei.kaoku_kihon_rireki_no
+                     ,rec_f_kaokukihon_renkei.kaoku_toki_jusho
+                     ,rec_f_kaokukihon_renkei.kaoku_no
+                     ,rec_f_kaokukihon_renkei.toki_shurui_kbn
+                     ,rec_f_kaokukihon_renkei.yuka_menseki
+                     ,rec_f_kaokukihon_renkei.toki_kenchiku_ymd
+                     ,rec_f_kaokukihon_renkei.toki_kenchiku_ymd_fusho
+                     ,rec_f_kaokukihon_renkei.gimusha_atena_no
+                     ,rec_f_kaokukihon_renkei.genkyo_kenchiku_ymd
+                     ,rec_f_kaokukihon_renkei.genkyo_syurui_kbn
+                     ,rec_f_kaokukihon_renkei.yoto_kbn
+                     ,rec_f_kaokukihon_renkei.genkyo_yoto_kbn2
+                     ,rec_f_kaokukihon_renkei.genkyo_yoto_kbn3
+                     ,rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki
+                     ,rec_f_kaokukihon_renkei.kaoku_genkyo_jusho
+                     ,rec_f_kaokukihon_renkei.genin_kbn
+                     ,rec_f_kaokukihon_renkei.to_bukken_no
+                     ,rec_f_kaokukihon_renkei.to_bukken_rireki_no
+                     ,rec_f_kaokukihon_renkei.ins_datetime
+                     ,rec_f_kaokukihon_renkei.upd_datetime
+                     ,rec_f_kaokukihon_renkei.upd_tantosha_cd
+                     ,rec_f_kaokukihon_renkei.upd_tammatsu
+                     ,rec_f_kaokukihon_renkei.del_flg
                   );
 
                   ln_ins_count := ln_ins_count + 1;
@@ -202,9 +251,31 @@ BEGIN
                -- 連携データの作成・更新
                BEGIN
                   UPDATE f_kaokukihon_renkei
-                     SET  
+                     SET  kaoku_toki_jusho = rec_f_kaokukihon_renkei.kaoku_toki_jusho
+                     ,kaoku_no = rec_f_kaokukihon_renkei.kaoku_no
+                     ,toki_shurui_kbn = rec_f_kaokukihon_renkei.toki_shurui_kbn
+                     ,yuka_menseki = rec_f_kaokukihon_renkei.yuka_menseki
+                     ,toki_kenchiku_ymd = rec_f_kaokukihon_renkei.toki_kenchiku_ymd
+                     ,toki_kenchiku_ymd_fusho = rec_f_kaokukihon_renkei.toki_kenchiku_ymd_fusho
+                     ,gimusha_atena_no = rec_f_kaokukihon_renkei.gimusha_atena_no
+                     ,genkyo_kenchiku_ymd = rec_f_kaokukihon_renkei.genkyo_kenchiku_ymd
+                     ,genkyo_syurui_kbn = rec_f_kaokukihon_renkei.genkyo_syurui_kbn
+                     ,yoto_kbn = rec_f_kaokukihon_renkei.yoto_kbn
+                     ,genkyo_yoto_kbn2 = rec_f_kaokukihon_renkei.genkyo_yoto_kbn2
+                     ,genkyo_yoto_kbn3 = rec_f_kaokukihon_renkei.genkyo_yoto_kbn3
+                     ,gokei_genkyo_yuka_menseki = rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki
+                     ,kaoku_genkyo_jusho = rec_f_kaokukihon_renkei.kaoku_genkyo_jusho
+                     ,genin_kbn = rec_f_kaokukihon_renkei.genin_kbn
+                     ,to_bukken_no = rec_f_kaokukihon_renkei.to_bukken_no
+                     ,to_bukken_rireki_no = rec_f_kaokukihon_renkei.to_bukken_rireki_no
+                     ,upd_datetime = rec_f_kaokukihon_renkei.upd_datetime
+                     ,upd_tantosha_cd = rec_f_kaokukihon_renkei.upd_tantosha_cd
+                     ,upd_tammatsu = rec_f_kaokukihon_renkei.upd_tammatsu
+                     ,del_flg = rec_f_kaokukihon_renkei.del_flg
                   WHERE 
-                  ;
+                     bukken_no = rec_f_kaokukihon_renkei.bukken_no
+                     AND kaoku_kihon_rireki_no = rec_f_kaokukihon_renkei.kaoku_kihon_rireki_no
+                     AND kazei_nendo = rec_f_kaokukihon_renkei.kazei_nendo;
 
                   ln_upd_count := ln_upd_count + 1;
                   lc_err_text := '';
@@ -219,22 +290,29 @@ BEGIN
                   ln_result_cd := ln_result_cd_err;
                END;
             END IF;
-         END IF;
 
-         -- 中間テーブル更新
-         UPDATE i_r4g_kaoku
-            SET result_cd = ln_result_cd
-            , error_cd = lc_err_cd
-            , error_text = lc_err_text
-            WHERE shikuchoson_cd = rec_main.shikuchoson_cd
-            AND bukken_no = rec_main.bukken_no
-            AND kazei_nendo = rec_main.kazei_nendo
-			AND kaoku_kihon_rireki_no = rec_main.kaoku_kihon_rireki_no;
+            -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
+            IF rec_kojin.del_flg = 1 THEN
+               ln_result_cd := ln_result_cd_del;
+            END IF;
+
+            -- 中間テーブル更新
+            UPDATE i_r4g_kaoku
+               SET result_cd = ln_result_cd
+               , error_cd = lc_err_cd
+               , error_text = lc_err_text
+               WHERE shikuchoson_cd = rec_main.shikuchoson_cd
+               AND bukken_no = rec_main.bukken_no
+               AND kazei_nendo = rec_main.kazei_nendo
+               AND kaoku_kihon_rireki_no = rec_main.kaoku_kihon_rireki_no;
       END LOOP;
    CLOSE cur_main;
 
-   CALL proc_r4g_kaoku_shokai(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
-   CALL proc_r4g_kaiso(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
+   -- dlgrenkeiプロシージャ：proc_r4g_kaoku_shokaiを実行する
+   CALL dlgrenkei.proc_r4g_kaoku_shokai(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
+
+   -- dlgrenkeiプロシージャ：proc_r4g_kaisoを実行する
+   CALL dlgrenkei.proc_r4g_kaiso(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
 
    rec_log.seq_no_renkei := in_n_renkei_seq;
    rec_log.proc_shuryo_datetime := CURRENT_TIMESTAMP;
