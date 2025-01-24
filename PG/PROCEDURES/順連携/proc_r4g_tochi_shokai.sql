@@ -150,10 +150,6 @@ BEGIN
          lc_err_text                    := NULL;
          rec_lock                       := NULL;
 
-         OPEN cur_lock;
-            FETCH cur_lock INTO rec_lock;
-         CLOSE cur_lock;
-
          OPEN cur_busho;
             LOOP
 
@@ -282,6 +278,11 @@ BEGIN
                rec_shokai_fudosan.upd_tammatsu := 'SERVER';
                -- 削除フラグ
                rec_shokai_fudosan.del_flg := rec_main.del_flg::numeric;
+
+               -- ロック情報取得
+               OPEN cur_lock;
+                  FETCH cur_lock INTO rec_lock;
+               CLOSE cur_lock;
 
                IF rec_lock.kojin_no IS NULL THEN
                   BEGIN

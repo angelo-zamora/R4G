@@ -629,7 +629,7 @@ BEGIN
                      lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
                      lc_err_cd := lc_err_cd_err;
                      ln_result_cd := ln_result_cd_err;
-               END;
+                  END;
             ELSE
                BEGIN
                   --データ更新処理
