@@ -135,7 +135,7 @@ BEGIN
             -- 評価額
             rec_f_tochihyoka_renkei.hyokagaku := rec_main.hyokagaku::numeric;
             -- 登録年月日
-            rec_f_tochihyoka_renkei.toroku_ymd := get_hyphen_nashi_date(rec_main.sosa_ymd);
+            rec_f_tochihyoka_renkei.toroku_ymd := get_date_to_num(to_date(rec_main.sosa_ymd, 'YYYY-MM-DD'));
             -- 土地評価_履歴番号
             rec_f_tochihyoka_renkei.hyoka_rireki_no := rec_main.hyoka_rireki_no::numeric;
             -- データ作成日時
