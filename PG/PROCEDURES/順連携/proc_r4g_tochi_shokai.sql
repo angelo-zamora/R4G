@@ -114,11 +114,11 @@ BEGIN
    IF ln_para01 = 1 THEN
       BEGIN
          SELECT COUNT(*) INTO ln_del_count_f_shokai_fudosan FROM f_shokai_fudosan;
-         lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan;';
+         lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan';
          EXECUTE lc_sql;
 
          SELECT COUNT(*) INTO ln_del_count_f_shokai_fudosan_kaiso FROM f_shokai_fudosan_kaiso;
-         lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan_kaiso;';
+         lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan_kaiso';
          EXECUTE lc_sql;
       
          ln_del_count := ln_del_count_f_shokai_fudosan + ln_del_count_f_shokai_fudosan_kaiso;
