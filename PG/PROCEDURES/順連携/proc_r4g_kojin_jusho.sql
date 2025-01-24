@@ -54,7 +54,7 @@ DECLARE
    rec_parameter                  dlgrenkei.f_renkei_parameter%ROWTYPE;
     
    cur_main CURSOR FOR
-   SELECT DISTINCT ON (atena_no) 
+   SELECT
       *
    FROM dlgrenkei.i_r4g_atena AS tbl_atena
    WHERE tbl_atena.saishin_flg = '1' 
@@ -70,9 +70,13 @@ DECLARE
         AND rireki_no = tbl_atena.rireki_no
    )
    AND tbl_atena.result_cd < 8;
-    
-   rec_lock             f_kojin_jusho%ROWTYPE;
 
+   cur_lock CURSOR FOR
+   SELECT *
+   FROM f_kojin_jusho
+   WHERE kojin_no = lc_kojin_no
+   rec_lock             f_kojin_jusho%ROWTYPE;
+   
 BEGIN
 
    rec_log.proc_kaishi_datetime := CURRENT_TIMESTAMP;
