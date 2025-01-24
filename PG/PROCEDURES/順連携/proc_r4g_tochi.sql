@@ -92,10 +92,10 @@ BEGIN
          lc_sql := 'TRUNCATE TABLE dlgmain.f_tochikihon_renkei';
          EXECUTE lc_sql;
          EXCEPTION
-         WHEN OTHERS THEN
-         io_c_err_code := SQLSTATE;
-         io_c_err_text := SQLERRM;
-         RETURN;
+            WHEN OTHERS THEN
+            io_c_err_code := SQLSTATE;
+            io_c_err_text := SQLERRM;
+            RETURN;
       END; 
    END IF;
 
@@ -230,11 +230,11 @@ BEGIN
                   ln_result_cd := ln_result_cd_add;
 
                   EXCEPTION
-                  WHEN OTHERS THEN
-                  ln_err_count := ln_err_count + 1;
-                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                  lc_err_cd := lc_err_cd_err;
-                  ln_result_cd := ln_result_cd_err;
+                     WHEN OTHERS THEN
+                     ln_err_count := ln_err_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
                END;
             ELSE
                -- 連携データの作成・更新
@@ -269,11 +269,11 @@ BEGIN
                   ln_result_cd := ln_result_cd_upd;
 
                   EXCEPTION
-                  WHEN OTHERS THEN
-                  ln_err_count := ln_err_count + 1;
-                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                  lc_err_cd := lc_err_cd_err;
-                  ln_result_cd := ln_result_cd_err;
+                     WHEN OTHERS THEN
+                     ln_err_count := ln_err_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
                END;
             END IF;
 
@@ -312,9 +312,9 @@ BEGIN
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
    EXCEPTION
-   WHEN OTHERS THEN
-   io_c_err_code := SQLSTATE;
-   io_c_err_text := SQLERRM;
-   RETURN;
+      WHEN OTHERS THEN
+      io_c_err_code := SQLSTATE;
+      io_c_err_text := SQLERRM;
+      RETURN;
 END;
 $$;
