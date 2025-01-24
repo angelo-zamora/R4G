@@ -747,7 +747,7 @@ BEGIN
             END IF;
          END IF;
          
-         UPDATE i_r4g_atena 
+         UPDATE dlgrenkei.i_r4g_atena 
             SET result_cd = ln_result_cd
                , error_cd = lc_err_cd
                , error_text = lc_err_text

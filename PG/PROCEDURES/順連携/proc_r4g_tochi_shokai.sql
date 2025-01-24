@@ -442,7 +442,7 @@ BEGIN
       END IF;
 
       -- 中間テーブル更新
-      UPDATE i_r4g_tochi 
+      UPDATE dlgrenkei.i_r4g_tochi 
       SET result_cd = ln_result_cd
           , error_cd = lc_err_cd
           , error_text = lc_err_text
