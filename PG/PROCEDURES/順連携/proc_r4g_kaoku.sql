@@ -2,61 +2,82 @@
 --  DDL for Procedure proc_r4g_kaoku
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE proc_r4g_kaoku ( in_n_renkei_data_cd IN numeric, in_n_renkei_seq IN numeric, in_n_shori_ymd IN numeric, io_c_err_code INOUT character varying, io_c_err_text INOUT character varying )
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kaoku ( 
+   in_n_renkei_data_cd IN numeric, 
+   in_n_renkei_seq IN numeric, 
+   in_n_shori_ymd IN numeric, 
+   io_c_err_code INOUT character varying, 
+   io_c_err_text INOUT character varying )
 LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : 個人宛名情報連携（電話番号）                                                                               */
-/* 引数 IN  :  in_n_renkei_data_cd … 連携データコード                                                                   */
-/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
-/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                */
-/*      OUT : io_c_err_code      …例外エラー発生時のエラーコード                                                      */
-/*            io_c_err_text    … 例外エラー発生時のエラー内容                                                        */
+/* 処理概要 : f_家屋基本_連携（f_kaokukihon_renkei）の追加／更新／削除を実施する                                           */
+/* 引数 IN  : in_n_renkei_data_cd  … 連携データコード                                                                  */
+/*            in_n_renkei_seq       … 連携SEQ（処理単位で符番されるSEQ）                                                */
+/*            in_n_shori_ymd        … 処理日 （処理単位で設定される処理日）                                              */
+/*      OUT : io_c_err_code         …例外エラー発生時のエラーコード                                                      */
+/*            io_c_err_text         … 例外エラー発生時のエラー内容                                                       */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 :                                                                                                         */
+/* 履歴     : 2025/01/24  CRESS-INFO.Drexler     新規作成     012o005「家屋基本情報」の取込を行う                         */
 /**********************************************************************************************************************/
 
 DECLARE
+
+
+   rec_log                        dlgrenkei.f_renkei_log%ROWTYPE;
+   rec_f_kaokukihon_renkei        f_kaokukihon_renkei%ROWTYPE;
    
-   ln_para01                           numeric DEFAULT 0;
-   ln_para02                           numeric DEFAULT 0;
+   ln_para01                      numeric DEFAULT 0;
+   ln_para02                      numeric DEFAULT 0;
 
-   ln_shori_count                      numeric;
-   ln_ins_count                        numeric;
-   ln_upd_count                        numeric;
-   ln_del_count                        numeric;
-   ln_err_count                        numeric;
-   lc_err_text                    character varying(100);
-   ln_result_cd                   numeric DEFAULT 0;
-   lc_err_cd                      character varying;
-   lc_sql                            character varying(1000);
+   ln_shori_count                 numeric DEFAULT 0;             -- 処理件数用変数
+   ln_ins_count                   numeric DEFAULT 0;             -- 追加件数用変数
+   ln_upd_count                   numeric DEFAULT 0;             -- 更新件数用変数
+   ln_del_count                   numeric DEFAULT 0;             -- 削除件数用変数
+   ln_err_count                   numeric DEFAULT 0;             -- エラー件数用変数
+   lc_err_cd                      character varying;             -- エラーコード用変数
+   lc_err_text                    character varying(100):='';    -- エラー内容用変数
+   ln_result_cd                   numeric DEFAULT 0;             -- 結果区分更新用変数
 
-   rec_log                           f_renkei_log%ROWTYPE;
+    lc_sql                        character varying;             -- SQL文用変数
 
+   ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
+   ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
+   ln_result_cd_del               numeric DEFAULT 3;             -- 削除フラグ
+   ln_result_cd_warning           numeric DEFAULT 7;             -- 警告フラグ
+   ln_result_cd_err               numeric DEFAULT 9;             -- エラーフラグ
+
+   lc_err_cd_normal               character varying = '0';       -- 通常フラグ
+   lc_err_cd_err                  character varying = '9';       -- エラーフラグ
+
+   -- メインカーソル
    cur_main CURSOR FOR
    SELECT *
-   FROM i_r4g_kaoku
+   FROM dlgrenkei.i_r4g_kaoku
    WHERE saishin_flg = '1'
    AND result_cd < 8 ;
 
-   rec_main                          i_r4g_kaoku%ROWTYPE;
+   rec_main                           dlgrenkei.i_r4g_kaoku%ROWTYPE;
 
+   -- パラメータ取得カーソル
    cur_parameter CURSOR FOR
    SELECT *
-   FROM f_renkei_parameter
+   FROM dlgrenkei.f_renkei_parameter
    WHERE renkei_data_cd = in_n_renkei_data_cd;
 
-   rec_parameter                     f_renkei_parameter%ROWTYPE;
+   rec_parameter                      dlgrenkei.f_renkei_parameter%ROWTYPE;
 
+   -- 行ロック用カーソル
    cur_lock CURSOR FOR
    SELECT *
    FROM f_kaokukihon_renkei
    WHERE 
-   --Add PK and declare
-   ;
+   bukken_no = rec_main.bukken_no
+   AND kazei_nendo = rec_main.kazei_nendo::numeric
+   AND kaoku_kihon_rireki_no = rec_main.kaoku_kihon_rireki_no::numeric;
 
-   rec_lock                       f_kaokukihon_renkei%ROWTYPE;
+   rec_lock                           f_kaokukihon_renkei%ROWTYPE;
 
 BEGIN
    rec_log.proc_kaishi_datetime := CURRENT_TIMESTAMP;
@@ -102,31 +123,80 @@ BEGIN
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
 
-         --Declare PK VALUE
+            rec_f_kaokukihon_renkei.bukken_no := rec_main.bukken_no;
+            rec_f_kaokukihon_renkei.kazei_nendo := rec_main.kazei_nendo::numeric;
+            rec_f_kaokukihon_renkei.kaoku_kihon_rireki_no := kaoku_kihon_rireki_no::numeric;
+            rec_f_kaokukihon_renkei.kaoku_toki_jusho := get_trimmed_space(rec_main.kaoku_toki_jusho);
+            rec_f_kaokukihon_renkei.kaoku_no := get_trimmed_space(rec_main.kaoku_no);
+            rec_f_kaokukihon_renkei.toki_shurui_kbn := rec_main.toki_shurui_kbn;
+            rec_f_kaokukihon_renkei.yuka_menseki := rec_main.yuka_menseki::numeric;
+            rec_f_kaokukihon_renkei.toki_kenchiku_ymd := get_trimmed_date(rec_main.toki_kenchiku_ymd);
+            rec_f_kaokukihon_renkei.toki_kenchiku_ymd_fusho := rec_main.toki_kenchiku_ymd_fusho;
+            rec_f_kaokukihon_renkei.gimusha_atena_no := rec_main.gimusha_atena_no;
+            rec_f_kaokukihon_renkei.genkyo_kenchiku_ymd :=get_trimmed_date(rec_main.genkyo_kenchiku_ymd);
+            rec_f_kaokukihon_renkei.genkyo_syurui_kbn :=
+            rec_f_kaokukihon_renkei.yoto_kbn :=
+            rec_f_kaokukihon_renkei.genkyo_yoto_kbn2 :=
+            rec_f_kaokukihon_renkei.genkyo_yoto_kbn3 :=
+            rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki :=
+            rec_f_kaokukihon_renkei.kaoku_genkyo_jusho :=
+            rec_f_kaokukihon_renkei.genin_kbn :=
+            rec_f_kaokukihon_renkei.to_bukken_no :=
+            rec_f_kaokukihon_renkei.to_bukken_rireki_no :=
+            rec_f_kaokukihon_renkei.ins_datetime :=
+            rec_f_kaokukihon_renkei.upd_datetime :=
+            rec_f_kaokukihon_renkei.upd_tantosha_cd :=
+            rec_f_kaokukihon_renkei.upd_tammatsu :=
+            rec_f_kaokukihon_renkei.del_flg :=
 
             OPEN cur_lock;
-               FETCH cur_busho INTO rec_lock;
+               FETCH cur_lock INTO rec_lock;
             CLOSE cur_lock;
 
             IF rec_lock IS NULL THEN
                BEGIN
                   -- 登録処理
-                  INSERT INTO f_kaokukihon_renkei(						
+                  INSERT INTO f_kaokukihon_renkei(			
+                     bukken_no
+                     ,kazei_nendo
+                     ,kaoku_kihon_rireki_no
+                     ,kaoku_toki_jusho
+                     ,kaoku_no
+                     ,toki_shurui_kbn
+                     ,yuka_menseki
+                     ,toki_kenchiku_ymd
+                     ,toki_kenchiku_ymd_fusho
+                     ,gimusha_atena_no
+                     ,genkyo_kenchiku_ymd
+                     ,genkyo_syurui_kbn
+                     ,yoto_kbn
+                     ,genkyo_yoto_kbn2
+                     ,genkyo_yoto_kbn3
+                     ,gokei_genkyo_yuka_menseki
+                     ,kaoku_genkyo_jusho
+                     ,genin_kbn
+                     ,to_bukken_no
+                     ,to_bukken_rireki_no
+                     ,ins_datetime
+                     ,upd_datetime
+                     ,upd_tantosha_cd
+                     ,upd_tammatsu
+                     ,del_flg
                   )
                   VALUES (
                   );
 
                   ln_ins_count := ln_ins_count + 1;
                   lc_err_text := '';
-                  lc_err_cd := '0';
-                  ln_result_cd := 1;
+                  lc_err_cd := lc_err_cd_normal;
+                  ln_result_cd := ln_result_cd_add;
 
-                  EXCEPTION
+               EXCEPTION
                   WHEN OTHERS THEN
                   ln_err_count := ln_err_count + 1;
                   lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                  lc_err_cd := '9';
-                  ln_result_cd := 9;
+                  lc_err_cd := lc_err_cd_err;
+                  ln_result_cd := ln_result_cd_err;
                END;
             ELSE
                -- 連携データの作成・更新
@@ -138,15 +208,15 @@ BEGIN
 
                   ln_upd_count := ln_upd_count + 1;
                   lc_err_text := '';
-                  lc_err_cd := '0';
-                  ln_result_cd := 2;
+                  lc_err_cd := lc_err_cd_normal;
+                  ln_result_cd := ln_result_cd_upd;
 
-                  EXCEPTION
+               EXCEPTION
                   WHEN OTHERS THEN
                   ln_err_count := ln_err_count + 1;
                   lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                  lc_err_cd := '9';
-                  ln_result_cd := 9;
+                  lc_err_cd := lc_err_cd_err;
+                  ln_result_cd := ln_result_cd_err;
                END;
             END IF;
          END IF;

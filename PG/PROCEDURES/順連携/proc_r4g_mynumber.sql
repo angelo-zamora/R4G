@@ -243,10 +243,10 @@ BEGIN
                         , del_flg = rec_f_kojin_mynumber.del_flg
                         WHERE kojin_no = rec_f_kojin_mynumber.kojin_no;
 
-                        ln_upd_count := ln_upd_count + 1;
-                        lc_err_text := '';
-                        lc_err_cd := lc_err_cd_normal;
-                        ln_result_cd := ln_result_cd_upd;
+                     ln_upd_count := ln_upd_count + 1;
+                     lc_err_text := '';
+                     lc_err_cd := lc_err_cd_normal;
+                     ln_result_cd := ln_result_cd_upd;
 
                   EXCEPTION WHEN OTHERS THEN
                      ln_err_count := ln_err_count + 1;

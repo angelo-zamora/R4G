@@ -243,7 +243,7 @@ BEGIN
             -- 戸籍_筆頭者_名
             rec_kojin.koseki_hittosha_mei := get_trimmed_space(rec_main.koseki_hitto_mei);
             -- 生年月日
-            rec_kojin.birth_ymd := CASE WHEN ymd_NULL_check(rec_main.birth_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.birth_ymd) END;
+            rec_kojin.birth_ymd := CASE WHEN ymd_NULL_check(rec_main.birth_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.birth_ymd) END;
             -- 生年月日_不詳フラグ
             rec_kojin.birth_fusho_flg := rec_main.birth_fusho_flg::numeric;
             -- 生年月日_不詳表記
@@ -269,45 +269,45 @@ BEGIN
             -- 自治体コード
             rec_kojin.jichitai_cd := rec_main.jusho_shikuchoson_cd;
             -- 処理年月日
-            rec_kojin.shori_ymd := get_trimmed_date(rec_main.atena_shori_ymd);
+            rec_kojin.shori_ymd := get_hyphen_nashi_date(rec_main.atena_shori_ymd);
             -- 異動年月日
-            rec_kojin.ido_ymd := get_trimmed_date(rec_main.ido_ymd);
+            rec_kojin.ido_ymd := get_hyphen_nashi_date(rec_main.ido_ymd);
             -- 異動年月日_不詳フラグ
             rec_kojin.ido_ymd_fusho_flg := rec_main.ido_fusho_flg::numeric;
             -- 異動年月日_不詳表記
             rec_kojin.ido_ymd_fusho := rec_main.ido_fusho;
             -- 異動届出年月日
-            rec_kojin.ido_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.ido_todoke_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.ido_todoke_ymd) END;
+            rec_kojin.ido_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.ido_todoke_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.ido_todoke_ymd) END;
             -- 異動事由コード
             rec_kojin.ido_jiyu_cd := rec_main.ido_jiyu_cd;
             -- 死亡年月日
-            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN get_trimmed_date(rec_main.ido_ymd) ELSE 0 END;
+            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN get_hyphen_nashi_date(rec_main.ido_ymd) ELSE 0 END;
             -- 住民日
-            rec_kojin.jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.jumin_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.jumin_ymd) END;
+            rec_kojin.jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.jumin_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.jumin_ymd) END;
             -- 住民日_不詳フラグ
             rec_kojin.jumin_ymd_fusho_flg := CASE WHEN rec_main.jumin_fusho_flg IS NULL OR rec_main.jumin_fusho_flg = '' THEN 0 ELSE rec_main.jumin_fusho_flg::numeric END;
             -- 住民日_不詳表記
             rec_kojin.jumin_ymd_fusho := rec_main.jumin_fusho;
             -- 外国人住民日
-            rec_kojin.gaikokujin_jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.gaikokujin_jumin_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.gaikokujin_jumin_ymd) END;
+            rec_kojin.gaikokujin_jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.gaikokujin_jumin_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.gaikokujin_jumin_ymd) END;
             -- 外国人住民日_不詳フラグ
             rec_kojin.gaikokujin_jumin_ymd_fusho_flg := CASE WHEN rec_main.gaikokujin_jumin_fusho_flg IS NULL OR rec_main.gaikokujin_jumin_fusho_flg = '' THEN 0 ELSE rec_main.gaikokujin_jumin_fusho_flg::numeric END;
             -- 外国人住民日_不詳表記
             rec_kojin.gaikokujin_jumin_ymd_fusho := rec_main.gaikokujin_jumin_fusho;
             -- 住定日
-            rec_kojin.jutei_ymd := CASE WHEN ymd_NULL_check(rec_main.jutei_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.jutei_ymd) END;
+            rec_kojin.jutei_ymd := CASE WHEN ymd_NULL_check(rec_main.jutei_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.jutei_ymd) END;
             -- 住定日_不詳フラグ
             rec_kojin.jutei_ymd_fusho_flg := rec_main.jutei_fusho_flg;
             -- 住定日_不詳表記
             rec_kojin.jutei_ymd_fusho := rec_main.jutei_fusho;
             -- 転入通知年月日
-            rec_kojin.tennyu_tsuchi_ymd := CASE WHEN ymd_NULL_check(rec_main.tennyu_tsuchi_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.tennyu_tsuchi_ymd) END;
+            rec_kojin.tennyu_tsuchi_ymd := CASE WHEN ymd_NULL_check(rec_main.tennyu_tsuchi_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.tennyu_tsuchi_ymd) END;
             -- 転出届出年月日
-            rec_kojin.tenshutsu_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_todoke_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.tenshutsu_todoke_ymd) END;
+            rec_kojin.tenshutsu_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_todoke_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.tenshutsu_todoke_ymd) END;
             -- 転出予定年月日
-            rec_kojin.tenshutsu_yotei_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_yotei_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.tenshutsu_yotei_ymd) END;
+            rec_kojin.tenshutsu_yotei_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_yotei_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.tenshutsu_yotei_ymd) END;
             -- 転出年月日（確定）
-            rec_kojin.tenshutsu_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_ymd) = TRUE THEN 0 ELSE get_trimmed_date(rec_main.tenshutsu_ymd) END;
+            rec_kojin.tenshutsu_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_ymd) = TRUE THEN 0 ELSE get_hyphen_nashi_date(rec_main.tenshutsu_ymd) END;
             -- 通称名カタカナ(検索用)
             rec_kojin.tsushomei_kensaku_kana := get_kensaku_kana(rec_main.tsushomei_kana, 2);
             -- 旧氏カタカナ(検索用)
@@ -333,7 +333,7 @@ BEGIN
             -- 在留期間等日コード
             rec_kojin.zairyu_kikan_hi_cd := rec_main.zairyu_kikan_hi_cd::numeric;
             -- 在留期間等満了年月日
-            rec_kojin.zairyu_manryo_ymd := get_trimmed_date(rec_main.zairyu_manryo_ymd);
+            rec_kojin.zairyu_manryo_ymd := get_hyphen_nashi_date(rec_main.zairyu_manryo_ymd);
             -- 記載順位
             rec_kojin.kisai_juni := rec_main.kisai_juni::numeric;
             -- 法第30条46又は47区分

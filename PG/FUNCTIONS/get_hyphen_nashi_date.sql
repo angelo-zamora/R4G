@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_trimmed_date(in_ymd character varying)
+CREATE OR REPLACE FUNCTION get_hyphen_nashi_date(in_ymd character varying)
 RETURNS NUMERIC AS $$
 /**********************************************************************************************************************/
 /* 処理概要 : 日付項目にて「-」を削除                                                */
