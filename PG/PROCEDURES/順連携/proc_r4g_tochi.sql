@@ -238,25 +238,25 @@ BEGIN
                -- 連携データの作成・更新
                BEGIN
                   UPDATE f_tochikihon_renkei
-                     SET toki_shozai = rec_main.toki_shozai
-                     , chimoku = rec_main.chimoku
-                     , chiseki = rec_main.chiseki
-                     , gimusha_kojin_no = rec_main.gimusha_kojin_no
-                     , genkyo_shozai = rec_main.genkyo_shozai
-                     , genkyo_chimoku = rec_main.genkyo_chimoku
-                     , genkyo_chiseki = rec_main.genkyo_chiseki
-                     , kazei_chiseki = rec_main.kazei_chiseki
-                     , yoto_cd1 = rec_main.yoto_cd1
-                     , yoto_cd2 = rec_main.yoto_cd2
-                     , yoto_cd3 = rec_main.yoto_cd3
-                     , genin_kbn = rec_main.genin_kbn
-                     , hitsu_bukken_no = rec_main.hitsu_bukken_no
-                     , hitsu_rireki_no = rec_main.hitsu_rireki_no
-                     , kakuchi_no = rec_main.kakuchi_no
-                     , upd_datetime = rec_main.upd_datetime
-                     , upd_tantosha_cd = rec_main.upd_tantosha_cd
-                     , upd_tammatsu = rec_main.upd_tammatsu
-                     , del_flg = rec_main.del_flg
+                     SET toki_shozai = rec_f_tochikihon_renkei.toki_shozai
+                     , chimoku = rec_f_tochikihon_renkei.chimoku
+                     , chiseki = rec_f_tochikihon_renkei.chiseki
+                     , gimusha_kojin_no = rec_f_tochikihon_renkei.gimusha_kojin_no
+                     , genkyo_shozai = rec_f_tochikihon_renkei.genkyo_shozai
+                     , genkyo_chimoku = rec_f_tochikihon_renkei.genkyo_chimoku
+                     , genkyo_chiseki = rec_f_tochikihon_renkei.genkyo_chiseki
+                     , kazei_chiseki = rec_f_tochikihon_renkei.kazei_chiseki
+                     , yoto_cd1 = rec_f_tochikihon_renkei.yoto_cd1
+                     , yoto_cd2 = rec_f_tochikihon_renkei.yoto_cd2
+                     , yoto_cd3 = rec_f_tochikihon_renkei.yoto_cd3
+                     , genin_kbn = rec_f_tochikihon_renkei.genin_kbn
+                     , hitsu_bukken_no = rec_f_tochikihon_renkei.hitsu_bukken_no
+                     , hitsu_rireki_no = rec_f_tochikihon_renkei.hitsu_rireki_no
+                     , kakuchi_no = rec_f_tochikihon_renkei.kakuchi_no
+                     , upd_datetime = rec_f_tochikihon_renkei.upd_datetime
+                     , upd_tantosha_cd = rec_f_tochikihon_renkei.upd_tantosha_cd
+                     , upd_tammatsu = rec_f_tochikihon_renkei.upd_tammatsu
+                     , del_flg = rec_f_tochikihon_renkei.del_flg
                   WHERE bukken_no = lc_bukken_no
                      AND kazei_nendo = ln_kazeinendo
                      AND rireki_no = ln_rireki_no;
@@ -274,7 +274,7 @@ BEGIN
                   ln_result_cd := ln_result_cd_err;
                END;
             END IF;
-         
+
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
          IF rec_main.del_flg = 1 THEN
             ln_result_cd = ln_result_cd_del;
