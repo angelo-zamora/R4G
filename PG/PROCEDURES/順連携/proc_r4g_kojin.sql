@@ -624,12 +624,12 @@ BEGIN
                      lc_err_cd := lc_err_cd_normal;
                      ln_result_cd := ln_result_cd_add;
 
-                  EXCEPTION WHEN OTHERS THEN
-                     ln_err_count := ln_err_count + 1;
-                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                     lc_err_cd := lc_err_cd_err;
-                     ln_result_cd := ln_result_cd_err;
-                  END;
+               EXCEPTION WHEN OTHERS THEN
+                  ln_err_count := ln_err_count + 1;
+                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                  lc_err_cd := lc_err_cd_err;
+                  ln_result_cd := ln_result_cd_err;
+               END;
             ELSE
                BEGIN
                   --データ更新処理

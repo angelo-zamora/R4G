@@ -41,18 +41,18 @@ DECLARE
    ln_para12                      numeric DEFAULT 0;
    ln_del_diag_count              numeric DEFAULT 0;
    
-   ln_result_cd_add               numeric DEFAULT 1;              -- 追加フラグ
-   ln_result_cd_upd               numeric DEFAULT 2;              -- 更新フラグ
-   ln_result_cd_del               numeric DEFAULT 3;              -- 削除フラグ
-   ln_result_cd_warning           numeric DEFAULT 7;              -- 警告フラグ
-   ln_result_cd_err               numeric DEFAULT 9;              -- エラーフラグ
+   ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
+   ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
+   ln_result_cd_del               numeric DEFAULT 3;             -- 削除フラグ
+   ln_result_cd_warning           numeric DEFAULT 7;             -- 警告フラグ
+   ln_result_cd_err               numeric DEFAULT 9;             -- エラーフラグ
 
-   lc_err_cd_normal               character varying = '0';        -- 通常フラグ
-   lc_err_cd_err                  character varying = '9';        -- エラーフラグ
+   lc_err_cd_normal               character varying = '0';       -- 通常フラグ
+   lc_err_cd_err                  character varying = '9';       -- エラーフラグ
 
-   ln_kojin_no_length             numeric DEFAULT 0;              -- 個人番号の文字数用変数
+   ln_kojin_no_length             numeric DEFAULT 0;             -- 個人番号の文字数用変数
    
-   lc_sql                         character varying;              -- SQL文用変数
+   lc_sql                         character varying;             -- SQL文用変数
 
    -- メインカーソル
    cur_main CURSOR FOR
@@ -225,12 +225,12 @@ BEGIN
                         lc_err_cd := lc_err_cd_normal;
                         ln_result_cd := ln_result_cd_add;
 
-                     EXCEPTION WHEN OTHERS THEN
-                        ln_ins_count := ln_ins_count + 1;
-                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                        lc_err_cd := lc_err_cd_err;
-                        ln_result_cd := ln_result_cd_err;
-                     END;
+                  EXCEPTION WHEN OTHERS THEN
+                     ln_ins_count := ln_ins_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
+                  END;
                ELSE
                   BEGIN
                      --データ更新処理
@@ -248,12 +248,12 @@ BEGIN
                         lc_err_cd := lc_err_cd_normal;
                         ln_result_cd := ln_result_cd_upd;
 
-                        EXCEPTION WHEN OTHERS THEN
-                           ln_err_count := ln_err_count + 1;
-                           lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                           lc_err_cd := lc_err_cd_err;
-                           ln_result_cd := ln_result_cd_err;
-                        END;
+                  EXCEPTION WHEN OTHERS THEN
+                     ln_err_count := ln_err_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
+                  END;
                END IF;   
          END IF;
 
