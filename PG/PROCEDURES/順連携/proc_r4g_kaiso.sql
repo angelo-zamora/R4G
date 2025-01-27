@@ -171,17 +171,17 @@ BEGIN
                   INSERT INTO f_shokai_fudosan_kaiso(
                      kojin_no
                      , seq_no_shokai
-                     , sbukken_no
-                     , skaiso_cd
-                     , skaiso
-                     , sbukken_shurui_cd
-                     , syuka_menseki
-                     , sfudosan_no
-                     , sins_datetime
-                     , supd_datetime
-                     , supd_tantosha_cd
-                     , supd_tammatsu
-                     , sdel_flg
+                     , bukken_no
+                     , kaiso_cd
+                     , kaiso
+                     , bukken_shurui_cd
+                     , yuka_menseki
+                     , fudosan_no
+                     , ins_datetime
+                     , upd_datetime
+                     , upd_tantosha_cd
+                     , upd_tammatsu
+                     , del_flg
                   )
                   VALUES (
                      rec_f_shokai_fudosan_kaiso.kojin_no
@@ -217,10 +217,10 @@ BEGIN
                   UPDATE f_shokai_fudosan_kaiso
                      SET kaiso = rec_f_shokai_fudosan_kaiso.kaiso
                        , yuka_menseki = rec_f_shokai_fudosan_kaiso.yuka_menseki
-                       , upd_datetime = concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp
-                       , upd_tantosha_cd = rec_main.sosasha_cd
-                       , upd_tammatsu = 'SERVER'
-                       , del_flg = rec_main.del_flg
+                       , upd_datetime = rec_f_shokai_fudosan_kaiso.upd_datetime
+                       , upd_tantosha_cd = rec_f_shokai_fudosan_kaiso.upd_tantosha_cd
+                       , upd_tammatsu = rec_f_shokai_fudosan_kaiso.upd_tammatsu
+                       , del_flg = rec_f_shokai_fudosan_kaiso.del_flg
                   WHERE
                      kojin_no = rec_main.kojin_no
                   AND seq_no_shokai = rec_main.seq_no_shokai
@@ -258,6 +258,19 @@ BEGIN
 
       END LOOP;
    CLOSE cur_main;
+
+   rec_log.seq_no_renkei := in_n_renkei_seq;
+   rec_log.proc_shuryo_datetime := CURRENT_TIMESTAMP;
+   rec_log.proc_shori_count := ln_shori_count;
+   rec_log.proc_ins_count := ln_ins_count;
+   rec_log.proc_upd_count := ln_upd_count;
+   rec_log.proc_del_count := ln_del_count;
+   rec_log.proc_err_count := ln_err_count;
+
+   -- データ連携ログ更新
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+
+   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
 EXCEPTION
    WHEN OTHERS THEN

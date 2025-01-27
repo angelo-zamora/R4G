@@ -41,17 +41,29 @@ DECLARE
    ln_kazeinendo                       numeric;
    ln_rireki_no                        numeric;
 
+   ln_result_cd_add                    numeric DEFAULT 1; -- 追加
+   ln_result_cd_upd                    numeric DEFAULT 2; -- 更新
+   ln_result_cd_err                    numeric DEFAULT 9; -- エラー
+
+   lc_err_cd_normal                    character varying = '0'; -- 通常
+   lc_err_cd_err                       character varying = '9'; -- エラー
+
    rec_log                             dlgrenkei.f_renkei_log%ROWTYPE;
 
    cur_main CURSOR FOR
-   SELECT *
-	FROM dlgrenkei.i_r4g_sharyo
-	WHERE saishin_flg = '1'
-	AND keiji_rireki_no = (
-		SELECT MAX(keiji_rireki_no)
-		FROM dlgrenkei.i_r4g_sharyo
-		)
-	AND result_cd < 8;
+   SELECT
+    *
+   FROM
+      dlgrenkei.i_r4g_sharyo
+   WHERE
+      saishin_flg = '1'
+      AND keiji_rireki_no = (
+         SELECT
+               MAX(keiji_rireki_no)
+         FROM
+               dlgrenkei.i_r4g_sharyo
+      )
+      AND result_cd < 8;
 
    rec_main                          dlgrenkei.i_r4g_sharyo%ROWTYPE;
 
@@ -89,7 +101,8 @@ BEGIN
          SELECT COUNT(*) INTO ln_del_count FROM f_sharyo_renkei;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_sharyo_renkei';
          EXECUTE lc_sql;
-         EXCEPTION
+
+      EXCEPTION
          WHEN OTHERS THEN
          io_c_err_code := SQLSTATE;
          io_c_err_text := SQLERRM;
@@ -173,138 +186,142 @@ BEGIN
          -- 削除フラグ
          rec_f_sharyo_renkei.del_flg := rec_main.del_flg::numeric;
 
-            OPEN cur_lock;
-               FETCH cur_lock INTO rec_lock;
-            CLOSE cur_lock;
+         OPEN cur_lock;
+            FETCH cur_lock INTO rec_lock;
+         CLOSE cur_lock;
 
-            IF rec_lock IS NULL THEN
-               BEGIN
-                  -- 登録処理
-                  INSERT INTO f_sharyo_renkei(
-                     keiji_kanri_no
-                     , gimusha_kojin_no
-                     , ikkatsu_nozei_kbn
-                     , shiyosha_kojin_no
-                     , shoyusha_kojin_no
-                     , shinkoku_kbn
-                     , shinkoku_jiyu
-                     , shinkoku_ymd
-                     , ido_ymd
-                     , syaryo_ido_ymd
-                     , ido_jiyu
-                     , shori_ymd
-                     , keiji_syubetsu_cd
-                     , haiki_kbn
-                     , so_haikiryo
-                     , shadai_no
-                     , shodo_kensa_ym
-                     , shoyu_keitai_kbn
-                     , hyoban_moji
-                     , bunrui_no
-                     , kana_moji
-                     , ichiren_shitei_no
-                     , kazei_kbn
-                     , haisha_ymd
-                     , keiji_rireki_no
-                     , ins_datetime
-                     , upd_datetime
-                     , upd_tantosha_cd
-                     , upd_tammatsu
-                     , del_flg
-                  )
-                  VALUES (
-                     rec_f_sharyo_renkei.keiji_kanri_no
-                     , rec_f_sharyo_renkei.gimusha_kojin_no
-                     , rec_f_sharyo_renkei.ikkatsu_nozei_kbn
-                     , rec_f_sharyo_renkei.shiyosha_kojin_no
-                     , rec_f_sharyo_renkei.shoyusha_kojin_no
-                     , rec_f_sharyo_renkei.shinkoku_kbn
-                     , rec_f_sharyo_renkei.shinkoku_jiyu
-                     , rec_f_sharyo_renkei.shinkoku_ymd
-                     , rec_f_sharyo_renkei.ido_ymd
-                     , rec_f_sharyo_renkei.syaryo_ido_ymd
-                     , rec_f_sharyo_renkei.ido_jiyu
-                     , rec_f_sharyo_renkei.shori_ymd
-                     , rec_f_sharyo_renkei.keiji_syubetsu_cd
-                     , rec_f_sharyo_renkei.haiki_kbn
-                     , rec_f_sharyo_renkei.so_haikiryo
-                     , rec_f_sharyo_renkei.shadai_no
-                     , rec_f_sharyo_renkei.shodo_kensa_ym
-                     , rec_f_sharyo_renkei.shoyu_keitai_kbn
-                     , rec_f_sharyo_renkei.hyoban_moji
-                     , rec_f_sharyo_renkei.bunrui_no
-                     , rec_f_sharyo_renkei.kana_moji
-                     , rec_f_sharyo_renkei.ichiren_shitei_no
-                     , rec_f_sharyo_renkei.kazei_kbn
-                     , rec_f_sharyo_renkei.haisha_ymd
-                     , rec_f_sharyo_renkei.keiji_rireki_no
-                     , rec_f_sharyo_renkei.ins_datetime
-                     , rec_f_sharyo_renkei.upd_datetime
-                     , rec_f_sharyo_renkei.upd_tantosha_cd
-                     , rec_f_sharyo_renkei.upd_tammatsu
-                     , rec_f_sharyo_renkei.del_flg
-                  );
+         IF rec_lock IS NULL THEN
+            BEGIN
+               -- 登録処理
+               INSERT INTO f_sharyo_renkei(
+                  keiji_kanri_no
+                  , gimusha_kojin_no
+                  , ikkatsu_nozei_kbn
+                  , shiyosha_kojin_no
+                  , shoyusha_kojin_no
+                  , shinkoku_kbn
+                  , shinkoku_jiyu
+                  , shinkoku_ymd
+                  , ido_ymd
+                  , syaryo_ido_ymd
+                  , ido_jiyu
+                  , shori_ymd
+                  , keiji_syubetsu_cd
+                  , haiki_kbn
+                  , so_haikiryo
+                  , shadai_no
+                  , shodo_kensa_ym
+                  , shoyu_keitai_kbn
+                  , hyoban_moji
+                  , bunrui_no
+                  , kana_moji
+                  , ichiren_shitei_no
+                  , kazei_kbn
+                  , haisha_ymd
+                  , keiji_rireki_no
+                  , ins_datetime
+                  , upd_datetime
+                  , upd_tantosha_cd
+                  , upd_tammatsu
+                  , del_flg
+               )
+               VALUES (
+                  rec_f_sharyo_renkei.keiji_kanri_no
+                  , rec_f_sharyo_renkei.gimusha_kojin_no
+                  , rec_f_sharyo_renkei.ikkatsu_nozei_kbn
+                  , rec_f_sharyo_renkei.shiyosha_kojin_no
+                  , rec_f_sharyo_renkei.shoyusha_kojin_no
+                  , rec_f_sharyo_renkei.shinkoku_kbn
+                  , rec_f_sharyo_renkei.shinkoku_jiyu
+                  , rec_f_sharyo_renkei.shinkoku_ymd
+                  , rec_f_sharyo_renkei.ido_ymd
+                  , rec_f_sharyo_renkei.syaryo_ido_ymd
+                  , rec_f_sharyo_renkei.ido_jiyu
+                  , rec_f_sharyo_renkei.shori_ymd
+                  , rec_f_sharyo_renkei.keiji_syubetsu_cd
+                  , rec_f_sharyo_renkei.haiki_kbn
+                  , rec_f_sharyo_renkei.so_haikiryo
+                  , rec_f_sharyo_renkei.shadai_no
+                  , rec_f_sharyo_renkei.shodo_kensa_ym
+                  , rec_f_sharyo_renkei.shoyu_keitai_kbn
+                  , rec_f_sharyo_renkei.hyoban_moji
+                  , rec_f_sharyo_renkei.bunrui_no
+                  , rec_f_sharyo_renkei.kana_moji
+                  , rec_f_sharyo_renkei.ichiren_shitei_no
+                  , rec_f_sharyo_renkei.kazei_kbn
+                  , rec_f_sharyo_renkei.haisha_ymd
+                  , rec_f_sharyo_renkei.keiji_rireki_no
+                  , rec_f_sharyo_renkei.ins_datetime
+                  , rec_f_sharyo_renkei.upd_datetime
+                  , rec_f_sharyo_renkei.upd_tantosha_cd
+                  , rec_f_sharyo_renkei.upd_tammatsu
+                  , rec_f_sharyo_renkei.del_flg
+               );
 
-                  ln_ins_count := ln_ins_count + 1;
-                  lc_err_text := '';
-                  lc_err_cd := '0';
-                  ln_result_cd := 1;
+               ln_ins_count := ln_ins_count + 1;
+               lc_err_text := '';
+               lc_err_cd := lc_err_cd_normal;
+               ln_result_cd := ln_result_cd_add;
 
-               EXCEPTION
-                  WHEN OTHERS THEN
-                  ln_err_count := ln_err_count + 1;
-                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                  lc_err_cd := '9';
-                  ln_result_cd := 9;
-               END;
-            ELSE
-               -- 連携データの作成・更新
-               BEGIN
-                  UPDATE f_sharyo_renkei
-                     SET gimusha_kojin_no = rec_f_sharyo_renkei.gimusha_kojin_no
-                     , ikkatsu_nozei_kbn = rec_f_sharyo_renkei.ikkatsu_nozei_kbn
-                     , shiyosha_kojin_no = rec_f_sharyo_renkei.shiyosha_kojin_no
-                     , shoyusha_kojin_no = rec_f_sharyo_renkei.shoyusha_kojin_no
-                     , shinkoku_kbn = rec_f_sharyo_renkei.shinkoku_kbn
-                     , shinkoku_jiyu = rec_f_sharyo_renkei.shinkoku_jiyu
-                     , shinkoku_ymd = rec_f_sharyo_renkei.shinkoku_ymd
-                     , ido_ymd = rec_f_sharyo_renkei.ido_ymd
-                     , syaryo_ido_ymd = rec_f_sharyo_renkei.syaryo_ido_ymd
-                     , ido_jiyu = rec_f_sharyo_renkei.ido_jiyu
-                     , shori_ymd = rec_f_sharyo_renkei.shori_ymd
-                     , keiji_syubetsu_cd = rec_f_sharyo_renkei.keiji_syubetsu_cd
-                     , haiki_kbn = rec_f_sharyo_renkei.haiki_kbn
-                     , so_haikiryo = rec_f_sharyo_renkei.so_haikiryo
-                     , shadai_no = rec_f_sharyo_renkei.shadai_no
-                     , shodo_kensa_ym = rec_f_sharyo_renkei.shodo_kensa_ym
-                     , shoyu_keitai_kbn = rec_f_sharyo_renkei.shoyu_keitai_kbn
-                     , hyoban_moji = rec_f_sharyo_renkei.hyoban_moji
-                     , bunrui_no = rec_f_sharyo_renkei.bunrui_no
-                     , kana_moji = rec_f_sharyo_renkei.kana_moji
-                     , ichiren_shitei_no = rec_f_sharyo_renkei.ichiren_shitei_no
-                     , kazei_kbn = rec_f_sharyo_renkei.kazei_kbn
-                     , haisha_ymd = rec_f_sharyo_renkei.haisha_ymd
-                     , keiji_rireki_no = rec_f_sharyo_renkei.keiji_rireki_no
-                     , upd_datetime = rec_f_sharyo_renkei.upd_datetime
-                     , upd_tantosha_cd = rec_f_sharyo_renkei.upd_tantosha_cd
-                     , upd_tammatsu = rec_f_sharyo_renkei.upd_tammatsu
-                     , del_flg = rec_f_sharyo_renkei.del_flg
-                  WHERE 
-                     keiji_kanri_no = rec_f_sharyo_renkei.keiji_kanri_no;
+            EXCEPTION
+               WHEN OTHERS THEN
+               ln_err_count := ln_err_count + 1;
+               lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+               lc_err_cd := lc_err_cd_err;
+               ln_result_cd := ln_result_cd_err;
+            END;
+         ELSE
+            -- 連携データの作成・更新
+            BEGIN
+               UPDATE f_sharyo_renkei
+                  SET gimusha_kojin_no = rec_f_sharyo_renkei.gimusha_kojin_no
+                  , ikkatsu_nozei_kbn = rec_f_sharyo_renkei.ikkatsu_nozei_kbn
+                  , shiyosha_kojin_no = rec_f_sharyo_renkei.shiyosha_kojin_no
+                  , shoyusha_kojin_no = rec_f_sharyo_renkei.shoyusha_kojin_no
+                  , shinkoku_kbn = rec_f_sharyo_renkei.shinkoku_kbn
+                  , shinkoku_jiyu = rec_f_sharyo_renkei.shinkoku_jiyu
+                  , shinkoku_ymd = rec_f_sharyo_renkei.shinkoku_ymd
+                  , ido_ymd = rec_f_sharyo_renkei.ido_ymd
+                  , syaryo_ido_ymd = rec_f_sharyo_renkei.syaryo_ido_ymd
+                  , ido_jiyu = rec_f_sharyo_renkei.ido_jiyu
+                  , shori_ymd = rec_f_sharyo_renkei.shori_ymd
+                  , keiji_syubetsu_cd = rec_f_sharyo_renkei.keiji_syubetsu_cd
+                  , haiki_kbn = rec_f_sharyo_renkei.haiki_kbn
+                  , so_haikiryo = rec_f_sharyo_renkei.so_haikiryo
+                  , shadai_no = rec_f_sharyo_renkei.shadai_no
+                  , shodo_kensa_ym = rec_f_sharyo_renkei.shodo_kensa_ym
+                  , shoyu_keitai_kbn = rec_f_sharyo_renkei.shoyu_keitai_kbn
+                  , hyoban_moji = rec_f_sharyo_renkei.hyoban_moji
+                  , bunrui_no = rec_f_sharyo_renkei.bunrui_no
+                  , kana_moji = rec_f_sharyo_renkei.kana_moji
+                  , ichiren_shitei_no = rec_f_sharyo_renkei.ichiren_shitei_no
+                  , kazei_kbn = rec_f_sharyo_renkei.kazei_kbn
+                  , haisha_ymd = rec_f_sharyo_renkei.haisha_ymd
+                  , keiji_rireki_no = rec_f_sharyo_renkei.keiji_rireki_no
+                  , upd_datetime = rec_f_sharyo_renkei.upd_datetime
+                  , upd_tantosha_cd = rec_f_sharyo_renkei.upd_tantosha_cd
+                  , upd_tammatsu = rec_f_sharyo_renkei.upd_tammatsu
+                  , del_flg = rec_f_sharyo_renkei.del_flg
+               WHERE 
+                  keiji_kanri_no = rec_f_sharyo_renkei.keiji_kanri_no;
 
-                  ln_upd_count := ln_upd_count + 1;
-                  lc_err_text := '';
-                  lc_err_cd := '0';
-                  ln_result_cd := 2;
+               ln_upd_count := ln_upd_count + 1;
+               lc_err_text := '';
+               lc_err_cd := lc_err_cd_normal;
+               ln_result_cd := ln_result_cd_upd;
 
-               EXCEPTION
-                  WHEN OTHERS THEN
-                  ln_err_count := ln_err_count + 1;
-                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                  lc_err_cd := '9';
-                  ln_result_cd := 9;
-               END;
-            END IF;
+            EXCEPTION
+               WHEN OTHERS THEN
+               ln_err_count := ln_err_count + 1;
+               lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+               lc_err_cd := lc_err_cd_err;
+               ln_result_cd := ln_result_cd_err;
+            END;
+         END IF;
+
+         -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
+         IF rec_main.del_flg::numeric = 1 THEN
+            ln_result_cd = ln_result_cd_del;
          END IF;
 
          -- 中間テーブル更新
@@ -316,8 +333,8 @@ BEGIN
             , shori_ymd     = in_n_shori_ymd
             WHERE  
             shikuchoson_cd = rec_main.shikuchoson_cd
-            keiji_kanri_no = rec_main.keiji_kanri_no
-            keiji_rireki_no = rec_main.keiji_rireki_no
+            AND keiji_kanri_no = rec_main.keiji_kanri_no
+            AND keiji_rireki_no = rec_main.keiji_rireki_no;
 
       END LOOP;
    CLOSE cur_main;
@@ -331,11 +348,11 @@ BEGIN
    rec_log.proc_err_count := ln_err_count;
 
    -- データ連携ログ更新
-   CALL proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
-   EXCEPTION
+EXCEPTION
    WHEN OTHERS THEN
    io_c_err_code := SQLSTATE;
    io_c_err_text := SQLERRM;
