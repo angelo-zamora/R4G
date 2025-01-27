@@ -374,6 +374,7 @@ BEGIN
             BEGIN 
                DELETE FROM f_kojin
                WHERE kojin_no = rec_kojin.kojin_no;
+               
                GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
                ln_del_count = ln_del_count + ln_del_diag_count;
                
