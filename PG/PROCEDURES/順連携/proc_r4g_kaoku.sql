@@ -122,6 +122,9 @@ BEGIN
       LOOP
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
+
+            ln_shori_count := ln_shori_count + 1;
+
             -- 物件番号
             rec_f_kaokukihon_renkei.bukken_no := rec_main.bukken_no;
             -- 課税年度

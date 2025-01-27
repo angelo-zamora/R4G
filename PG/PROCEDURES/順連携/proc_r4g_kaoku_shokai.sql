@@ -144,7 +144,9 @@ BEGIN
 
             FETCH cur_busho INTO rec_busho;
             EXIT WHEN NOT FOUND;
-
+               
+               ln_shori_count := ln_shori_count + 1;
+               
                OPEN cur_lock;
                   FETCH cur_lock INTO rec_lock;
                CLOSE cur_lock;
