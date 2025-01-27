@@ -59,12 +59,12 @@ DECLARE
    WHERE tbl_atena.saishin_flg = '1'
    AND tbl_atena.rireki_no = (
       SELECT MAX(rireki_no)
-      FROM i_r4g_atena
+      FROM dlgrenkei.i_r4g_atena
       WHERE atena_no = tbl_atena.atena_no
    )
    AND tbl_atena.rireki_no_eda = (
       SELECT MAX(rireki_no_eda)
-      FROM i_r4g_atena
+      FROM dlgrenkei.i_r4g_atena
       WHERE atena_no = tbl_atena.atena_no
         AND rireki_no = tbl_atena.rireki_no
    )
