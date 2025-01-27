@@ -176,7 +176,7 @@ BEGIN
          rec_f_kojin_mynumber.del_flg := rec_main.del_flg::numeric;
          
          -- 削除フラグが「1」の場合は対象データを物理削除する。
-         IF rec_main.del_flg = 1 THEN
+         IF rec_main.del_flg::numeric = 1 THEN
             BEGIN
                DELETE FROM f_kojin_number
                WHERE kojin_no = rec_f_kojin_mynumber.atena_no;

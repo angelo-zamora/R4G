@@ -292,7 +292,7 @@ BEGIN
             END IF;
 
             -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
-            IF rec_kojin.del_flg = 1 THEN
+            IF rec_main.del_flg::numeric = 1 THEN
                ln_result_cd := ln_result_cd_del;
             END IF;
 
