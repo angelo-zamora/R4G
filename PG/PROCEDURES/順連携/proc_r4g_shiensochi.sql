@@ -84,7 +84,7 @@ DECLARE
    rec_log         dlgrenkei.f_renkei_log%ROWTYPE;
 
 BEGIN
-]
+
    rec_log.proc_kaishi_datetime := CURRENT_TIMESTAMP;
    
    -- パラメータ情報の取得
