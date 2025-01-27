@@ -2,7 +2,12 @@
 --  DDL for Procedure proc_r4g_kaoku_hyoka
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kaoku_hyoka ( in_n_renkei_data_cd IN numeric, in_n_renkei_seq IN numeric, in_n_shori_ymd IN numeric, io_c_err_code INOUT character varying, io_c_err_text INOUT character varying )
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kaoku_hyoka ( 
+   in_n_renkei_data_cd IN numeric, 
+   in_n_renkei_seq IN numeric, 
+   in_n_shori_ymd IN numeric, 
+   io_c_err_code INOUT character varying, 
+   io_c_err_text INOUT character varying )
 LANGUAGE plpgsql
 AS $$
 
