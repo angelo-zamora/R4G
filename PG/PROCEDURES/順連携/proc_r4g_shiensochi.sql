@@ -8,18 +8,18 @@ CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_shiensochi(
 	in_n_shori_ymd numeric,
 	INOUT io_c_err_code character varying,
 	INOUT io_c_err_text character varying)
-LANGUAGE 'plpgsql'
+LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_支援措置（f_shiensochi）の追加／更新／削除を実施する                                                      */
-/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                   */
-/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
-/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                */
-/*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                       */
-/*            io_c_err_text       … 例外エラー発生時のエラー内容                                                         */
+/* 処理概要 : f_支援措置（f_shiensochi）の追加／更新／削除を実施する                                                  */
+/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
+/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
+/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
+/*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
+/*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 :  CRESS-INFO.Angelo     新規作成     001o009「支援措置対象者情報」の取込を行う。                              */
+/* 履歴　　 :  CRESS-INFO.Angelo     新規作成     001o009「支援措置対象者情報」の取込を行う                           */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -44,7 +44,6 @@ DECLARE
    ln_para01 numeric DEFAULT 0;
    lc_kojin_no character varying;
    ln_kaishi_ymd numeric;
-   lc_tokusoku_kaijo_ymd character varying;
    lc_sql character varying;
    
    cur_parameter CURSOR FOR
@@ -61,7 +60,7 @@ DECLARE
    WHERE tbl_shiensochi.saishin_flg = '1' 
    AND tbl_shiensochi.rireki_no = (
       SELECT MAX(rireki_no)
-      FROM i_r4g_shiensochi
+      FROM dlgrenkei.i_r4g_shiensochi
       WHERE atena_no = tbl_shiensochi.atena_no
    )
    AND tbl_shiensochi.result_cd < 8;
@@ -85,7 +84,7 @@ DECLARE
    rec_log         dlgrenkei.f_renkei_log%ROWTYPE;
 
 BEGIN
-	
+]
    rec_log.proc_kaishi_datetime := CURRENT_TIMESTAMP;
    
    -- パラメータ情報の取得
@@ -129,7 +128,7 @@ BEGIN
       LOOP
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
-		 
+
          ln_shori_count                 := ln_shori_count + 1;
          lc_err_cd                      := lc_err_cd_normal;
          ln_result_cd                   := 0;
@@ -137,15 +136,14 @@ BEGIN
          rec_lock                       := NULL;
 
          lc_kojin_no := rec_main.atena_no::character varying;
-         ln_kaishi_ymd := get_date_to_num(to_date(rec_main.shiensochi_kaishi_ymd, 'yyyy-mm-dd'));
-         lc_tokusoku_kaijo_ymd := rec_main.shiensochi_kaishi_ymd;
+         ln_kaishi_ymd := get_date_to_num(to_date(rec_main.shiensochi_kaishi_ymd, 'YYYY-MM-DD'));
 
          -- 個人番号
          rec_f_shiensochi.kojin_no := lc_kojin_no;
          -- 期間開始日
          rec_f_shiensochi.kaishi_ymd := ln_kaishi_ymd;
          -- 支援措置区分
-         rec_f_shiensochi.shiensochi_kbn := rec_main.shikuchoson_cd;
+         rec_f_shiensochi.shiensochi_kbn := rec_main.sochi_jkn;
          -- 期間終了日
          rec_f_shiensochi.shuryo_ymd := CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE get_date_to_num(to_date(rec_main.shiensochi_shuryo_ymd, 'yyyy-mm-dd')) END;
          -- 一時解除（照会）フラグ
@@ -162,30 +160,30 @@ BEGIN
          rec_f_shiensochi.kaijo_hakko_shuryo_datetime := NULL;
          -- 一時解除（発行）回数
          rec_f_shiensochi.kaijo_hakko_kaisu := 1;
-         -- 異動フラグ									
+         -- 異動フラグ
          rec_f_shiensochi.ido_flg := 0;
-         -- 終了フラグ				
+         -- 終了フラグ
          rec_f_shiensochi.shuryo_flg := 0;
-         -- 備考										
+         -- 備考
          rec_f_shiensochi.biko := NULL;
-         -- 履歴番号										
+         -- 履歴番号
          rec_f_shiensochi.rireki_no := rec_main.rireki_no::numeric;
-         -- データ作成日時							
+         -- データ作成日時
          rec_f_shiensochi.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
-         -- データ更新日時									
+         -- データ更新日時
          rec_f_shiensochi.upd_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
-         -- 更新担当者コード									
-         rec_f_shiensochi.upd_tantosha_cd := sosasha_cd;
-         -- 更新端末名称									
+         -- 更新担当者コード
+         rec_f_shiensochi.upd_tantosha_cd := rec_main.sosasha_cd;
+         -- 更新端末名称
          rec_f_shiensochi.upd_tammatsu := 'SERVER';
-         -- 削除フラグ									
-         rec_f_shiensochi.del_flg := rec_main.del_flg::numeric;								
+         -- 削除フラグ
+         rec_f_shiensochi.del_flg := rec_main.del_flg::numeric;
 
          OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
-		   CLOSE cur_lock;
+         CLOSE cur_lock;
 
-			IF rec_lock IS NULL THEN
+         IF rec_lock IS NULL THEN
                   BEGIN
                      INSERT INTO f_shiensochi(
                            kojin_no
@@ -214,20 +212,20 @@ BEGIN
                         , rec_f_shiensochi.shiensochi_kbn
                         , rec_f_shiensochi.shuryo_ymd
                         , rec_f_shiensochi.kaijo_shokai_flg
-                        , rec_f_shiensochi.kaijo_shokai_kaishi_datetime											
-                        , rec_f_shiensochi.kaijo_shokai_shuryo_datetime											
-                        , rec_f_shiensochi.kaijo_hakko_flg											
-                        , rec_f_shiensochi.kaijo_hakko_kaishi_datetime											
-                        , rec_f_shiensochi.kaijo_hakko_shuryo_datetime											
-                        , rec_f_shiensochi.kaijo_hakko_kaisu											
-                        , rec_f_shiensochi.ido_flg											
-                        , rec_f_shiensochi.shuryo_flg											
-                        , rec_f_shiensochi.biko											
-                        , rec_f_shiensochi.rireki_no											
-                        , rec_f_shiensochi.ins_datetime											
-                        , rec_f_shiensochi.upd_datetime											
-                        , rec_f_shiensochi.upd_tantosha_cd											
-                        , rec_f_shiensochi.upd_tammatsu											
+                        , rec_f_shiensochi.kaijo_shokai_kaishi_datetime	
+                        , rec_f_shiensochi.kaijo_shokai_shuryo_datetime	
+                        , rec_f_shiensochi.kaijo_hakko_flg	
+                        , rec_f_shiensochi.kaijo_hakko_kaishi_datetime	
+                        , rec_f_shiensochi.kaijo_hakko_shuryo_datetime	
+                        , rec_f_shiensochi.kaijo_hakko_kaisu	
+                        , rec_f_shiensochi.ido_flg	
+                        , rec_f_shiensochi.shuryo_flg	
+                        , rec_f_shiensochi.biko	
+                        , rec_f_shiensochi.rireki_no	
+                        , rec_f_shiensochi.ins_datetime	
+                        , rec_f_shiensochi.upd_datetime	
+                        , rec_f_shiensochi.upd_tantosha_cd	
+                        , rec_f_shiensochi.upd_tammatsu	
                         , rec_f_shiensochi.del_flg	
                      );
 
@@ -387,7 +385,7 @@ BEGIN
    rec_log.proc_err_count := ln_err_count;
    
    -- データ連携ログ更新
-   CALL proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 

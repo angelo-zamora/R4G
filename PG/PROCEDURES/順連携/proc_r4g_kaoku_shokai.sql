@@ -62,24 +62,12 @@ DECLARE
                MAX(kazei_nendo)
          FROM
                dlgrenkei.i_r4g_kaoku
-         WHERE
-               saishin_flg = '1'
       )
       AND kaoku_kihon_rireki_no = (
          SELECT
                MAX(kaoku_kihon_rireki_no)
          FROM
                dlgrenkei.i_r4g_kaoku
-         WHERE
-               saishin_flg = '1'
-               AND kazei_nendo = (
-                  SELECT
-                     MAX(kazei_nendo)
-                  FROM
-                     dlgrenkei.i_r4g_kaoku
-                  WHERE
-                     saishin_flg = '1'
-               )
       );
 
    rec_main                            dlgrenkei.i_r4g_kaoku%ROWTYPE;
@@ -461,8 +449,6 @@ BEGIN
                   SET result_cd     = ln_result_cd
                   , error_cd      = ln_err_cd
                   , error_text    = lc_err_text
-                  , seq_no_renkei = in_n_renkei_seq
-                  , shiro_ymd     = in_n_shori_ymd
                   WHERE seq_no_renkei = rec_lock.seq_no_shokai;
                   
             END LOOP;
