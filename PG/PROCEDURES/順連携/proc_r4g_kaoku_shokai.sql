@@ -11,14 +11,14 @@ CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kaoku_shokai (
 ) LANGUAGE plpgsql AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 :  f_照会_不動産（f_shokai_fudosan）の追加／更新／削除を実施する                                               */
-/* 引数 IN  :  in_n_renkei_data_cd … 連携データコード                                                                   */
-/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
-/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                */
-/*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                      */
-/*            io_c_err_text       … 例外エラー発生時のエラー内容                                                        */
+/* 処理概要 :  f_照会_不動産（f_shokai_fudosan）の追加／更新／削除を実施する                                          */
+/* 引数 IN  :  in_n_renkei_data_cd … 連携データコード                                                                */
+/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
+/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
+/*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
+/*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/24  CRESS-INFO.Angelo     新規作成     012o005「家屋基本情報」の取込を行う                          */
+/* 履歴     : 2025/01/24  CRESS-INFO.Angelo     新規作成     012o005「家屋基本情報」の取込を行う                      */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -34,6 +34,7 @@ DECLARE
    lc_err_cd                           character varying;
    lc_sql                              character varying(1000);
 
+   ln_commit_count                     numeric DEFAULT 10000;
    ln_para01                           numeric DEFAULT 0;
    ln_para02                           numeric DEFAULT 0;
 
@@ -93,7 +94,12 @@ DECLARE
    SELECT
       *
    FROM 
-      f_shokai_fudosan;
+      f_shokai_fudosan
+   WHERE busho_cd = rec_busho.busho_cd
+      AND kojin_no = rec_main.kojin_no 
+      AND bukken_no = rec_main.bukken_no
+      AND bukken_shurui_cd = rec_main.bukken_shurui_cd;
+   
    rec_lock                            f_shokai_fudosan%ROWTYPE;
 
 BEGIN
@@ -139,12 +145,22 @@ BEGIN
             FETCH cur_busho INTO rec_busho;
             EXIT WHEN NOT FOUND;
 
+               OPEN cur_lock;
+                  FETCH cur_lock INTO rec_lock;
+               CLOSE cur_lock;
+
                -- 部署コード
                rec_f_shokai_fudosan.busho_cd := rec_busho.busho_cd;
                -- 個人番号
                rec_f_shokai_fudosan.kojin_no := rec_main.gimusha_atena_no;
+
                -- 照会SEQ
-               rec_f_shokai_fudosan.seq_no_shokai := rec_lock.seq_no_shokai;
+               IF rec_lock.seq_no_shokai IS NOT NULL THEN
+                   rec_f_shokai_fudosan.seq_no_shokai        := rec_lock.seq_no_shokai;
+               ELSE
+                   rec_f_shokai_fudosan.seq_no_shokai        := SEQ_SHOKAI.NEXTVAL;
+               END IF;
+
                -- 物件番号
                rec_f_shokai_fudosan.bukken_no := rec_main.bukken_no;
                -- 物件種類コード
@@ -282,10 +298,6 @@ BEGIN
                -- 削除フラグ
                rec_f_shokai_fudosan.del_flg := rec_main.del_flg::numeric;
 
-               OPEN cur_lock;
-                  FETCH cur_lock INTO rec_lock;
-               CLOSE cur_lock;
-
                IF rec_lock IS NULL THEN
                   BEGIN
                      -- 登録処理
@@ -422,7 +434,7 @@ BEGIN
                            , del_flg = rec_f_shokai_fudosan.del_flg
                      WHERE busho_cd = rec_f_shokai_fudosan.busho_cd
                         AND kojin_no = rec_f_shokai_fudosan.kojin_no 
-                        AND seq_no_shokai = SEQ_SHOKAI.NEXTVAL
+                        AND seq_no_shokai = rec_f_shokai_fudosan.seq_no_shokai
                         AND bukken_no = rec_f_shokai_fudosan.bukken_no
                         AND bukken_shurui_cd = rec_f_shokai_fudosan.bukken_shurui_cd;
 
@@ -441,7 +453,7 @@ BEGIN
                END IF;
 
                -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
-               IF rec_main.del_flg = 1 THEN
+               IF rec_main.del_flg::numeric = 1 THEN
                   ln_result_cd = ln_result_cd_del;
                END IF;
 
@@ -449,13 +461,38 @@ BEGIN
                   SET result_cd     = ln_result_cd
                   , error_cd      = ln_err_cd
                   , error_text    = lc_err_text
-                  WHERE seq_no_renkei = rec_lock.seq_no_shokai;
+                  , seq_no_renkei = in_n_renkei_seq
+                  , shori_ymd     = in_n_shori_ymd
+                  WHERE shikuchoson_cd = rec_main.shikuchoson_cd
+                     AND bukken_no = rec_main.bukken_no
+                     AND kazei_nendo = rec_main.kazei_nendo
+                     AND kaoku_kihon_rireki_no = rec_main.kaoku_kihon_rireki_no;
                   
             END LOOP;
+
+            ln_shori_count := ln_shori_count + 1;
+
+            IF MOD( ln_shori_count, ln_commit_count) = 0 THEN
+               COMMIT;
+            END IF;
+
          CLOSE cur_busho;
 
       END LOOP;
    CLOSE cur_main;
+
+   rec_log.seq_no_renkei := in_n_renkei_seq;
+   rec_log.proc_shuryo_datetime := CURRENT_TIMESTAMP;
+   rec_log.proc_shori_count := ln_shori_count;
+   rec_log.proc_ins_count := ln_ins_count;
+   rec_log.proc_upd_count := ln_upd_count;
+   rec_log.proc_del_count := ln_del_count;
+   rec_log.proc_err_count := ln_err_count;
+
+   -- データ連携ログ更新
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+
+   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
 EXCEPTION
    WHEN OTHERS THEN
