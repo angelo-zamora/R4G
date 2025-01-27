@@ -180,8 +180,6 @@ BEGIN
                rec_shokai_fudosan.busho_cd := rec_busho.busho_cd;
                -- 個人番号
                rec_shokai_fudosan.kojin_no := rec_busho.gimusha_atena_no;
-               -- 照会SEQ
-               rec_shokai_fudosan.seq_no_shokai := CASE WHEN rec_lock.seq_no_shokai IS NOT NULL THEN rec_lock.seq_no_shokai ELSE SEQ_SHOKAI.NEXTVAL END;
                -- 物件番号
                rec_shokai_fudosan.bukken_no := rec_main.bukken_no;
                -- 物件種類コード
@@ -283,6 +281,9 @@ BEGIN
                OPEN cur_lock;
                   FETCH cur_lock INTO rec_lock;
                CLOSE cur_lock;
+
+               -- 照会SEQ
+               rec_shokai_fudosan.seq_no_shokai := CASE WHEN rec_lock.seq_no_shokai IS NOT NULL THEN rec_lock.seq_no_shokai ELSE SEQ_SHOKAI.NEXTVAL END;
 
                IF rec_lock.kojin_no IS NULL THEN
                   BEGIN
@@ -417,7 +418,7 @@ BEGIN
                         , del_flg = rec_shokai_fudosan.del_flg
                      WHERE busho_cd = rec_busho.busho_cd
                         AND kojin_no = rec_shokai_fudosan.kojin_no 
-                        AND seq_no_shokai = SEQ_SHOKAI.NEXTVAL
+                        AND seq_no_shokai = rec_shokai_fudosan.seq_no_shokai 
                         AND bukken_no = rec_shokai_fudosan.bukken_no
                         AND bukken_shurui_cd = rec_shokai_fudosan.bukken_shurui_cd;
 
