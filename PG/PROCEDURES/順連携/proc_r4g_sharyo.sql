@@ -27,11 +27,11 @@ DECLARE
    ln_para01                           numeric DEFAULT 0;
    ln_para02                           numeric DEFAULT 0;
 
-   ln_shori_count                      numeric;
-   ln_ins_count                        numeric;
-   ln_upd_count                        numeric;
-   ln_del_count                        numeric;
-   ln_err_count                        numeric;
+   ln_shori_count                      numeric DEFAULT 0;
+   ln_ins_count                        numeric DEFAULT 0;
+   ln_upd_count                        numeric DEFAULT 0;
+   ln_del_count                        numeric DEFAULT 0;
+   ln_err_count                        numeric DEFAULT 0;
    lc_err_text                         character varying(100);
    ln_result_cd                        numeric DEFAULT 0;
    lc_err_cd                           character varying;
@@ -61,7 +61,8 @@ DECLARE
          SELECT
                MAX(keiji_rireki_no)
          FROM
-               dlgrenkei.i_r4g_sharyo
+               dlgrenkei.i_r4g_sharyo AS sub
+		   WHERE sub.keiji_kanri_no = i_r4g_sharyo.keiji_kanri_no
       )
       AND result_cd < 8;
 
@@ -125,6 +126,8 @@ BEGIN
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
 
+         ln_shori_count                 := ln_shori_count + 1;
+
          -- 軽自管理番号
          rec_f_sharyo_renkei.keiji_kanri_no := rec_main.keiji_kanri_no;
          -- 納税義務者_宛名番号
@@ -140,15 +143,15 @@ BEGIN
          -- 申告事由
          rec_f_sharyo_renkei.shinkoku_jiyu := rec_main.shinkoku_jiyu;
          -- 申告年月日
-         rec_f_sharyo_renkei.shinkoku_ymd := get_date_to_num(rec_main.shinkoku_ymd);
+         rec_f_sharyo_renkei.shinkoku_ymd := get_date_to_num(to_date(rec_main.shinkoku_ymd, 'YYYY-MM-DD'));
          -- 異動（登録・取得）年月日
-         rec_f_sharyo_renkei.ido_ymd := get_date_to_num(rec_main.ido_ymd);
+         rec_f_sharyo_renkei.ido_ymd := get_date_to_num(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
          -- 車両情報の異動年月日
-         rec_f_sharyo_renkei.syaryo_ido_ymd := get_date_to_num(rec_main.sharyo_ido_ymd);
+         rec_f_sharyo_renkei.syaryo_ido_ymd := get_date_to_num(to_date(rec_main.sharyo_ido_ymd, 'YYYY-MM-DD'));
          -- 異動事由
          rec_f_sharyo_renkei.ido_jiyu := rec_main.ido_jiyu::numeric;
          -- 処理年月日
-         rec_f_sharyo_renkei.shori_ymd := get_date_to_num(rec_main.keiji_shori_ymd);
+         rec_f_sharyo_renkei.shori_ymd := get_date_to_num(to_date(rec_main.keiji_shori_ymd, 'YYYY-MM-DD'));
          -- 種別コード
          rec_f_sharyo_renkei.keiji_syubetsu_cd := rec_main.shubetsu_cd::numeric;
          -- 排気区分
@@ -172,7 +175,7 @@ BEGIN
          -- 課税区分
          rec_f_sharyo_renkei.kazei_kbn := rec_main.kazei_kbn::numeric;
          -- 廃車年月日
-         rec_f_sharyo_renkei.haisha_ymd := get_date_to_num(rec_main.haisha_ymd);
+         rec_f_sharyo_renkei.haisha_ymd := get_date_to_num(to_date(rec_main.haisha_ymd, 'YYYY-MM-DD'));
          -- 軽自履歴番号
          rec_f_sharyo_renkei.keiji_rireki_no := rec_main.keiji_rireki_no::numeric;
          -- データ作成日時
@@ -180,7 +183,7 @@ BEGIN
          -- データ更新日時
          rec_f_sharyo_renkei.upd_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- 更新担当者コード
-         rec_f_sharyo_renkei.upd_tantosha_cd := rec_main.upd_tantosha_cd;
+         rec_f_sharyo_renkei.upd_tantosha_cd := rec_main.sosasha_cd;
          -- 更新端末名称
          rec_f_sharyo_renkei.upd_tammatsu := 'SERVER';
          -- 削除フラグ
@@ -321,7 +324,7 @@ BEGIN
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
          IF rec_main.del_flg::numeric = 1 THEN
-            ln_result_cd = ln_result_cd_del;
+            ln_result_cd := ln_result_cd_del;
          END IF;
 
          -- 中間テーブル更新

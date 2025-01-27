@@ -324,7 +324,7 @@ BEGIN
                WHERE kojin_no = lc_kojin_no;
 
                GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
-               ln_del_count = ln_del_diag_count + ln_del_count;
+               ln_del_count := ln_del_diag_count + ln_del_count;
 
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;

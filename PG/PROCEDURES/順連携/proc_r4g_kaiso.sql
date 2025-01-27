@@ -134,6 +134,8 @@ BEGIN
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
 
+            ln_shori_count                 := ln_shori_count + 1;
+
             OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
             CLOSE cur_lock;
@@ -242,7 +244,7 @@ BEGIN
 
             -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
             IF rec_main.del_flg::numeric = 1 THEN
-               ln_result_cd = ln_result_cd_del;
+               ln_result_cd := ln_result_cd_del;
             END IF;
 
             UPDATE dlgrenkei.i_r4g_kaoku
