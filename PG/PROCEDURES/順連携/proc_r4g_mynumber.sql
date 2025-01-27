@@ -8,7 +8,6 @@ CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_mynumber(
    io_c_err_code INOUT character varying, 
    io_c_err_text INOUT character varying 
 )
-
 LANGUAGE plpgsql
 AS $$
 
@@ -41,18 +40,18 @@ DECLARE
    ln_para12                      numeric DEFAULT 0;
    ln_del_diag_count              numeric DEFAULT 0;
    
-   ln_result_cd_add               numeric DEFAULT 1;              -- 追加フラグ
-   ln_result_cd_upd               numeric DEFAULT 2;              -- 更新フラグ
-   ln_result_cd_del               numeric DEFAULT 3;              -- 削除フラグ
-   ln_result_cd_warning           numeric DEFAULT 7;              -- 警告フラグ
-   ln_result_cd_err               numeric DEFAULT 9;              -- エラーフラグ
+   ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
+   ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
+   ln_result_cd_del               numeric DEFAULT 3;             -- 削除フラグ
+   ln_result_cd_warning           numeric DEFAULT 7;             -- 警告フラグ
+   ln_result_cd_err               numeric DEFAULT 9;             -- エラーフラグ
 
-   lc_err_cd_normal               character varying = '0';        -- 通常フラグ
-   lc_err_cd_err                  character varying = '9';        -- エラーフラグ
+   lc_err_cd_normal               character varying = '0';       -- 通常フラグ
+   lc_err_cd_err                  character varying = '9';       -- エラーフラグ
 
-   ln_kojin_no_length             numeric DEFAULT 0;              -- 個人番号の文字数用変数
+   ln_kojin_no_length             numeric DEFAULT 0;             -- 個人番号の文字数用変数
    
-   lc_sql                         character varying;              -- SQL文用変数
+   lc_sql                         character varying;             -- SQL文用変数
 
    -- メインカーソル
    cur_main CURSOR FOR
@@ -61,12 +60,12 @@ DECLARE
    WHERE tbl_atena.saishin_flg = '1'
    AND tbl_atena.rireki_no = (
       SELECT MAX(rireki_no)
-      FROM i_r4g_atena
+      FROM dlgrenkei.i_r4g_atena
       WHERE atena_no = tbl_atena.atena_no
    )
    AND tbl_atena.rireki_no_eda = (
       SELECT MAX(rireki_no_eda)
-      FROM i_r4g_atena
+      FROM dlgrenkei.i_r4g_atena
       WHERE atena_no = tbl_atena.atena_no
         AND rireki_no = tbl_atena.rireki_no
    )
@@ -173,10 +172,10 @@ BEGIN
          -- 更新端末名称
          rec_f_kojin_mynumber.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_f_kojin_mynumber.del_flg := 0;
+         rec_f_kojin_mynumber.del_flg := rec_main.del_flg::numeric;
          
          -- 削除フラグが「1」の場合は対象データを物理削除する。
-         IF rec_main.del_flg = 1 THEN
+         IF rec_main.del_flg::numeric = 1 THEN
             BEGIN
                DELETE FROM f_kojin_number
                WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
@@ -225,12 +224,12 @@ BEGIN
                         lc_err_cd := lc_err_cd_normal;
                         ln_result_cd := ln_result_cd_add;
 
-                     EXCEPTION WHEN OTHERS THEN
-                        ln_ins_count := ln_ins_count + 1;
-                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                        lc_err_cd := lc_err_cd_err;
-                        ln_result_cd := ln_result_cd_err;
-                     END;
+                  EXCEPTION WHEN OTHERS THEN
+                     ln_ins_count := ln_ins_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
+                  END;
                ELSE
                   BEGIN
                      --データ更新処理
@@ -243,17 +242,17 @@ BEGIN
                         , del_flg = rec_f_kojin_mynumber.del_flg
                         WHERE kojin_no = rec_f_kojin_mynumber.kojin_no;
 
-                        ln_upd_count := ln_upd_count + 1;
-                        lc_err_text := '';
-                        lc_err_cd := lc_err_cd_normal;
-                        ln_result_cd := ln_result_cd_upd;
+                     ln_upd_count := ln_upd_count + 1;
+                     lc_err_text := '';
+                     lc_err_cd := lc_err_cd_normal;
+                     ln_result_cd := ln_result_cd_upd;
 
-                        EXCEPTION WHEN OTHERS THEN
-                           ln_err_count := ln_err_count + 1;
-                           lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                           lc_err_cd := lc_err_cd_err;
-                           ln_result_cd := ln_result_cd_err;
-                        END;
+                  EXCEPTION WHEN OTHERS THEN
+                     ln_err_count := ln_err_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
+                  END;
                END IF;   
          END IF;
 
@@ -262,6 +261,8 @@ BEGIN
          SET result_cd = ln_result_cd
             , error_cd = lc_err_cd
             , error_text = lc_err_text
+            , seq_no_renkei = in_n_renkei_seq
+            , shori_ymd     = in_n_shori_ymd
          WHERE shikuchoson_cd = rec_main.shikuchoson_cd
                AND atena_no = rec_main.atena_no
                AND rireki_no = rec_main.rireki_no;
@@ -278,11 +279,11 @@ BEGIN
     rec_log.proc_err_count := ln_err_count;
    
    -- データ連携ログ更新
-   CALL proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
-   EXCEPTION
+EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;
       io_c_err_text := SQLERRM;

@@ -2,7 +2,7 @@
 --  DDL for Procedure  proc_upd_log
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE proc_upd_log ( rec_log IN f_renkei_log, io_c_err_code INOUT character varying, io_c_err_text INOUT character varying )
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_upd_log ( rec_log IN f_renkei_log, io_c_err_code INOUT character varying, io_c_err_text INOUT character varying )
 LANGUAGE plpgsql
 AS $$
 
@@ -17,7 +17,7 @@ AS $$
 
 BEGIN
    
-   UPDATE f_renkei_log
+   UPDATE dlgrenkei.f_renkei_log
    SET proc_kaishi_datetime = rec_log.proc_kaishi_datetime
       , proc_shuryo_datetime = rec_log.proc_shuryo_datetime
       , proc_shori_count = rec_log.proc_shori_count
