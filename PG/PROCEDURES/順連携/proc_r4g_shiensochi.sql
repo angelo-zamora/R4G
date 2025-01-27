@@ -3,11 +3,11 @@
 --------------------------------------------------------
 
 CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_shiensochi(
-	in_n_renkei_data_cd numeric,
-	in_n_renkei_seq numeric,
-	in_n_shori_ymd numeric,
-	INOUT io_c_err_code character varying,
-	INOUT io_c_err_text character varying)
+   in_n_renkei_data_cd numeric,
+   in_n_renkei_seq numeric,
+   in_n_shori_ymd numeric,
+   INOUT io_c_err_code character varying,
+   INOUT io_c_err_text character varying)
 LANGUAGE plpgsql
 AS $$
 
@@ -184,90 +184,90 @@ BEGIN
          CLOSE cur_lock;
 
          IF rec_lock IS NULL THEN
-                  BEGIN
-                     INSERT INTO f_shiensochi(
-                           kojin_no
-                        , kaishi_ymd
-                        , shiensochi_kbn
-                        , shuryo_ymd
-                        , kaijo_shokai_flg
-                        , kaijo_shokai_kaishi_datetime
-                        , kaijo_shokai_shuryo_datetime
-                        , kaijo_hakko_flg
-                        , kaijo_hakko_kaishi_datetime
-                        , kaijo_hakko_shuryo_datetime
-                        , kaijo_hakko_kaisu
-                        , ido_flg
-                        , shuryo_flg
-                        , biko
-                        , rireki_no
-                        , ins_datetime
-                        , upd_datetime
-                        , upd_tantosha_cd
-                        , upd_tammatsu
-                        , del_flg
-                     ) VALUES (
-                           rec_f_shiensochi.kojin_no
-                        , rec_f_shiensochi.kaishi_ymd
-                        , rec_f_shiensochi.shiensochi_kbn
-                        , rec_f_shiensochi.shuryo_ymd
-                        , rec_f_shiensochi.kaijo_shokai_flg
-                        , rec_f_shiensochi.kaijo_shokai_kaishi_datetime	
-                        , rec_f_shiensochi.kaijo_shokai_shuryo_datetime	
-                        , rec_f_shiensochi.kaijo_hakko_flg	
-                        , rec_f_shiensochi.kaijo_hakko_kaishi_datetime	
-                        , rec_f_shiensochi.kaijo_hakko_shuryo_datetime	
-                        , rec_f_shiensochi.kaijo_hakko_kaisu	
-                        , rec_f_shiensochi.ido_flg	
-                        , rec_f_shiensochi.shuryo_flg	
-                        , rec_f_shiensochi.biko	
-                        , rec_f_shiensochi.rireki_no	
-                        , rec_f_shiensochi.ins_datetime	
-                        , rec_f_shiensochi.upd_datetime	
-                        , rec_f_shiensochi.upd_tantosha_cd	
-                        , rec_f_shiensochi.upd_tammatsu	
-                        , rec_f_shiensochi.del_flg	
-                     );
+               BEGIN
+                  INSERT INTO f_shiensochi(
+                        kojin_no
+                     , kaishi_ymd
+                     , shiensochi_kbn
+                     , shuryo_ymd
+                     , kaijo_shokai_flg
+                     , kaijo_shokai_kaishi_datetime
+                     , kaijo_shokai_shuryo_datetime
+                     , kaijo_hakko_flg
+                     , kaijo_hakko_kaishi_datetime
+                     , kaijo_hakko_shuryo_datetime
+                     , kaijo_hakko_kaisu
+                     , ido_flg
+                     , shuryo_flg
+                     , biko
+                     , rireki_no
+                     , ins_datetime
+                     , upd_datetime
+                     , upd_tantosha_cd
+                     , upd_tammatsu
+                     , del_flg
+                  ) VALUES (
+                        rec_f_shiensochi.kojin_no
+                     , rec_f_shiensochi.kaishi_ymd
+                     , rec_f_shiensochi.shiensochi_kbn
+                     , rec_f_shiensochi.shuryo_ymd
+                     , rec_f_shiensochi.kaijo_shokai_flg
+                     , rec_f_shiensochi.kaijo_shokai_kaishi_datetime
+                     , rec_f_shiensochi.kaijo_shokai_shuryo_datetime
+                     , rec_f_shiensochi.kaijo_hakko_flg
+                     , rec_f_shiensochi.kaijo_hakko_kaishi_datetime
+                     , rec_f_shiensochi.kaijo_hakko_shuryo_datetime
+                     , rec_f_shiensochi.kaijo_hakko_kaisu
+                     , rec_f_shiensochi.ido_flg
+                     , rec_f_shiensochi.shuryo_flg
+                     , rec_f_shiensochi.biko
+                     , rec_f_shiensochi.rireki_no
+                     , rec_f_shiensochi.ins_datetime
+                     , rec_f_shiensochi.upd_datetime
+                     , rec_f_shiensochi.upd_tantosha_cd
+                     , rec_f_shiensochi.upd_tammatsu
+                     , rec_f_shiensochi.del_flg
+                  );
 
-                     ln_ins_count := ln_ins_count + 1;
-                     lc_err_text := '';
-                     lc_err_cd := lc_err_cd_normal;
-                     ln_result_cd := ln_result_cd_add;
+                  ln_ins_count := ln_ins_count + 1;
+                  lc_err_text := '';
+                  lc_err_cd := lc_err_cd_normal;
+                  ln_result_cd := ln_result_cd_add;
 
-                     EXCEPTION
-                        WHEN OTHERS THEN
-                           ln_err_count := ln_err_count + 1;
-                           lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                           lc_err_cd := lc_err_cd_err;
-                           ln_result_cd := ln_result_cd_err;
-                  END;
-               ELSE
-                  BEGIN
-                     UPDATE f_shiensochi
-                     SET shiensochi_kbn = rec_f_shiensochi.shiensochi_kbn
-                        , shuryo_ymd = rec_f_shiensochi.shuryo_ymd
-                        , rireki_no = rec_f_shiensochi.rireki_no
-                        , upd_datetime = rec_f_shiensochi.upd_datetime
-                        , upd_tantosha_cd = rec_f_shiensochi.upd_tantosha_cd
-                        , upd_tammatsu = rec_f_shiensochi.upd_tammatsu
-                        , del_flg = rec_f_shiensochi.del_flg
-                     WHERE 
-                        kojin_no  = lc_kojin_no 
-                        AND kaishi_ymd = ln_kaishi_ymd;
+                  EXCEPTION
+                     WHEN OTHERS THEN
+                        ln_err_count := ln_err_count + 1;
+                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                        lc_err_cd := lc_err_cd_err;
+                        ln_result_cd := ln_result_cd_err;
+               END;
+            ELSE
+               BEGIN
+                  UPDATE f_shiensochi
+                  SET shiensochi_kbn = rec_f_shiensochi.shiensochi_kbn
+                     , shuryo_ymd = rec_f_shiensochi.shuryo_ymd
+                     , rireki_no = rec_f_shiensochi.rireki_no
+                     , upd_datetime = rec_f_shiensochi.upd_datetime
+                     , upd_tantosha_cd = rec_f_shiensochi.upd_tantosha_cd
+                     , upd_tammatsu = rec_f_shiensochi.upd_tammatsu
+                     , del_flg = rec_f_shiensochi.del_flg
+                  WHERE 
+                     kojin_no  = lc_kojin_no 
+                     AND kaishi_ymd = ln_kaishi_ymd;
 
-                     ln_upd_count := ln_upd_count + 1;
-                     lc_err_text := '';
-                     lc_err_cd := lc_err_cd_normal;
-                     ln_result_cd := ln_result_cd_upd;
+                  ln_upd_count := ln_upd_count + 1;
+                  lc_err_text := '';
+                  lc_err_cd := lc_err_cd_normal;
+                  ln_result_cd := ln_result_cd_upd;
 
-                     EXCEPTION
-                        WHEN OTHERS THEN
-                           ln_err_count := ln_err_count + 1;
-                           lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                           lc_err_cd := lc_err_cd_err;
-                           ln_result_cd := ln_result_cd_err;
-                  END;
-               END IF;
+                  EXCEPTION
+                     WHEN OTHERS THEN
+                        ln_err_count := ln_err_count + 1;
+                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                        lc_err_cd := lc_err_cd_err;
+                        ln_result_cd := ln_result_cd_err;
+               END;
+            END IF;
 
          IF (rec_main.del_flg = '0' AND rec_main.sochi_kbn = '3') OR rec_main.del_flg = '1' THEN
             
@@ -361,6 +361,8 @@ BEGIN
             SET result_cd = ln_result_cd
                , error_cd = lc_err_cd
                , error_text = lc_err_text
+               , seq_no_renkei = in_n_renkei_seq
+               , shori_ymd = in_n_shori_ymd
             WHERE shikuchoson_cd = rec_main.shikuchoson_cd
                AND atena_no = rec_main.atena_no
                AND rireki_no = rec_main.rireki_no

@@ -71,7 +71,7 @@ DECLARE
    )
    AND tbl_atena.result_cd < 8;
 
-   rec_main                       dlgrenkei.i_r4g_kojin_jusho%ROWTYPE;
+   rec_main                       dlgrenkei.i_r4g_atena%ROWTYPE;
 
    cur_lock CURSOR FOR
    SELECT *
@@ -325,6 +325,11 @@ BEGIN
 
                GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
                ln_del_count = ln_del_diag_count + ln_del_count;
+
+               lc_err_text := '';
+               lc_err_cd := lc_err_cd_normal;
+               ln_result_cd := ln_result_cd_del;
+
             EXCEPTION
                WHEN OTHERS THEN
                   io_c_err_code := SQLSTATE;
@@ -591,12 +596,14 @@ BEGIN
 
          -- 中間テーブル更新
          UPDATE dlgrenkei.i_r4g_atena 
-         SET result_cd = ln_result_cd
-            , error_cd = lc_err_cd
-            , error_text = lc_err_text
+         SET result_cd      = ln_result_cd
+            , error_cd      = lc_err_cd
+            , error_text    = lc_err_text
+            , seq_no_renkei = in_n_renkei_seq
+            , shori_ymd     = in_n_shori_ymd
          WHERE shikuchoson_cd = rec_main.shikuchoson_cd
-            AND atena_no = rec_main.atena_no
-            AND rireki_no = rec_main.rireki_no
+            AND atena_no      = rec_main.atena_no
+            AND rireki_no     = rec_main.rireki_no
             AND rireki_no_eda = rec_main.rireki_no_eda;
 
       END LOOP;

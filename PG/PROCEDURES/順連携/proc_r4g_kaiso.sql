@@ -111,11 +111,11 @@ BEGIN
          SELECT COUNT(*) INTO ln_del_count FROM f_shokai_fudosan_kaiso;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan_kaiso';
          EXECUTE lc_sql;
-         EXCEPTION
-            WHEN OTHERS THEN
-            io_c_err_code := SQLSTATE;
-            io_c_err_text := SQLERRM;
-            RETURN;
+      EXCEPTION
+         WHEN OTHERS THEN
+         io_c_err_code := SQLSTATE;
+         io_c_err_text := SQLERRM;
+         RETURN;
       END; 
    END IF;
 
@@ -204,12 +204,12 @@ BEGIN
                   lc_err_cd := lc_err_cd_normal;
                   ln_result_cd := ln_result_cd_add;
 
-                  EXCEPTION
-                     WHEN OTHERS THEN
-                     ln_err_count := ln_err_count + 1;
-                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                     lc_err_cd := lc_err_cd_err;
-                     ln_result_cd := ln_result_cd_err;
+               EXCEPTION
+                  WHEN OTHERS THEN
+                  ln_err_count := ln_err_count + 1;
+                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                  lc_err_cd := lc_err_cd_err;
+                  ln_result_cd := ln_result_cd_err;
                END;
             ELSE
                -- 連携データの作成・更新
@@ -231,12 +231,12 @@ BEGIN
                   lc_err_cd := lc_err_cd_normal;
                   ln_result_cd := ln_result_cd_upd;
 
-                  EXCEPTION
-                     WHEN OTHERS THEN
-                     ln_err_count := ln_err_count + 1;
-                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                     lc_err_cd := lc_err_cd_err;
-                     ln_result_cd := ln_result_cd_err;
+               EXCEPTION
+                  WHEN OTHERS THEN
+                  ln_err_count := ln_err_count + 1;
+                  lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                  lc_err_cd := lc_err_cd_err;
+                  ln_result_cd := ln_result_cd_err;
                END;
             END IF;
 
