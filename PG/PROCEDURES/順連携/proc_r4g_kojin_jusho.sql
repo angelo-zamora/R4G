@@ -338,7 +338,6 @@ BEGIN
                   RETURN;
             END;
          ELSE
-
             IF rec_lock IS NULL THEN
                BEGIN
                   INSERT INTO f_kojin_jusho (
