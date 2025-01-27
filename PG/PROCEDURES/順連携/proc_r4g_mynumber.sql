@@ -181,7 +181,7 @@ BEGIN
                DELETE FROM f_kojin_number
                WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
                GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
-               ln_del_count = ln_del_count + ln_del_diag_count;
+               ln_del_count := ln_del_count + ln_del_diag_count;
 
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;
