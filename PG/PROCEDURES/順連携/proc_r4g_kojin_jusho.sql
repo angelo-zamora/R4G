@@ -13,14 +13,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_個人_住所（f_kojin_jusho）の追加／更新／削除を実施する                                                    */
-/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                   */
-/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
-/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                               */
-/*      OUT : io_c_err_code     … 例外エラー発生時のエラーコード                                                        */
-/*            io_c_err_text      … 例外エラー発生時のエラー内容                                                         */
+/* 処理概要 : f_個人_住所（f_kojin_jusho）の追加／更新／削除を実施する                                                */
+/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
+/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
+/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
+/*      OUT : io_c_err_code     … 例外エラー発生時のエラーコード                                                     */
+/*            io_c_err_text      … 例外エラー発生時のエラー内容                                                      */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/22  CRESS-INFO.Angelo     新規作成     001o006「住民情報（個人番号あり）」の取込を行う               */
+/* 履歴     : 2025/01/22  CRESS-INFO.Angelo     新規作成     001o006「住民情報（個人番号あり）」の取込を行う          */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -60,21 +60,23 @@ DECLARE
    WHERE tbl_atena.saishin_flg = '1' 
    AND tbl_atena.rireki_no = (
       SELECT MAX(rireki_no)
-      FROM i_r4g_atena
+      FROM dlgrenkei.i_r4g_atena
       WHERE atena_no = tbl_atena.atena_no
    )
    AND tbl_atena.rireki_no_eda = (
       SELECT MAX(rireki_no_eda)
-      FROM i_r4g_atena
+      FROM dlgrenkei.i_r4g_atena
       WHERE atena_no = tbl_atena.atena_no
         AND rireki_no = tbl_atena.rireki_no
    )
    AND tbl_atena.result_cd < 8;
 
+   rec_main                       dlgrenkei.i_r4g_kojin_jusho%ROWTYPE;
+
    cur_lock CURSOR FOR
    SELECT *
    FROM f_kojin_jusho
-   WHERE kojin_no = lc_kojin_no
+   WHERE kojin_no = lc_kojin_no;
    rec_lock             f_kojin_jusho%ROWTYPE;
    
 BEGIN
@@ -97,7 +99,7 @@ BEGIN
    IF ln_para01 = 1 THEN
       BEGIN
          SELECT COUNT(*) INTO ln_del_count FROM f_kojin_jusho;
-         lc_sql := 'TRUNCATE TABLE dlgmain.f_kojin_jusho;';
+         lc_sql := 'TRUNCATE TABLE dlgmain.f_kojin_jusho';
          EXECUTE lc_sql;
       EXCEPTION
          WHEN OTHERS THEN
@@ -123,7 +125,7 @@ BEGIN
       LOOP
          FETCH cur_main INTO rec_main;
          EXIT WHEN NOT FOUND;
-		 
+
          ln_shori_count                 := ln_shori_count + 1;
          lc_err_cd                      := lc_err_cd_normal;
          ln_result_cd                   := 0;
@@ -160,9 +162,9 @@ BEGIN
           -- 住所_確定住所
          rec_f_kojin_jusho.adr_kakutei_jusho := CONCAT(
                         rec_main.jusho_todofuken
-                        , ' ', rec_main.jusho_shikugunchoson
-                        , ' ', rec_main.jusho_machiaza
-                        , ' ', rec_main.jusho_banchigohyoki
+                        , rec_main.jusho_shikugunchoson
+                        , rec_main.jusho_machiaza
+                        , rec_main.jusho_banchigohyoki
                      );
           -- 住所_国名コード            
          rec_f_kojin_jusho.adr_kokumei_cd := NULL;
@@ -189,9 +191,9 @@ BEGIN
           -- 転入前住所_確定住所
          rec_f_kojin_jusho.tennyumae_kakutei_jusho := CONCAT(
                         rec_main.tennyumae_todofuken
-                        , ' ', rec_main.tennyumae_shikugunchoson
-                        , ' ', rec_main.tennyumae_machiaza
-                        , ' ', rec_main.tennyumae_banchigohyoki
+                        , rec_main.tennyumae_shikugunchoson
+                        , rec_main.tennyumae_machiaza
+                        , rec_main.tennyumae_banchigohyoki
                      );
           -- 転入前住所_国名コード
          rec_f_kojin_jusho.tennyumae_kokumei_cd := rec_main.tennyumae_kokumei_cd;
@@ -218,9 +220,9 @@ BEGIN
           -- 最終登録住所_確定住
          rec_f_kojin_jusho.saishu_kakutei_jusho := CONCAT(
                         rec_main.saishu_todofuken
-                        , ' ', rec_main.saishu_shikugunchoson
-                        , ' ', rec_main.saishu_machiaza
-                        , ' ', rec_main.saishu_banchigohyoki
+                        , rec_main.saishu_shikugunchoson
+                        , rec_main.saishu_machiaza
+                        , rec_main.saishu_banchigohyoki
                      );
           -- 転居前住所_市区町村コード
          rec_f_kojin_jusho.tenkyomae_shikuchoson_cd := rec_main.tenkyomae_shikuchoson_cd;
@@ -245,9 +247,9 @@ BEGIN
           -- 転居前住所_確定住所
          rec_f_kojin_jusho.tenkyomae_kakutei_jusho := CONCAT(
                         rec_main.tenkyomae_todofuken
-                        , ' ', rec_main.tenkyomae_shikugunchoson
-                        , ' ', rec_main.tenkyomae_machiaza
-                        , ' ', rec_main.tenkyomae_banchigohyoki
+                        , rec_main.tenkyomae_shikugunchoson
+                        , rec_main.tenkyomae_machiaza
+                        , rec_main.tenkyomae_banchigohyoki
                      );
           -- 転出先住所（予定）_市区町村コード
          rec_f_kojin_jusho.tenshutsu_yotei_shikuchoson_cd := rec_main.tenshutsusaki_yotei_shikuchoson_cd;
@@ -268,9 +270,9 @@ BEGIN
           -- 転出先住所（予定）_確定住所
          rec_f_kojin_jusho.tenshutsu_yotei_kakutei_jusho := CONCAT(
                         rec_main.tenshutsusaki_yotei_todofuken
-                        , ' ', rec_main.tenshutsusaki_yotei_shikugunchoson
-                        , ' ', rec_main.tenshutsusaki_yotei_machiaza
-                        , ' ', rec_main.tenshutsusaki_yotei_banchigohyoki
+                        , rec_main.tenshutsusaki_yotei_shikugunchoson
+                        , rec_main.tenshutsusaki_yotei_machiaza
+                        , rec_main.tenshutsusaki_yotei_banchigohyoki
                      );
           -- 転出先住所（予定）_国名コード
          rec_f_kojin_jusho.tenshutsu_yotei_kokumei_cd := rec_main.tenshutsusaki_yotei_kokumei_cd;
@@ -297,9 +299,9 @@ BEGIN
           -- 転出先住所（確定）_確定住所
          rec_f_kojin_jusho.tenshutsusaki_kakutei_jusho := CONCAT(
                         rec_main.tenshutsusaki_todofuken
-                        , ' ', rec_main.tenshutsusaki_shikugunchoson
-                        , ' ', rec_main.tenshutsusaki_machiaza
-                        , ' ', rec_main.tenshutsusaki_banchigohyoki
+                        , rec_main.tenshutsusaki_shikugunchoson
+                        , rec_main.tenshutsusaki_machiaza
+                        , rec_main.tenshutsusaki_banchigohyoki
                      );
           -- データ作成日時
          rec_f_kojin_jusho.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
@@ -321,7 +323,7 @@ BEGIN
                DELETE FROM f_kojin_jusho
                WHERE kojin_no = lc_kojin_no;
 
-            GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
+               GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
                ln_del_count = ln_del_diag_count + ln_del_count;
             EXCEPTION
                WHEN OTHERS THEN
@@ -492,12 +494,12 @@ BEGIN
                   lc_err_cd := lc_err_cd_normal;
                   ln_result_cd := ln_result_cd_add;
 
-                  EXCEPTION
-                     WHEN OTHERS THEN
-                        ln_err_count := ln_err_count + 1;
-                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                        lc_err_cd := lc_err_cd_err;
-                        ln_result_cd := ln_result_cd_err;
+               EXCEPTION
+                  WHEN OTHERS THEN
+                     ln_err_count := ln_err_count + 1;
+                     lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                     lc_err_cd := lc_err_cd_err;
+                     ln_result_cd := ln_result_cd_err;
                END;
             ELSE
                BEGIN
@@ -586,8 +588,8 @@ BEGIN
                END;
             END IF;
          END IF;
-		 
-		 -- 中間テーブル更新
+
+         -- 中間テーブル更新
          UPDATE dlgrenkei.i_r4g_atena 
          SET result_cd = ln_result_cd
             , error_cd = lc_err_cd
@@ -596,7 +598,7 @@ BEGIN
             AND atena_no = rec_main.atena_no
             AND rireki_no = rec_main.rireki_no
             AND rireki_no_eda = rec_main.rireki_no_eda;
-			
+
       END LOOP;
    CLOSE cur_main;
    
@@ -609,16 +611,14 @@ BEGIN
    rec_log.proc_err_count := ln_err_count;
    
    -- データ連携ログ更新
-   CALL proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
+   CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
    RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-   COMMIT;
 
 EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;
       io_c_err_text := SQLERRM;
-      ROLLBACK;
       RETURN;
 END;
 $$;
