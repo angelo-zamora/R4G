@@ -284,7 +284,7 @@ BEGIN
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
          IF rec_main.del_flg::numeric = 1 THEN
-            ln_result_cd = ln_result_cd_del;
+            ln_result_cd := ln_result_cd_del;
          END IF;
 
          -- 中間テーブル更新
