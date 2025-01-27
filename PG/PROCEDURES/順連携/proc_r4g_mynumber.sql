@@ -142,6 +142,7 @@ BEGIN
       WHEN OTHERS THEN
          ln_kojin_no_length := 15;
    END;
+   
    ln_shori_count := 0;
    
    -- メイン処理
