@@ -121,7 +121,7 @@ BEGIN
 
          lc_bukken_no := rec_main.bukken_no;
          ln_kazeinendo := rec_main.kazei_nendo::numeric;
-         ln_rireki_no := rec_main.tochi_kihon_rireki_no::numeric
+         ln_rireki_no := rec_main.tochi_kihon_rireki_no::numeric;
          ln_shori_count   := ln_shori_count + 1;
 
          -- 物件番号
