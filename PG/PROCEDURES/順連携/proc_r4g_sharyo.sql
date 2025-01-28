@@ -327,17 +327,21 @@ BEGIN
             ln_result_cd := ln_result_cd_del;
          END IF;
 
-         -- 中間テーブル更新
-         UPDATE dlgrenkei.i_r4g_sharyo
-            SET result_cd = ln_result_cd
-            , error_cd = lc_err_cd
-            , error_text = lc_err_text
-            , seq_no_renkei = in_n_renkei_seq
-            , shori_ymd     = in_n_shori_ymd
-            WHERE  
-            shikuchoson_cd = rec_main.shikuchoson_cd
-            AND keiji_kanri_no = rec_main.keiji_kanri_no
-            AND keiji_rireki_no = rec_main.keiji_rireki_no;
+         BEGIN
+            -- 中間テーブル更新
+            UPDATE dlgrenkei.i_r4g_sharyo
+               SET result_cd = ln_result_cd
+               , error_cd = lc_err_cd
+               , error_text = lc_err_text
+               , seq_no_renkei = in_n_renkei_seq
+               , shori_ymd     = in_n_shori_ymd
+               WHERE  
+               shikuchoson_cd = rec_main.shikuchoson_cd
+               AND keiji_kanri_no = rec_main.keiji_kanri_no
+               AND keiji_rireki_no = rec_main.keiji_rireki_no;
+         EXCEPTION
+            WHEN OTHERS THEN NULL;
+         END;
 
       END LOOP;
    CLOSE cur_main;
