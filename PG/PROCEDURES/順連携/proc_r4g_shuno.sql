@@ -263,6 +263,7 @@ BEGIN
 
                 GET DIAGNOSTICS ln_del_count_tmp := ROW_COUNT;
                 ln_del_count := ln_del_count + ln_del_count_tmp;
+                
                 lc_err_text := '';
                 lc_err_cd := lc_err_cd_normal;
                 ln_result_cd := ln_result_cd_del; 

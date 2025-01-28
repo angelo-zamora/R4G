@@ -239,6 +239,11 @@ BEGIN
             END;
          END IF;
 
+         -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
+         IF rec_main.del_flg::numeric = 1 THEN
+            ln_result_cd := ln_result_cd_del;
+         END IF;
+
          UPDATE i_r4g_tokusoku
          SET result_cd = ln_result_cd
             , error_cd = lc_err_cd
