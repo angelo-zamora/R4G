@@ -244,23 +244,28 @@ BEGIN
             ln_result_cd := ln_result_cd_del;
          END IF;
 
-         UPDATE i_r4g_tokusoku
-         SET result_cd = ln_result_cd
-            , error_cd = lc_err_cd
-            , error_text = lc_err_text
-            , seq_no_renkei = in_n_renkei_seq
-            , shori_ymd     = in_n_shori_ymd
-         WHERE  fuka_nendo = rec_main.fuka_nendo
-            AND soto_nendo = rec_main.soto_nendo
-            AND tsuchisho_no = rec_main.tsuchisho_no
-            AND zeimoku_cd = rec_main.zeimoku_cd
-            AND tokucho_shitei_no = rec_main.tokucho_shitei_no
-            AND kibetsu_cd = rec_main.kibetsu_cd
-            AND shinkoku_rireki_no = rec_main.shinkoku_rireki_no
-            AND jigyo_nendo_no = rec_main.jigyo_nendo_no
-            AND jido_atena_no = rec_main.jido_atena_no
-            AND atena_no = rec_main.atena_no
-            AND rireki_no = rec_main.rireki_no;
+         -- 中間テーブル更新
+         BEGIN
+            UPDATE i_r4g_tokusoku
+            SET result_cd = ln_result_cd
+               , error_cd = lc_err_cd
+               , error_text = lc_err_text
+               , seq_no_renkei = in_n_renkei_seq
+               , shori_ymd     = in_n_shori_ymd
+            WHERE  fuka_nendo = rec_main.fuka_nendo
+               AND soto_nendo = rec_main.soto_nendo
+               AND tsuchisho_no = rec_main.tsuchisho_no
+               AND zeimoku_cd = rec_main.zeimoku_cd
+               AND tokucho_shitei_no = rec_main.tokucho_shitei_no
+               AND kibetsu_cd = rec_main.kibetsu_cd
+               AND shinkoku_rireki_no = rec_main.shinkoku_rireki_no
+               AND jigyo_nendo_no = rec_main.jigyo_nendo_no
+               AND jido_atena_no = rec_main.jido_atena_no
+               AND atena_no = rec_main.atena_no
+               AND rireki_no = rec_main.rireki_no;
+         EXCEPTION
+            WHEN OTHERS THEN NULL;
+         END;
 
       END LOOP;
    CLOSE cur_main;

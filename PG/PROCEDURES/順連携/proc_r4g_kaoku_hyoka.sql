@@ -218,14 +218,18 @@ BEGIN
          END IF;
 
          -- 中間テーブル更新
-         UPDATE dlgrenkei.i_r4g_kaoku_hyoka
-            SET result_cd = ln_result_cd
-            , error_cd = lc_err_cd
-            , error_text = lc_err_text
+         BEGIN
+            UPDATE dlgrenkei.i_r4g_kaoku_hyoka
+               SET result_cd = ln_result_cd
+               , error_cd = lc_err_cd
+               , error_text = lc_err_text
             WHERE  shikuchoson_cd = rec_main.shikuchoson_cd
-            AND bukken_no = rec_main.bukken_no
-            AND kazei_nendo = rec_main.kazei_nendo
-            AND kaoku_hyoka_no = rec_main.kaoku_hyoka_no;
+               AND bukken_no = rec_main.bukken_no
+               AND kazei_nendo = rec_main.kazei_nendo
+               AND kaoku_hyoka_no = rec_main.kaoku_hyoka_no;
+         EXCEPTION
+            WHEN OTHERS THEN NULL;
+         END;
 
       END LOOP;
    CLOSE cur_main;

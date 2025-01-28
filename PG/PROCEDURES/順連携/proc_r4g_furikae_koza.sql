@@ -299,16 +299,20 @@ BEGIN
               END IF;
 
             -- 中間テーブル更新
-            UPDATE i_r4g_furikae_koza
-            SET result_cd = ln_result_cd
-                , error_cd = lc_err_cd
-                , error_text = lc_err_text
-            WHERE shikuchoson_cd = rec_main.shikuchoson_cd
-                AND atena_no = rec_main.atena_no
-                AND zeimoku_cd = rec_main.zeimoku_cd
-                AND furikae_kbn = rec_main.furikae_kbn
-                AND jido_atena_no = rec_main.jido_atena_no
-                AND koza_rireki_no = rec_main.koza_rireki_no;
+            BEGIN
+                UPDATE i_r4g_furikae_koza
+                SET result_cd = ln_result_cd
+                    , error_cd = lc_err_cd
+                    , error_text = lc_err_text
+                WHERE shikuchoson_cd = rec_main.shikuchoson_cd
+                    AND atena_no = rec_main.atena_no
+                    AND zeimoku_cd = rec_main.zeimoku_cd
+                    AND furikae_kbn = rec_main.furikae_kbn
+                    AND jido_atena_no = rec_main.jido_atena_no
+                    AND koza_rireki_no = rec_main.koza_rireki_no;
+            EXCEPTION
+                WHEN OTHERS THEN NULL;
+            END;
                 
       END LOOP;
    CLOSE cur_main;

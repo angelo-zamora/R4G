@@ -231,17 +231,21 @@ BEGIN
             END IF;
 
             -- 中間テーブル更新
-            UPDATE dlgrenkei.i_r4g_tochi_hyoka
-               SET result_cd = ln_result_cd
-               , error_cd = lc_err_cd
-               , error_text = lc_err_text
-               , seq_no_renkei = in_n_renkei_seq
-               , shori_ymd     = in_n_shori_ymd
-               WHERE  shikuchoson_cd = rec_main.shikuchoson_cd
-            AND bukken_no = rec_main.bukken_no
-            AND kazei_nendo = rec_main.kazei_nendo
-            AND hyoka_nendo = rec_main.hyoka_nendo
-            AND hyoka_rireki_no = rec_main.hyoka_rireki_no;
+            BEGIN
+               UPDATE dlgrenkei.i_r4g_tochi_hyoka
+                  SET result_cd = ln_result_cd
+                  , error_cd = lc_err_cd
+                  , error_text = lc_err_text
+                  , seq_no_renkei = in_n_renkei_seq
+                  , shori_ymd     = in_n_shori_ymd
+                  WHERE  shikuchoson_cd = rec_main.shikuchoson_cd
+               AND bukken_no = rec_main.bukken_no
+               AND kazei_nendo = rec_main.kazei_nendo
+               AND hyoka_nendo = rec_main.hyoka_nendo
+               AND hyoka_rireki_no = rec_main.hyoka_rireki_no;
+            EXCEPTION
+               WHEN OTHERS THEN NULL;
+            END;
       END LOOP;
    CLOSE cur_main;
 
