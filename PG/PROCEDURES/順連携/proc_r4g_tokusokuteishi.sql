@@ -13,14 +13,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_督促停止（f_tokusokuteishi）の追加／更新／削除を実施する                                              */
+/* 処理概要 : 督促停止情報（統合収滞納）                                                                              */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
 /*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 :  CRESS-INFO.Angelo     新規作成     036o008「督促停止情報（統合収滞納）」の取込を行う                   */
+/* 履歴　　 :  2025/01/28 CRESS-INFO.Angelo     新規作成     036o008「督促停止情報（統合収滞納）」の取込を行う        */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -88,7 +88,6 @@ BEGIN
    -- 2. 連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_tokusokuteishi;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_tokusokuteishi';
          EXECUTE lc_sql;
       EXCEPTION
@@ -129,11 +128,11 @@ BEGIN
          -- 個人番号
          rec_f_tokusokuteishi.kojin_no := rec_main.atena_no;
          -- 督促停止年月日
-         rec_f_tokusokuteishi.teishi_ymd := getdatetonum(to_date(rec_main.tokusoku_teishi_ymd, 'YYYY-MM-DD'));
+         rec_f_tokusokuteishi.teishi_ymd := get_ymd_str_to_num(rec_main.tokusoku_teishi_ymd);
          -- 督促停止事由コード
-         rec_f_tokusokuteishi.teishi_jiyu_cd := rec_main.tokusoku_kaijo_jiyu::numeric;
+         rec_f_tokusokuteishi.teishi_jiyu_cd := get_str_to_num(rec_main.tokusoku_kaijo_jiyu);
          -- 督促停止解除年月日
-         rec_f_tokusokuteishi.kaijo_ymd := getdatetonum(to_date(rec_main.tokusoku_kaijo_ymd, 'YYYY-MM-DD'));
+         rec_f_tokusokuteishi.kaijo_ymd := get_ymd_str_to_num(rec_main.tokusoku_kaijo_ymd);
          -- 督促停止解除事由コード
          rec_f_tokusokuteishi.teishi_kaijo_riyu_cd := rec_main.tokusoku_teishi_jiyu;
          -- データ作成日時
@@ -145,7 +144,7 @@ BEGIN
          -- 更新端末名称
          rec_f_tokusokuteishi.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_f_tokusokuteishi.del_flg := rec_main.del_flg::numeric;
+         rec_f_tokusokuteishi.del_flg := get_str_to_num(rec_main.del_flg);
 
          OPEN cur_lock;
             FETCH cur_lock INTO rec_lock;
@@ -220,7 +219,8 @@ BEGIN
          END IF;
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF get_str_to_num(rec_main.del_flg) = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
 
@@ -253,8 +253,6 @@ BEGIN
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-   
 EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;

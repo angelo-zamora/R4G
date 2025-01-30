@@ -12,14 +12,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_滞納（f_taino）の追加／更新／削除を実施する                                                           */
+/* 処理概要 : 調定収納情報（統合収滞納）                                                                              */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
 /*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 :  CRESS-INFO.Angelo     新規作成     036o005「調定収納情報（統合収滞納）」の取込を行う                   */
+/* 履歴　　 :  2025/01/28 CRESS-INFO.Angelo     新規作成     036o005「調定収納情報（統合収滞納）」の取込を行う        */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -115,7 +115,6 @@ BEGIN
    -- ２．連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_taino;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_taino';
          EXECUTE lc_sql;
 
@@ -167,9 +166,9 @@ BEGIN
                rec_main.shinkoku_rireki_no
             );
             -- 賦課年度
-            rec_f_taino.fuka_nendo := rec_main.fuka_nendo::numeric;
+            rec_f_taino.fuka_nendo := get_str_to_num(rec_main.fuka_nendo);
             -- 相当年度
-            rec_f_taino.soto_nendo := rec_main.soto_nendo::numeric;
+            rec_f_taino.soto_nendo := get_str_to_num(rec_main.soto_nendo);
             -- 税目コード
             rec_f_taino.zeimoku_cd := get_r4g_code_conv(0, 3, rec_main.zeimoku_cd, NULL);
             -- 期別コード
@@ -190,11 +189,11 @@ BEGIN
             -- 通知書番号
             rec_main.tsuchisho_no := rec_main.tsuchisho_no;
             -- 事業開始
-            rec_main.jigyo_kaishi_ymd := CASE WHEN rec_main.jigyo_kaishi_ymd IS NOT NULL THEN getdatetonum(to_date(rec_main.jigyo_kaishi_ymd, 'YYYY-MM-DD')) ELSE 0 END;
+            rec_main.jigyo_kaishi_ymd := get_ymd_str_to_num(rec_main.jigyo_kaishi_ymd);
             -- 事業終了
-            rec_main.jigyo_shuryo_ymd := CASE WHEN rec_main.jigyo_shuryo_ymd IS NOT NULL THEN getdatetonum(to_date(rec_main.jigyo_shuryo_ymd, 'YYYY-MM-DD')) ELSE 0 END;
+            rec_main.jigyo_shuryo_ymd := get_ymd_str_to_num(rec_main.jigyo_shuryo_ymd);
             -- 申告区分コード
-            rec_main.shinkoku_cd := CASE WHEN rec_main.shinkoku_cd IS NOT NULL THEN rec_main.shinkoku_cd::numeric ELSE 0 END;
+            rec_main.shinkoku_cd := get_str_to_num(rec_main.shinkoku_cd);
             -- 修正回数
             rec_f_taino.shusei_kaisu := 0;
             -- 年度区分
@@ -206,17 +205,17 @@ BEGIN
             -- 特別徴収義務者指定番号
             rec_f_taino.tokucho_shitei_no := rec_main.tokucho_shitei_no;
             -- 申告履歴番号
-            rec_f_taino.shinkoku_rireki_no := rec_main.shinkoku_rireki_no::numeric;
+            rec_f_taino.shinkoku_rireki_no := get_str_to_num(rec_main.shinkoku_rireki_no);
             -- 事業年度番号
-            rec_f_taino.jigyo_nendo_no := rec_main.jigyo_nendo_no::numeric;
+            rec_f_taino.jigyo_nendo_no := get_str_to_num(rec_main.jigyo_nendo_no);
             -- 児童宛名番号
             rec_f_taino.jido_kojin_no := rec_main.jido_atena_no;
             -- 納期限
-            rec_f_taino.noki_ymd := getdatetonum(to_date(rec_main.noki_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.noki_ymd := get_ymd_str_to_num(rec_main.noki_ymd);
             -- 繰上納期限
             rec_f_taino.noki_kuriage_ymd := 0;
             -- 指定納期限
-            rec_f_taino.shitei_noki_ymd := getdatetonum(to_date(rec_main.shitei_noki_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.shitei_noki_ymd := get_ymd_str_to_num(rec_main.shitei_noki_ymd);
             -- 督促発布日
             rec_f_taino.tokusoku_ymd := 0;
             -- 督促返戻日
@@ -232,91 +231,91 @@ BEGIN
             -- 法定納期限等
             rec_f_taino.hotei_noki_to_ymd := CASE
                                                 WHEN ln_para15 IN (0, 2) THEN 
-                                                      getdatetonum(to_date(rec_main.hotei_noki_to_ymd, 'YYYY-MM-DD'))
+                                                      get_ymd_str_to_num(rec_main.hotei_noki_to_ymd)
                                                 WHEN ln_para15 = 1 THEN 0
                                                 ELSE NULL END;
             -- 法定納期限
             rec_f_taino.hotei_noki_ymd := CASE
                                           WHEN ln_para16 IN (0, 2) THEN 
-                                                getdatetonum(to_date(rec_main.hotei_noki_ymd, 'YYYY-MM-DD'))
+                                                get_ymd_str_to_num(rec_main.hotei_noki_ymd)
                                           WHEN ln_para16 = 1 THEN 0
                                           ELSE NULL END;
             -- 起算日
             rec_f_taino.kisan_ymd := 0;
             -- 課税更正日
-            rec_f_taino.kazei_kosei_ymd := getdatetonum(to_date(rec_main.kazei_kosei_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.kazei_kosei_ymd := get_ymd_str_to_num(rec_main.kazei_kosei_ymd);
             -- 更正事由コード
-            rec_f_taino.kosei_jiyu_cd := rec_main.kosei_jiyu_cd::numeric;
+            rec_f_taino.kosei_jiyu_cd := get_str_to_num(rec_main.kosei_jiyu_cd);
             -- 申告日
-            rec_f_taino.shinkoku_ymd := getdatetonum(to_date(rec_main.shinkoku_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.shinkoku_ymd := get_ymd_str_to_num(rec_main.shinkoku_ymd);
             -- 修正申告日
-            rec_f_taino.shusei_shinkoku_ymd := getdatetonum(to_date(rec_main.shusei_shinkoku_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.shusei_shinkoku_ymd := get_ymd_str_to_num(rec_main.shusei_shinkoku_ymd);
             --確定申告日
-            rec_f_taino.kakutei_shinkoku_ymd := getdatetonum(to_date(rec_main.kakutei_shinkoku_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.kakutei_shinkoku_ymd := get_ymd_str_to_num(rec_main.kakutei_shinkoku_ymd);
             -- 更正決定通知年月日
-            rec_f_taino.kosei_kettei_tsuchi_ymd := getdatetonum(to_date(rec_main.kosei_kettei_tsuchi_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.kosei_kettei_tsuchi_ymd := get_ymd_str_to_num(rec_main.kosei_kettei_tsuchi_ymd);
             -- 延長月数
-            rec_f_taino.encho_tsuki := rec_main.shinkoku_kigen_encho::numeric;
+            rec_f_taino.encho_tsuki := get_str_to_num(rec_main.shinkoku_kigen_encho);
             -- 申告期限
-            rec_f_taino.shinkoku_kigen_ymd := getdatetonum(to_date(rec_main.shinkoku_kigen, 'YYYY-MM-DD'));
+            rec_f_taino.shinkoku_kigen_ymd := get_ymd_str_to_num(rec_main.shinkoku_kigen);
             -- 延長期限
-            rec_f_taino.encho_kigen_ymd := getdatetonum(to_date(rec_main.encho_shinkoku_kigen, 'YYYY-MM-DD'));
+            rec_f_taino.encho_kigen_ymd := get_ymd_str_to_num(rec_main.encho_shinkoku_kigen);
             -- 更正請求日
-            rec_f_taino.kosei_seikyu_ymd := getdatetonum(to_date(rec_main.kosei_seikyu_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.kosei_seikyu_ymd := get_ymd_str_to_num(rec_main.kosei_seikyu_ymd);
             -- 国税の申告基礎区分
-            rec_f_taino.kokuzei_shinkoku_kiso_kbn := rec_main.kokuzei_shinkoku_kbn::numeric;
+            rec_f_taino.kokuzei_shinkoku_kiso_kbn := get_str_to_num(rec_main.kokuzei_shinkoku_kbn);
             -- 国税申告（更正）年月日
-            rec_f_taino.kokuzei_shinkoku_ymd := getdatetonum(to_date(rec_main.kokuzei_shinkoku_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.kokuzei_shinkoku_ymd := get_ymd_str_to_num(rec_main.kokuzei_shinkoku_ymd);
             -- 更正申告日
-            rec_f_taino.kosei_shinkoku_ymd := CASE WHEN getdatetonum(to_date(rec_main.kosei_seikyu_ymd, 'YYYY-MM-DD')) <= getdatetonum(to_date(rec_main.kokuzei_shinkoku_ymd, 'YYYY-MM-DD')) THEN
-                                                         getdatetonum(to_date(rec_main.kosei_seikyu_ymd, 'YYYY-MM-DD'))
-                                                    ELSE getdatetonum(to_date(rec_main.kokuzei_shinkoku_ymd, 'YYYY-MM-DD')) END;
+            rec_f_taino.kosei_shinkoku_ymd := CASE WHEN get_ymd_str_to_num(rec_main.kosei_seikyu_ymd) <= get_ymd_str_to_num(rec_main.kokuzei_shinkoku_ymd) THEN
+                                                         get_ymd_str_to_num(rec_main.kosei_seikyu_ymd)
+                                                    ELSE get_ymd_str_to_num(rec_main.kokuzei_shinkoku_ymd) END;
             -- 時効予定日
             rec_f_taino.jiko_yotei_ymd := 0;
             -- 納税消滅予定年月日
             rec_f_taino.shometsu_yotei_ymd := 0;
             -- 税額
-            rec_f_taino.zeigaku := rec_main.zeigaku::numeric;
+            rec_f_taino.zeigaku := get_str_to_num(rec_main.zeigaku);
             -- 督促手数料
-            rec_f_taino.tokusoku := rec_main.tokusoku::numeric;
+            rec_f_taino.tokusoku := get_str_to_num(rec_main.tokusoku);
             -- 延滞金
-            rec_f_taino.entaikin := rec_main.entaikin::numeric;
+            rec_f_taino.entaikin := get_str_to_num(rec_main.entaikin);
             -- 延滞金確定コード
             rec_f_taino.entaikin_kakutei_cd := CASE WHEN rec_f_taino.entaikin = 0 THEN 0 ELSE 1 END;
             -- 延滞金強制入力区分
-            rec_f_taino.entaikin_kyosei_kbn := rec_main.entaikin_kyosei_kbn::numeric;
+            rec_f_taino.entaikin_kyosei_kbn := get_str_to_num(rec_main.entaikin_kyosei_kbn);
             -- 延滞金強制入力年月日
-            rec_f_taino.entaikin_kyosei_ymd := getdatetonum(to_date(rec_main.entaikin_kyosei_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.entaikin_kyosei_ymd := get_ymd_str_to_num(rec_main.entaikin_kyosei_ymd);
             -- 調定額_法人住民税内訳_均等割額
-            rec_f_taino.zeigaku_kintowari := rec_main.zeigaku_kintowari::numeric;
+            rec_f_taino.zeigaku_kintowari := get_str_to_num(rec_main.zeigaku_kintowari);
             -- 調定額_法人住民税内訳_法人税割額
-            rec_f_taino.zeigaku_hojinwari := rec_main.zeigaku_hojinwari::numeric;
+            rec_f_taino.zeigaku_hojinwari := get_str_to_num(rec_main.zeigaku_hojinwari);
             -- 調定額_国民健康保険内訳_医療一般分
-            rec_f_taino.zeigaku_iryo_ippan := rec_main.zeigaku_iryo_ippan::numeric;
+            rec_f_taino.zeigaku_iryo_ippan := get_str_to_num(rec_main.zeigaku_iryo_ippan);
             -- 調定額_国民健康保険内訳_医療退職分
-            rec_f_taino.zeigaku_iryo_taisyoku := rec_main.zeigaku_iryo_taisyoku::numeric;
+            rec_f_taino.zeigaku_iryo_taisyoku := get_str_to_num(rec_main.zeigaku_iryo_taisyoku);
             -- 調定額_国民健康保険内訳_介護一般分
-            rec_f_taino.zeigaku_kaigo_ippan := rec_main.zeigaku_kaigo_ippan::numeric;
+            rec_f_taino.zeigaku_kaigo_ippan := get_str_to_num(rec_main.zeigaku_kaigo_ippan);
             -- 調定額_国民健康保険内訳_介護退職分
-            rec_f_taino.zeigaku_kaigo_taisyoku := rec_main.zeigaku_kaigo_taisyoku::numeric;
+            rec_f_taino.zeigaku_kaigo_taisyoku := get_str_to_num(rec_main.zeigaku_kaigo_taisyoku);
             -- 調定額_国民健康保険内訳_支援一般分
-            rec_f_taino.zeigaku_shien_ippan := rec_main.zeigaku_shien_ippan::numeric;
+            rec_f_taino.zeigaku_shien_ippan := get_str_to_num(rec_main.zeigaku_shien_ippan);
             -- 調定額_国民健康保険内訳_支援退職分
-            rec_f_taino.zeigaku_shien_taisyoku := rec_main.zeigaku_shien_taisyoku::numeric;
+            rec_f_taino.zeigaku_shien_taisyoku := get_str_to_num(rec_main.zeigaku_shien_taisyoku);
             -- 収納税額
-            rec_f_taino.zeigaku_shuno := rec_main.zeigaku_shuno::numeric + rec_main.zeigaku_karikeshi::numeric;
+            rec_f_taino.zeigaku_shuno := get_str_to_num(rec_main.zeigaku_shuno) + get_str_to_num(rec_main.zeigaku_karikeshi);
             -- 収納督促手数料
-            rec_f_taino.tokusoku_shuno := rec_main.tokusoku_shuno::numeric + rec_main.tokusoku_karikeshi::numeric;
+            rec_f_taino.tokusoku_shuno := get_str_to_num(rec_main.tokusoku_shuno) + get_str_to_num(rec_main.tokusoku_karikeshi);
             -- 収納延滞金
-            rec_f_taino.entaikin_shuno := rec_main.entaikin_shuno::numeric + rec_main.entaikin_karikeshi::numeric;
+            rec_f_taino.entaikin_shuno := get_str_to_num(rec_main.entaikin_shuno) + get_str_to_num(rec_main.entaikin_karikeshi);
             -- 収納額_法人住民税内訳_均等割額
-            rec_f_taino.zeigaku_kintowari_shuno := rec_main.zeigaku_kintowari_shuno::numeric;
+            rec_f_taino.zeigaku_kintowari_shuno := get_str_to_num(rec_main.zeigaku_kintowari_shuno);
             -- 収納額_法人住民税内訳_法人税割額
-            rec_f_taino.zeigaku_hojinwari_shuno := rec_main.zeigaku_hojinwari_shuno::numeric;
+            rec_f_taino.zeigaku_hojinwari_shuno := get_str_to_num(rec_main.zeigaku_hojinwari_shuno);
             -- 最終日計日
-            rec_f_taino.saishu_nikkei_ymd := getdatetonum(to_date(rec_main.shunyu_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.saishu_nikkei_ymd := get_ymd_str_to_num(rec_main.shunyu_ymd);
             -- 最終収納日
-            rec_f_taino.saishu_shuno_ymd := getdatetonum(to_date(rec_main.ryoshu_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.saishu_shuno_ymd := get_ymd_str_to_num(rec_main.ryoshu_ymd);
             -- 最終収納額
             rec_f_taino.saishu_shuno_kingaku := 0;
             -- 完納コード
@@ -379,33 +378,33 @@ BEGIN
             -- 通知年月日
             rec_f_taino.tsuchi_ymd := 0;
             -- 構成員督促送付可否フラグ
-            rec_f_taino.koseiin_tokusoku_flg := rec_main.koseiin_tokusoku_flg::numeric;
+            rec_f_taino.koseiin_tokusoku_flg := get_str_to_num(rec_main.koseiin_tokusoku_flg);
             -- 土地・家屋_固定資産税額
-            rec_f_taino.zeigaku_kotei_tochikaoku := rec_f_taino.zeigaku_kotei_tochikaoku::numeric;
+            rec_f_taino.zeigaku_kotei_tochikaoku := get_str_to_num(rec_main.zeigaku_kotei_tochikaoku);
             -- 償却資産_固定資産税額
-            rec_f_taino.zeigaku_kotei_shokyaku := rec_f_taino.zeigaku_kotei_shokyaku::numeric;
+            rec_f_taino.zeigaku_kotei_shokyaku := get_str_to_num(rec_main.zeigaku_kotei_shokyaku);
             -- 森林環境税額
-            rec_f_taino.zeigaku_shinrin := rec_f_taino.zeigaku_shinrin::numeric;
+            rec_f_taino.zeigaku_shinrin := get_str_to_num(rec_main.zeigaku_shinrin);
             -- 配当割・株式等譲渡所得割控除額
-            rec_f_taino.shotokuwari_kojo := rec_main.haitowari_shotokuwari_kojo::numeric;
+            rec_f_taino.shotokuwari_kojo := get_str_to_num(rec_main.haitowari_shotokuwari_kojo);
             -- 配当割・株式等譲渡所得割還付額
-            rec_f_taino.shotokuwari_kanpu := rec_main.haitowari_shotokuwari_kanpu::numeric;
+            rec_f_taino.shotokuwari_kanpu := get_str_to_num(rec_main.haitowari_shotokuwari_kanpu);
             -- 控除不足額
-            rec_f_taino.kojo_fusoku := rec_main.kojo_fusoku::numeric;
+            rec_f_taino.kojo_fusoku := get_str_to_num(rec_main.kojo_fusoku);
             -- 充当又は委託納付額
-            rec_f_taino.kojo_fusoku_nofu := rec_main.juto_itaku_nofu::numeric;
+            rec_f_taino.kojo_fusoku_nofu := get_str_to_num(rec_main.juto_itaku_nofu);
             -- 納期特例フラグ
-            rec_f_taino.noki_tokurei_flg := rec_main.noki_tokurei_kbn::numeric;
+            rec_f_taino.noki_tokurei_flg := get_str_to_num(rec_main.noki_tokurei_kbn);
             -- 納期特例適用後納期
-            rec_f_taino.noki_tokurei_ym := rec_main.noki_tokurei_ym::numeric;
+            rec_f_taino.noki_tokurei_ym := get_str_to_num(rec_main.noki_tokurei_ym);
             -- 課税区分
-            rec_f_taino.kazei_kbn := rec_main.kazei_kbn::numeric;
+            rec_f_taino.kazei_kbn := get_str_to_num(rec_main.kazei_kbn);
             -- 軽自管理番号
             rec_f_taino.keiji_kanri_no := rec_main.keiji_kanri_no;
             -- 車台番号
             rec_f_taino.shadai_no := rec_main.shadai_no;
             -- 種別コード
-            rec_f_taino.keiji_shubetsu_cd := rec_main.keiji_shubetsu_cd::numeric;
+            rec_f_taino.keiji_shubetsu_cd := get_str_to_num(rec_main.keiji_shubetsu_cd);
             -- 車両番号（標識番号）_標板文字
             rec_f_taino.sharyo_no1 := rec_main.sharyo_no1;
             -- 車両番号（標識番号）_分類番号
@@ -415,19 +414,19 @@ BEGIN
             -- 車両番号（標識番号）_一連指定番号
             rec_f_taino.sharyo_no4 := rec_main.sharyo_no4;
             -- 証明書有効期限
-            rec_f_taino.shomeisho_yuko_kigen := getdatetonum(to_date(rec_main.shomeisho_yuko_kigen, 'YYYY-MM-DD'));
+            rec_f_taino.shomeisho_yuko_kigen := get_ymd_str_to_num(rec_main.shomeisho_yuko_kigen);
             -- 重加算税の有無
-            rec_f_taino.jukazei_flg := rec_main.jukasanzei_flg::numeric;
+            rec_f_taino.jukazei_flg := get_str_to_num(rec_main.jukasanzei_flg);
             -- 不納欠損日
-            rec_f_taino.kesson_ymd := getdatetonum(to_date(rec_main.kesson_ymd, 'YYYY-MM-DD'));
+            rec_f_taino.kesson_ymd := get_ymd_str_to_num(rec_main.kesson_ymd);
             -- 不納欠損事由
-            rec_f_taino.kesson_jiyu_cd := rec_main.kesson_jiyu_cd::numeric;
+            rec_f_taino.kesson_jiyu_cd := get_str_to_num(rec_main.kesson_jiyu_cd);
             -- 不納欠損金額_本税（料）
-            rec_f_taino.zeigaku_kesson := rec_main.zeigaku_kesson::numeric;
+            rec_f_taino.zeigaku_kesson := get_str_to_num(rec_main.zeigaku_kesson);
             -- 不納欠損金額_延滞金
-            rec_f_taino.entaikin_kesson := rec_main.entaikin_kesson::numeric;
+            rec_f_taino.entaikin_kesson := get_str_to_num(rec_main.entaikin_kesson);
             -- 不納欠損金額_督促手数料
-            rec_f_taino.tokusoku_kesson := rec_main.tokusoku_kesson::numeric;
+            rec_f_taino.tokusoku_kesson := get_str_to_num(rec_main.tokusoku_kesson);
             -- 子ども・子育て事業所番号
             rec_f_taino.kodomo_jigyosho_no := rec_main.kodomo_jigyosho_no;
             -- データ作成日時
@@ -439,7 +438,7 @@ BEGIN
             -- 更新端末名称
             rec_f_taino.upd_tammatsu := 'SERVER';
             -- 削除フラグ
-            rec_f_taino.del_flg := rec_main.del_flg::numeric;
+            rec_f_taino.del_flg := get_str_to_num(rec_main.del_flg);
 
             OPEN cur_lock;
                   FETCH cur_lock INTO rec_lock;
@@ -848,7 +847,8 @@ BEGIN
          END IF;
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF get_str_to_num(rec_main.del_flg) = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
          
@@ -886,8 +886,6 @@ BEGIN
 
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
 EXCEPTION
    WHEN OTHERS THEN
