@@ -323,9 +323,7 @@ BEGIN
                DELETE FROM f_kojin_jusho
                WHERE kojin_no = lc_kojin_no;
 
-               GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
-               ln_del_count := ln_del_diag_count + ln_del_count;
-
+               ln_del_count := ln_del_count + 1;
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;
                ln_result_cd := ln_result_cd_del;

@@ -450,9 +450,7 @@ BEGIN
                DELETE FROM f_taino
                      WHERE kibetsu_key = rec_f_taino.kibetsu_key;
 
-                     GET DIAGNOSTICS ln_del_diag_count = ROW_COUNT;
-                     ln_del_count := ln_del_diag_count + ln_del_count;
-
+                     ln_del_count := ln_del_count + 1;
                      lc_err_text := '';
                      lc_err_cd := lc_err_cd_normal;
                      ln_result_cd := ln_result_cd_del;
