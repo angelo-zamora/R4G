@@ -9,6 +9,9 @@ RETURNS NUMERIC AS $$
 /**********************************************************************************************************************/
 
 BEGIN
+   
+   in_str_num := TRIM(in_str_num);
+
   　-- NULL、かつ空文字の場合は0を返す
     CASE WHEN in_str_num IS NULL OR in_str_num = '' THEN
         RETURN 0;
