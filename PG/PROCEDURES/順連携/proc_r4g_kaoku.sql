@@ -127,9 +127,9 @@ BEGIN
             -- 物件番号
             rec_f_kaokukihon_renkei.bukken_no := rec_main.bukken_no;
             -- 課税年度
-            rec_f_kaokukihon_renkei.kazei_nendo := rec_main.kazei_nendo::numeric;
+            rec_f_kaokukihon_renkei.kazei_nendo := get_str_to_num(rec_main.kazei_nendo);
             -- 家屋基本_履歴番号
-            rec_f_kaokukihon_renkei.kaoku_kihon_rireki_no := kaoku_kihon_rireki_no::numeric;
+            rec_f_kaokukihon_renkei.kaoku_kihon_rireki_no := get_str_to_num(rec_main.kaoku_kihon_rireki_no);
             -- 家屋_登記所在地
             rec_f_kaokukihon_renkei.kaoku_toki_jusho := get_trimmed_space(rec_main.kaoku_toki_jusho);
             -- 家屋番号
@@ -137,7 +137,7 @@ BEGIN
             -- 登記種類区分
             rec_f_kaokukihon_renkei.toki_shurui_kbn := rec_main.toki_shurui_kbn;
             -- 床面積
-            rec_f_kaokukihon_renkei.yuka_menseki := rec_main.yuka_menseki::numeric;
+            rec_f_kaokukihon_renkei.yuka_menseki :=  get_str_to_num(rec_main.yuka_menseki);
             -- 登記建築年月日
             rec_f_kaokukihon_renkei.toki_kenchiku_ymd := get_trimmed_date(rec_main.toki_kenchiku_ymd);
             -- 登記建築年月日_不詳表記
@@ -155,11 +155,11 @@ BEGIN
             -- 現況用途区分3
             rec_f_kaokukihon_renkei.genkyo_yoto_kbn3 := rec_main.genkyo_yoto_kbn3;
             -- 合計現況床面積
-            rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki := rec_main.gokei_genkyo_yuka_menseki::numeric;
+            rec_f_kaokukihon_renkei.gokei_genkyo_yuka_menseki := get_str_to_num(rec_main.gokei_genkyo_yuka_menseki);
             -- 家屋_現況所在地
             rec_f_kaokukihon_renkei.kaoku_genkyo_jusho := get_trimmed_space(rec_main.kaoku_genkyo_jusho);
             -- 分棟・合棟原因区分
-            rec_f_kaokukihon_renkei.genin_kbn := rec_main.genin_kbn::numeric;
+            rec_f_kaokukihon_renkei.genin_kbn := get_str_to_num(rec_main.genin_kbn);
             -- 分棟元・合棟先_物件番号
             rec_f_kaokukihon_renkei.to_bukken_no := rec_main.buntomoto_bukken_no;
             -- 分棟元・合棟先_履歴番号
@@ -173,7 +173,7 @@ BEGIN
             -- 更新端末名称
             rec_f_kaokukihon_renkei.upd_tammatsu := 'SERVER';
             -- 削除フラグ
-            rec_f_kaokukihon_renkei.del_flg := rec_main.del_flg::numeric;
+            rec_f_kaokukihon_renkei.del_flg := get_str_to_num(rec_main.del_flg);
 
             OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
@@ -294,7 +294,7 @@ BEGIN
             END IF;
 
             -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
-            IF rec_main.del_flg::numeric = 1 THEN
+            IF rec_f_kaokukihon_renkei.del_flg = 1 THEN
                ln_del_count := ln_del_count + 1;
                ln_result_cd := ln_result_cd_del;
             END IF;
