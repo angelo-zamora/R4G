@@ -128,15 +128,15 @@ BEGIN
             -- 物件番号
             rec_f_tochihyoka_renkei.bukken_no := rec_main.bukken_no;
             -- 課税年度
-            rec_f_tochihyoka_renkei.kazei_nendo := rec_main.kazei_nendo::numeric;
+            rec_f_tochihyoka_renkei.kazei_nendo := get_str_to_num(rec_main.kazei_nendo);
             -- 評価年度
-            rec_f_tochihyoka_renkei.hyoka_nendo := rec_main.hyoka_nendo::numeric;
+            rec_f_tochihyoka_renkei.hyoka_nendo := get_str_to_num(rec_main.hyoka_nendo);
             -- 評価額
-            rec_f_tochihyoka_renkei.hyokagaku := rec_main.hyokagaku::numeric;
+            rec_f_tochihyoka_renkei.hyokagaku := get_str_to_num(rec_main.hyokagaku);
             -- 登録年月日
-            rec_f_tochihyoka_renkei.toroku_ymd := getdatetonum(to_date(rec_main.sosa_ymd, 'YYYY-MM-DD'));
+            rec_f_tochihyoka_renkei.toroku_ymd := get_str_to_num(rec_main.sosa_ymd);
             -- 土地評価_履歴番号
-            rec_f_tochihyoka_renkei.hyoka_rireki_no := rec_main.hyoka_rireki_no::numeric;
+            rec_f_tochihyoka_renkei.hyoka_rireki_no := get_str_to_num(rec_main.hyoka_rireki_no);
             -- データ作成日時
             rec_f_tochihyoka_renkei.ins_datetime := CONCAT(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
             -- データ更新日時

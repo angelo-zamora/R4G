@@ -11,11 +11,11 @@ BEGIN
 
     in_ymd := TRIM(in_ymd);
     -- null または 0 または "0000-00-00" の場合チェック
-    IF in_ymd IS NULL OR in_ymd = '' OR rec_main.birth_ymd = '0000-00-00' THEN
+    IF in_ymd IS NULL OR in_ymd = '' OR in_ymd IS NULL OR in_ymd = '0' OR in_ymd = '0000-00-00' THEN
         RETURN 0;
     END IF;
 
-    RETURN getdatetonum(to_date(rec_main.ido_todoke_ymd, 'YYYY-MM-DD'));
+    RETURN getdatetonum(to_date(in_ymd, 'YYYY-MM-DD'));
 
 EXCEPTION
     WHEN OTHERS THEN
