@@ -143,15 +143,15 @@ BEGIN
          -- 申告事由
          rec_f_sharyo_renkei.shinkoku_jiyu := rec_main.shinkoku_jiyu;
          -- 申告年月日
-         rec_f_sharyo_renkei.shinkoku_ymd := get_date_to_num(to_date(rec_main.shinkoku_ymd, 'YYYY-MM-DD'));
+         rec_f_sharyo_renkei.shinkoku_ymd := getdatetonum(to_date(rec_main.shinkoku_ymd, 'YYYY-MM-DD'));
          -- 異動（登録・取得）年月日
-         rec_f_sharyo_renkei.ido_ymd := get_date_to_num(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
+         rec_f_sharyo_renkei.ido_ymd := getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
          -- 車両情報の異動年月日
-         rec_f_sharyo_renkei.syaryo_ido_ymd := get_date_to_num(to_date(rec_main.sharyo_ido_ymd, 'YYYY-MM-DD'));
+         rec_f_sharyo_renkei.syaryo_ido_ymd := getdatetonum(to_date(rec_main.sharyo_ido_ymd, 'YYYY-MM-DD'));
          -- 異動事由
          rec_f_sharyo_renkei.ido_jiyu := rec_main.ido_jiyu::numeric;
          -- 処理年月日
-         rec_f_sharyo_renkei.shori_ymd := get_date_to_num(to_date(rec_main.keiji_shori_ymd, 'YYYY-MM-DD'));
+         rec_f_sharyo_renkei.shori_ymd := getdatetonum(to_date(rec_main.keiji_shori_ymd, 'YYYY-MM-DD'));
          -- 種別コード
          rec_f_sharyo_renkei.keiji_syubetsu_cd := rec_main.shubetsu_cd::numeric;
          -- 排気区分
@@ -175,7 +175,7 @@ BEGIN
          -- 課税区分
          rec_f_sharyo_renkei.kazei_kbn := rec_main.kazei_kbn::numeric;
          -- 廃車年月日
-         rec_f_sharyo_renkei.haisha_ymd := get_date_to_num(to_date(rec_main.haisha_ymd, 'YYYY-MM-DD'));
+         rec_f_sharyo_renkei.haisha_ymd := getdatetonum(to_date(rec_main.haisha_ymd, 'YYYY-MM-DD'));
          -- 軽自履歴番号
          rec_f_sharyo_renkei.keiji_rireki_no := rec_main.keiji_rireki_no::numeric;
          -- データ作成日時

@@ -12,7 +12,7 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 機能概要 : f_督促_期別（f_tokusoku_kibetsu）の追加／更新／削除を実施する                                                */
+/* 機能概要 : 督促情報（統合収滞納）                                                                                     */
 /* 入力 IN  : in_n_renkei_data_cd  連携データコード                                                                     */
 /*            in_n_renkei_seq      連携SEQ（連携の一意性を保つSEQ）                                                      */
 /*            in_n_shori_ymd       処理日 （連携の処理を行う日付）                                                       */
@@ -108,7 +108,6 @@ BEGIN
    -- ２．連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_tokusoku_kibetsu;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_tokusoku_kibetsu';
          EXECUTE lc_sql;
       EXCEPTION
@@ -142,9 +141,9 @@ BEGIN
          -- 期別明細KEY
          rec_tokusoku.kibetsu_key := get_kibetsu_key(rec_main.fuka_nendo, rec_main.soto_nendo, rec_main.zeimoku_cd, rec_main.kibetsu_cd, rec_main.tokucho_shitei_no);
          -- 督促状発行日
-         rec_tokusoku.tokusoku_ymd := get_date_to_num(to_date(rec_main.tokusoku_hakko_ymd, 'YYYY-MM-DD'));
+         rec_tokusoku.tokusoku_ymd := getdatetonum(to_date(rec_main.tokusoku_hakko_ymd, 'YYYY-MM-DD'));
          -- 督促状返戻日
-         rec_tokusoku.tokusoku_henrei_ymd := get_date_to_num(to_date(rec_main.tokusoku_henrei_ymd, 'YYYY-MM-DD'));
+         rec_tokusoku.tokusoku_henrei_ymd := getdatetonum(to_date(rec_main.tokusoku_henrei_ymd, 'YYYY-MM-DD'));
          -- 督促区分
          rec_tokusoku.tokusoku_kbn := rec_main.tokusoku_kbn::numeric;
          -- 引き抜き（削除）区分
@@ -241,12 +240,13 @@ BEGIN
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
          IF rec_main.del_flg::numeric = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
 
          -- 中間テーブル更新
          BEGIN
-            UPDATE i_r4g_tokusoku
+            UPDATE dlgrenkei.i_r4g_tokusoku
             SET result_cd = ln_result_cd
                , error_cd = lc_err_cd
                , error_text = lc_err_text
@@ -280,9 +280,7 @@ BEGIN
    
    -- データ更新処理
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-   
-   RAISE NOTICE '処理結果 : % | エラーコード : % | 処理時間 : % | 処理内容 : % | 結果コード : %', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-   
+
    EXCEPTION WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;
       io_c_err_text := SQLERRM;

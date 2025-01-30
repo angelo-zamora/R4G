@@ -27,7 +27,7 @@ BEGIN
         -- 差押の場合
         WHEN in_shobun_shubetsu_cd IN ('1', '2', '3', '4') 
          AND ln_sashiosae_gemmen_ymd_kbn = 2 THEN
-            get_date_to_num(get_num_to_date(in_shobun_ymd) + 1)::VARCHAR
+            getdatetonum(get_num_to_date(in_shobun_ymd) + 1)::VARCHAR
         ELSE
             in_shobun_ymd::VARCHAR
     END;

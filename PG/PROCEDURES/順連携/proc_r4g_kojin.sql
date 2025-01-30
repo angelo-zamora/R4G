@@ -13,7 +13,7 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : 個人情報（f_kojin）の追加／更新／削除を実施する                                                             */
+/* 処理概要 : 住民情報（個人番号あり）                                                                                   */
 /* 引数 IN  : in_n_renkei_data_cd  … 連携データコード                                                                   */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                */
@@ -109,7 +109,6 @@ BEGIN
    -- ２．連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_kojin;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_kojin';
          EXECUTE lc_sql;
       EXCEPTION WHEN OTHERS THEN
@@ -243,7 +242,7 @@ BEGIN
             -- 戸籍_筆頭者_名
             rec_kojin.koseki_hittosha_mei := get_trimmed_space(rec_main.koseki_hitto_mei);
             -- 生年月日
-            rec_kojin.birth_ymd := CASE WHEN ymd_NULL_check(rec_main.birth_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.birth_ymd, 'YYYY-MM-DD'))END;
+            rec_kojin.birth_ymd := CASE WHEN ymd_NULL_check(rec_main.birth_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.birth_ymd, 'YYYY-MM-DD'))END;
             -- 生年月日_不詳フラグ
             rec_kojin.birth_fusho_flg := rec_main.birth_fusho_flg::numeric;
             -- 生年月日_不詳表記
@@ -269,45 +268,45 @@ BEGIN
             -- 自治体コード
             rec_kojin.jichitai_cd := rec_main.jusho_shikuchoson_cd;
             -- 処理年月日
-            rec_kojin.shori_ymd := get_date_to_num(to_date(rec_main.atena_shori_ymd, 'YYYY-MM-DD'));
+            rec_kojin.shori_ymd := getdatetonum(to_date(rec_main.atena_shori_ymd, 'YYYY-MM-DD'));
             -- 異動年月日
-            rec_kojin.ido_ymd := get_date_to_num(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
+            rec_kojin.ido_ymd := getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
             -- 異動年月日_不詳フラグ
             rec_kojin.ido_ymd_fusho_flg := rec_main.ido_fusho_flg::numeric;
             -- 異動年月日_不詳表記
             rec_kojin.ido_ymd_fusho := rec_main.ido_fusho;
             -- 異動届出年月日
-            rec_kojin.ido_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.ido_todoke_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.ido_todoke_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.ido_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.ido_todoke_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.ido_todoke_ymd, 'YYYY-MM-DD')) END;
             -- 異動事由コード
             rec_kojin.ido_jiyu_cd := rec_main.ido_jiyu_cd;
             -- 死亡年月日
-            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN get_date_to_num(to_date(rec_main.ido_ymd, 'YYYY-MM-DD')) ELSE 0 END;
+            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD')) ELSE 0 END;
             -- 住民日
-            rec_kojin.jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.jumin_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.jumin_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.jumin_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.jumin_ymd, 'YYYY-MM-DD')) END;
             -- 住民日_不詳フラグ
             rec_kojin.jumin_ymd_fusho_flg := CASE WHEN rec_main.jumin_fusho_flg IS NULL OR rec_main.jumin_fusho_flg = '' THEN 0 ELSE rec_main.jumin_fusho_flg::numeric END;
             -- 住民日_不詳表記
             rec_kojin.jumin_ymd_fusho := rec_main.jumin_fusho;
             -- 外国人住民日
-            rec_kojin.gaikokujin_jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.gaikokujin_jumin_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.gaikokujin_jumin_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.gaikokujin_jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.gaikokujin_jumin_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.gaikokujin_jumin_ymd, 'YYYY-MM-DD')) END;
             -- 外国人住民日_不詳フラグ
             rec_kojin.gaikokujin_jumin_ymd_fusho_flg := CASE WHEN rec_main.gaikokujin_jumin_fusho_flg IS NULL OR rec_main.gaikokujin_jumin_fusho_flg = '' THEN 0 ELSE rec_main.gaikokujin_jumin_fusho_flg::numeric END;
             -- 外国人住民日_不詳表記
             rec_kojin.gaikokujin_jumin_ymd_fusho := rec_main.gaikokujin_jumin_fusho;
             -- 住定日
-            rec_kojin.jutei_ymd := CASE WHEN ymd_NULL_check(rec_main.jutei_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.jutei_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.jutei_ymd := CASE WHEN ymd_NULL_check(rec_main.jutei_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.jutei_ymd, 'YYYY-MM-DD')) END;
             -- 住定日_不詳フラグ
             rec_kojin.jutei_ymd_fusho_flg := rec_main.jutei_fusho_flg;
             -- 住定日_不詳表記
             rec_kojin.jutei_ymd_fusho := rec_main.jutei_fusho;
             -- 転入通知年月日
-            rec_kojin.tennyu_tsuchi_ymd := CASE WHEN ymd_NULL_check(rec_main.tennyu_tsuchi_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.tennyu_tsuchi_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tennyu_tsuchi_ymd := CASE WHEN ymd_NULL_check(rec_main.tennyu_tsuchi_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tennyu_tsuchi_ymd, 'YYYY-MM-DD')) END;
             -- 転出届出年月日
-            rec_kojin.tenshutsu_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_todoke_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.tenshutsu_todoke_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tenshutsu_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_todoke_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tenshutsu_todoke_ymd, 'YYYY-MM-DD')) END;
             -- 転出予定年月日
-            rec_kojin.tenshutsu_yotei_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_yotei_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.tenshutsu_yotei_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tenshutsu_yotei_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_yotei_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tenshutsu_yotei_ymd, 'YYYY-MM-DD')) END;
             -- 転出年月日（確定）
-            rec_kojin.tenshutsu_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_ymd) = TRUE THEN 0 ELSE get_date_to_num(to_date(rec_main.tenshutsu_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tenshutsu_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tenshutsu_ymd, 'YYYY-MM-DD')) END;
             -- 通称名カタカナ(検索用)
             rec_kojin.tsushomei_kensaku_kana := get_kensaku_kana(rec_main.tsushomei_kana, 2);
             -- 旧氏カタカナ(検索用)
@@ -333,7 +332,7 @@ BEGIN
             -- 在留期間等日コード
             rec_kojin.zairyu_kikan_hi_cd := rec_main.zairyu_kikan_hi_cd::numeric;
             -- 在留期間等満了年月日
-            rec_kojin.zairyu_manryo_ymd := get_date_to_num(to_date(rec_main.zairyu_manryo_ymd, 'YYYY-MM-DD'));
+            rec_kojin.zairyu_manryo_ymd := getdatetonum(to_date(rec_main.zairyu_manryo_ymd, 'YYYY-MM-DD'));
             -- 記載順位
             rec_kojin.kisai_juni := rec_main.kisai_juni::numeric;
             -- 法第30条46又は47区分
@@ -376,7 +375,7 @@ BEGIN
                WHERE kojin_no = rec_kojin.kojin_no;
                
                GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
-               ln_del_count : ln_del_count + ln_del_diag_count;
+               ln_del_count := ln_del_count + ln_del_diag_count;
                
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;
@@ -746,7 +745,7 @@ BEGIN
                END;
             END IF;
          END IF;
-
+         
          BEGIN
             UPDATE dlgrenkei.i_r4g_atena 
                SET result_cd = ln_result_cd
@@ -784,9 +783,7 @@ BEGIN
    
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-   
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-   
+
    EXCEPTION
       WHEN OTHERS THEN
          io_c_err_code := SQLSTATE;

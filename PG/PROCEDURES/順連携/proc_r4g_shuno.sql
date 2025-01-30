@@ -10,7 +10,7 @@ CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_shuno(
 LANGUAGE plpgsql
 AS $$
 /**********************************************************************************************************************/
-/* 処理概要 : f_収納（f_shuno）の追加／更新／削除を実施する                                                               */
+/* 処理概要 : 収納履歴情報（統合収滞納）                                                                                 */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                    */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                   */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                 */
@@ -98,14 +98,8 @@ BEGIN
     -- ２．連携先データの削除
     IF ln_para01 = 1 THEN
         BEGIN
-            SELECT COUNT(*)
-            INTO ln_del_count
-            FROM f_shuno;
-
             lc_sql := 'TRUNCATE TABLE dlgmain.f_shuno';
-
             EXECUTE lc_sql;
-
             EXCEPTION
                 WHEN OTHERS THEN
                 io_c_err_code := SQLSTATE;
@@ -168,11 +162,11 @@ BEGIN
         rec_f_shuno.tsuchisho_no        := rec_main.tsuchisho_no;
         rec_f_shuno.jigyo_kaishi_ymd    :=  CASE 
                                                 WHEN ymd_null_check(rec_main.jigyo_kaishi_ymd) THEN 0
-                                                ELSE get_date_to_num(to_date(rec_main.jigyo_kaishi_ymd, 'YYYY-MM-DD'))
+                                                ELSE getdatetonum(to_date(rec_main.jigyo_kaishi_ymd, 'YYYY-MM-DD'))
                                             END;
         rec_f_shuno.jigyo_shuryo_ymd    :=  CASE 
                                                 WHEN ymd_null_check(rec_main.jigyo_shuryo_ymd) THEN 0
-                                                ELSE get_date_to_num(to_date(rec_main.jigyo_shuryo_ymd, 'YYYY-MM-DD'))
+                                                ELSE getdatetonum(to_date(rec_main.jigyo_shuryo_ymd, 'YYYY-MM-DD'))
                                             END;
         rec_f_shuno.shinkoku_cd         := CASE 
                                                 WHEN rec_main.shinkoku_cd = NULL OR rec_main.shinkoku_cd = '' THEN 0
@@ -197,8 +191,8 @@ BEGIN
         rec_f_shuno.nofu_shubetsu_cd    := rec_main.nofu_shubetsu_cd::numeric;
         rec_f_shuno.kumikae_kbn         := rec_main.kumikae_kbn::numeric;
         rec_f_shuno.nofu_channel_kbn    := rec_main.nofu_channel_kbn::numeric;
-        rec_f_shuno.shuno_ymd           := get_date_to_num(to_date(rec_main.ryoshu_ymd, 'YYYY-MM-DD'));
-        rec_f_shuno.nikkei_ymd          := get_date_to_num(to_date(rec_main.shunyu_ymd, 'YYYY-MM-DD'));
+        rec_f_shuno.shuno_ymd           := getdatetonum(to_date(rec_main.ryoshu_ymd, 'YYYY-MM-DD'));
+        rec_f_shuno.nikkei_ymd          := getdatetonum(to_date(rec_main.shunyu_ymd, 'YYYY-MM-DD'));
         rec_f_shuno.shotokuwari_shuno   := 0;
         rec_f_shuno.fukakachiwari_shuno := 0;
         rec_f_shuno.shihonwari_shuno    := 0;
@@ -478,9 +472,7 @@ BEGIN
 
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-
+   
 EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;

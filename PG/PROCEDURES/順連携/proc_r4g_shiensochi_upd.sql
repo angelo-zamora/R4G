@@ -150,7 +150,7 @@ BEGIN
                                         , nextval('dlgmain.seq_no_kiji')
                                         , rec_main.kojin_no
                                         , 1
-                                        , get_date_to_num(current_date)
+                                        , getdatetonum(current_date)
                                         , 0
                                         , 2
                                         , '事務処理用'
@@ -272,7 +272,7 @@ BEGIN
                                         , nextval('dlgmain.seq_no_kiji')
                                         , rec_i_r4g_atena.kojin_no
                                         , 1
-                                        , get_date_to_num(current_date)
+                                        , getdatetonum(current_date)
                                         , 0
                                         , 2
                                         , '事務処理用'

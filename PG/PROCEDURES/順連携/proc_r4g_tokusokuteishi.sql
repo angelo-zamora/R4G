@@ -129,11 +129,11 @@ BEGIN
          -- 個人番号
          rec_f_tokusokuteishi.kojin_no := rec_main.atena_no;
          -- 督促停止年月日
-         rec_f_tokusokuteishi.teishi_ymd := get_date_to_num(to_date(rec_main.tokusoku_teishi_ymd, 'YYYY-MM-DD'));
+         rec_f_tokusokuteishi.teishi_ymd := getdatetonum(to_date(rec_main.tokusoku_teishi_ymd, 'YYYY-MM-DD'));
          -- 督促停止事由コード
          rec_f_tokusokuteishi.teishi_jiyu_cd := rec_main.tokusoku_kaijo_jiyu::numeric;
          -- 督促停止解除年月日
-         rec_f_tokusokuteishi.kaijo_ymd := get_date_to_num(to_date(rec_main.tokusoku_kaijo_ymd, 'YYYY-MM-DD'));
+         rec_f_tokusokuteishi.kaijo_ymd := getdatetonum(to_date(rec_main.tokusoku_kaijo_ymd, 'YYYY-MM-DD'));
          -- 督促停止解除事由コード
          rec_f_tokusokuteishi.teishi_kaijo_riyu_cd := rec_main.tokusoku_teishi_jiyu;
          -- データ作成日時

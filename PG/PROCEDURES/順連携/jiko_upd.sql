@@ -19,7 +19,7 @@ DECLARE
 
 BEGIN
 
-      rec_get_jiko_handan := get_jiko_handan( rec_main.kibetsu_key, get_date_to_num( CURRENT_TIMESTAMP(0)::date ) );
+      rec_get_jiko_handan := get_jiko_handan( rec_main.kibetsu_key, getdatetonum( CURRENT_TIMESTAMP(0)::date ) );
       ln_jiko_ymd := rec_get_jiko_handan[1].jiko_ymd;
 	   ln_shometsu_ymd := rec_get_jiko_handan[1].shometsu_ymd;
 	   ln_jiko_kisan_ymd := rec_get_jiko_handan[1].jiko_kisan_ymd;

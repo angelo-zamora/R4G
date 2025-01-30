@@ -54,8 +54,8 @@ DECLARE
    cur_kanshi CURSOR FOR
    SELECT *
    FROM f_group_kanshi_settei
-   WHERE kanshi_kaishi_ymd <= get_date_to_num( CURRENT_TIMESTAMP(0)::date )
-     AND kanshi_shuryo_ymd >= get_date_to_num( CURRENT_TIMESTAMP(0)::date );
+   WHERE kanshi_kaishi_ymd <= getdatetonum( CURRENT_TIMESTAMP(0)::date )
+     AND kanshi_shuryo_ymd >= getdatetonum( CURRENT_TIMESTAMP(0)::date );
 
    rec_kanshi                     f_group_kanshi_settei%ROWTYPE;
 

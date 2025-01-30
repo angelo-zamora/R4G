@@ -319,9 +319,7 @@ BEGIN
 
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-
+   
 EXCEPTION
    WHEN OTHERS THEN
    io_c_err_code := SQLSTATE;

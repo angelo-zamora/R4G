@@ -136,7 +136,7 @@ BEGIN
          rec_lock                       := NULL;
 
          lc_kojin_no := rec_main.atena_no::character varying;
-         ln_kaishi_ymd := get_date_to_num(to_date(rec_main.shiensochi_kaishi_ymd, 'YYYY-MM-DD'));
+         ln_kaishi_ymd := getdatetonum(to_date(rec_main.shiensochi_kaishi_ymd, 'YYYY-MM-DD'));
 
          -- 個人番号
          rec_f_shiensochi.kojin_no := lc_kojin_no;
@@ -145,7 +145,7 @@ BEGIN
          -- 支援措置区分
          rec_f_shiensochi.shiensochi_kbn := rec_main.sochi_jkn;
          -- 期間終了日
-         rec_f_shiensochi.shuryo_ymd := CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE get_date_to_num(to_date(rec_main.shiensochi_shuryo_ymd, 'yyyy-mm-dd')) END;
+         rec_f_shiensochi.shuryo_ymd := CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE getdatetonum(to_date(rec_main.shiensochi_shuryo_ymd, 'yyyy-mm-dd')) END;
          -- 一時解除（照会）フラグ
          rec_f_shiensochi.kaijo_shokai_flg := 0;
          -- 一時解除（照会）開始日時
@@ -315,7 +315,7 @@ BEGIN
                         , nextval('dlgmain.seq_no_kiji')
                         , rec_main.atena_no
                         , 1
-                        , get_date_to_num(current_date)
+                        , getdatetonum(current_date)
                         , 0
                         , 2
                         , '事務処理用'
