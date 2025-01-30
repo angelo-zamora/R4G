@@ -253,7 +253,7 @@ BEGIN
 
          BEGIN
             -- 中間テーブル更新
-            IF rec_main.del_flg::numeric = 1 THEN
+            IF rec_kotei.del_flg = 1 THEN
                ln_del_count := ln_del_count + 1;
                ln_result_cd := ln_result_cd_del;
             END IF;
