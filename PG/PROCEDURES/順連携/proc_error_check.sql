@@ -2,7 +2,11 @@
 --  DDL for Procedure proc_error_check
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE proc_error_check( in_n_renkei_data_cd IN numeric, in_n_renkei_seq IN numeric, in_n_shori_ymd IN numeric, io_c_error_cd INOUT character varying, io_c_error_text INOUT character varying )
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_error_check( 
+    in_n_renkei_data_cd IN numeric, in_n_renkei_seq IN numeric, 
+    in_n_shori_ymd IN numeric, 
+    io_c_error_cd INOUT character varying, 
+    io_c_error_text INOUT character varying )
 LANGUAGE plpgsql
 AS $$
 
@@ -30,17 +34,17 @@ BEGIN
     -- (1) Fetch table name from F_RENKEI_DATA
     BEGIN
         SELECT table_name INTO lc_table_name
-        FROM f_renkei_data
+        FROM dlgrenkei.f_renkei_data
         WHERE renkei_data_cd = in_n_renkei_data_cd;
 
         IF lc_table_name IS NULL OR lc_table_name = '' THEN
-            io_n_error_cd := 9;
+            io_c_error_cd := '9';
             io_c_error_text := 'エラーチェック対象テーブル未設定';
             RETURN;
         END IF;
     EXCEPTION
         WHEN OTHERS THEN
-            io_n_error_cd := 9;
+            io_c_error_cd := '9';
             io_c_error_text := '中間テーブル名取得エラー';
             RETURN;
     END;
