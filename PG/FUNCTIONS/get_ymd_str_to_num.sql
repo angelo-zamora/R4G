@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_ymd_str_to_num_(in_ymd character varying)
+CREATE OR REPLACE FUNCTION get_ymd_str_to_num(in_ymd character varying)
 RETURNS NUMERIC AS $$
 /**********************************************************************************************************************/
 /* 処理概要 : 日付項目にてnull または 0 または "0000-00-00" の場合チェック                                                */
