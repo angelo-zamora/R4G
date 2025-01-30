@@ -11,12 +11,13 @@ RETURNS NUMERIC AS $$
 BEGIN
    
     in_str_num := TRIM(in_str_num);
+    
     -- NULLまたは空文字の場合は0を返却
-    CASE WHEN in_str_num IS NULL OR in_str_num = '' THEN
+    IF in_str_num IS NULL OR in_str_num = '' THEN
         RETURN 0;
-    ELSE
-        RETURN in_str_num::numeric;
-    END CASE;
+    END IF;
+
+    RETURN in_str_num::numeric;
 
 EXCEPTION
     WHEN OTHERS THEN
