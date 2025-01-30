@@ -11,7 +11,7 @@ RETURNS NUMERIC AS $$
 BEGIN
    
     in_str_num := TRIM(in_str_num);
-    
+
     -- NULLまたは空文字の場合は0を返却
     IF in_str_num IS NULL OR in_str_num = '' THEN
         RETURN 0;
@@ -21,6 +21,6 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        RETURN NULL;
+        RETURN 0;
 END;
 $$ LANGUAGE plpgsql;

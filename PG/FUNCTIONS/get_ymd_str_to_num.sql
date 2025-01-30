@@ -17,7 +17,6 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        -- 日付エラーの場合
-        RETURN True;
+        RETURN 0;
 END;
 $$ LANGUAGE plpgsql;
