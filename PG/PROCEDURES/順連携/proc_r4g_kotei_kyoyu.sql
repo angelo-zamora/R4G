@@ -287,8 +287,6 @@ BEGIN
    
    -- 更新内容は連携ツールの連携処理クラス（RenkeiProcess）の処理：insertRenkeiKekkaを参照
    CALL dlgrenkei.proc_upd_log(rec_log);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
    
    EXCEPTION
    WHEN OTHERS THEN
