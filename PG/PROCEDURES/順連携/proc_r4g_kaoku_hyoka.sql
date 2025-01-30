@@ -124,7 +124,7 @@ BEGIN
             -- 家屋評価額
             rec_f_kaokuhyoka_renkei.kaoku_hyokagaku := rec_main.kaoku_hyokagaku::numeric;
             -- 登録年月日
-            rec_f_kaokuhyoka_renkei.toroku_ymd := get_date_to_num(to_date(rec_main.toroku_ymd, 'YYYY-MM-DD'));
+            rec_f_kaokuhyoka_renkei.toroku_ymd := getdatetonum(to_date(rec_main.toroku_ymd, 'YYYY-MM-DD'));
             -- 家屋評価_履歴番号
             rec_f_kaokuhyoka_renkei.kaoku_hyoka_no := rec_main.kaoku_hyoka_no::numeric;
             -- データ作成日時

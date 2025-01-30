@@ -139,8 +139,8 @@ BEGIN
          rec_f_sofu_zeimoku.sofu_setti_riyu := rec_main.sofu_setti_riyu;
          rec_f_sofu_zeimoku.renrakusaki_kbn := rec_main.renrakusaki_kbn;
          rec_f_sofu_zeimoku.denwa_no := rec_main.tel_no;
-         rec_f_sofu_zeimoku.yukokigen_kaishi_ymd := get_date_to_num(to_date(rec_main.toroku_ymd, 'yyyy-mm-dd'));
-         rec_f_sofu_zeimoku.yukokigen_shuryo_ymd := get_date_to_num(to_date(rec_main.riyou_haishi_ymd, 'yyyy-mm-dd'));
+         rec_f_sofu_zeimoku.yukokigen_kaishi_ymd := getdatetonum(to_date(rec_main.toroku_ymd, 'yyyy-mm-dd'));
+         rec_f_sofu_zeimoku.yukokigen_shuryo_ymd := getdatetonum(to_date(rec_main.riyou_haishi_ymd, 'yyyy-mm-dd'));
          rec_f_sofu_zeimoku.renkei_flg := 1;
          rec_f_sofu_zeimoku.sofurireki_no := rec_main.sofu_rireki_no;
          rec_f_sofu_zeimoku.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;

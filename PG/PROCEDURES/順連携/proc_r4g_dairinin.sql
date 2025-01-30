@@ -113,8 +113,8 @@ BEGIN
          lc_dairinin_kojin_no := rec_main.dairinin_atena_no;
          lc_gyomu_cd := rec_main.gyomu_id;
          ln_zeimoku_cd := get_r4g_code_conv(1, '3', null, rec_main.zeimoku_cd::character varying);
-         ln_dairinin_yukokikan_kaishi_ymd := get_date_to_num(to_date(rec_main.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd'));
-         ln_dairinin_yukokikan_shuryo_ymd := get_date_to_num(to_date(rec_main.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd'));
+         ln_dairinin_yukokikan_kaishi_ymd := getdatetonum(to_date(rec_main.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd'));
+         ln_dairinin_yukokikan_shuryo_ymd := getdatetonum(to_date(rec_main.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd'));
          lc_denwa := get_trimmed_space(rec_main.denwa_no);
 
          OPEN cur_lock;

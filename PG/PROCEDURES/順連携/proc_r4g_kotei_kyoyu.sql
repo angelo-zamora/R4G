@@ -136,7 +136,7 @@ BEGIN
          rec_kotei.kyoyu_kbn := rec_main.kyoyu_kbn::numeric;
          -- rec_kotei.kyoyu_mochibun_kbn := rec_main.kyoyu_kbn; TO BE CONFIRMED
          rec_kotei.daihyosha_flg := rec_main.daihyo_flg::numeric;
-         rec_kotei.ido_ymd := get_date_to_num(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
+         rec_kotei.ido_ymd := getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
          rec_kotei.ido_jiyu_cd := rec_main.ido_jiyu::numeric;
          rec_kotei.kyoyusha_ninzu := rec_main.kyoyu_ninzu::numeric;
          rec_kotei.toki_mochibun_bunshi := get_trimmed_space(rec_main.toki_bunshi);

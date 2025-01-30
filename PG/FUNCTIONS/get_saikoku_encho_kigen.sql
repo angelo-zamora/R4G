@@ -36,7 +36,7 @@ BEGIN
     IF ln_hakko_ymd IS NULL THEN
         RETURN '0000-00-00';
     ELSE 
-        RETURN CAST(get_jiko_add_months_m(get_date_to_num(get_num_to_date(ln_hakko_ymd)) + ln_saikoku_nissu, 6, 0) AS character varying);
+        RETURN CAST(get_jiko_add_months_m(getdatetonum(get_num_to_date(ln_hakko_ymd)) + ln_saikoku_nissu, 6, 0) AS character varying);
     END IF;
 
 EXCEPTION

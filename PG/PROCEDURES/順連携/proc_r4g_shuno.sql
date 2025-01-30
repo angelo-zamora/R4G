@@ -162,11 +162,11 @@ BEGIN
         rec_f_shuno.tsuchisho_no        := rec_main.tsuchisho_no;
         rec_f_shuno.jigyo_kaishi_ymd    :=  CASE 
                                                 WHEN ymd_null_check(rec_main.jigyo_kaishi_ymd) THEN 0
-                                                ELSE get_date_to_num(to_date(rec_main.jigyo_kaishi_ymd, 'YYYY-MM-DD'))
+                                                ELSE getdatetonum(to_date(rec_main.jigyo_kaishi_ymd, 'YYYY-MM-DD'))
                                             END;
         rec_f_shuno.jigyo_shuryo_ymd    :=  CASE 
                                                 WHEN ymd_null_check(rec_main.jigyo_shuryo_ymd) THEN 0
-                                                ELSE get_date_to_num(to_date(rec_main.jigyo_shuryo_ymd, 'YYYY-MM-DD'))
+                                                ELSE getdatetonum(to_date(rec_main.jigyo_shuryo_ymd, 'YYYY-MM-DD'))
                                             END;
         rec_f_shuno.shinkoku_cd         := CASE 
                                                 WHEN rec_main.shinkoku_cd = NULL OR rec_main.shinkoku_cd = '' THEN 0
@@ -191,8 +191,8 @@ BEGIN
         rec_f_shuno.nofu_shubetsu_cd    := rec_main.nofu_shubetsu_cd::numeric;
         rec_f_shuno.kumikae_kbn         := rec_main.kumikae_kbn::numeric;
         rec_f_shuno.nofu_channel_kbn    := rec_main.nofu_channel_kbn::numeric;
-        rec_f_shuno.shuno_ymd           := get_date_to_num(to_date(rec_main.ryoshu_ymd, 'YYYY-MM-DD'));
-        rec_f_shuno.nikkei_ymd          := get_date_to_num(to_date(rec_main.shunyu_ymd, 'YYYY-MM-DD'));
+        rec_f_shuno.shuno_ymd           := getdatetonum(to_date(rec_main.ryoshu_ymd, 'YYYY-MM-DD'));
+        rec_f_shuno.nikkei_ymd          := getdatetonum(to_date(rec_main.shunyu_ymd, 'YYYY-MM-DD'));
         rec_f_shuno.shotokuwari_shuno   := 0;
         rec_f_shuno.fukakachiwari_shuno := 0;
         rec_f_shuno.shihonwari_shuno    := 0;

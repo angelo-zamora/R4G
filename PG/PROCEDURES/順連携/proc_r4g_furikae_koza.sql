@@ -134,9 +134,9 @@ BEGIN
          -- 児童_宛名番号
          rec_furikae.jido_kojin_no           := rec_main.jido_atena_no;
          -- 開始日
-         rec_furikae.kaishi_ymd              := get_date_to_num(to_date(rec_main.koufuri_kaishi_ymd, 'YYYY-MM-DD'));
+         rec_furikae.kaishi_ymd              := getdatetonum(to_date(rec_main.koufuri_kaishi_ymd, 'YYYY-MM-DD'));
          -- 終了日
-         rec_furikae.shuryo_ymd              := get_date_to_num(to_date(rec_main.koufuri_shuryo_ymd, 'YYYY-MM-DD'));
+         rec_furikae.shuryo_ymd              := getdatetonum(to_date(rec_main.koufuri_shuryo_ymd, 'YYYY-MM-DD'));
          -- 金融機関コード
          rec_furikae.kinyu_kikan_cd          := rec_main.kinyukikan_cd;
          -- 金融機関支店コード
@@ -156,11 +156,11 @@ BEGIN
          --- 口座名義人
          rec_furikae.koza_meiginin           := get_trimmed_space(rec_main.koza_meigi_kanji);
          -- 口座振替停止開始年月日
-         rec_furikae.teishi_kaishi_ymd       := get_date_to_num(to_date(rec_main.koza_teishi_kaishi_ymd, 'YYYY-MM-DD'));
+         rec_furikae.teishi_kaishi_ymd       := getdatetonum(to_date(rec_main.koza_teishi_kaishi_ymd, 'YYYY-MM-DD'));
          -- 口座振替停止終了年月日
-         rec_furikae.teishi_shuryo_ymd       := get_date_to_num(to_date(rec_main.koza_teishi_shuryo_ymd, 'YYYY-MM-DD'));
+         rec_furikae.teishi_shuryo_ymd       := getdatetonum(to_date(rec_main.koza_teishi_shuryo_ymd, 'YYYY-MM-DD'));
          -- 口座振替廃止年月日
-         rec_furikae.haishi_ymd              := get_date_to_num(to_date(rec_main.koza_haishi_ymd, 'YYYY-MM-DD'));
+         rec_furikae.haishi_ymd              := getdatetonum(to_date(rec_main.koza_haishi_ymd, 'YYYY-MM-DD'));
          -- 納付方法
          rec_furikae.nofuhoho_kbn            := rec_main.nofuhoho::numeric;
          -- メモ

@@ -82,8 +82,8 @@ BEGIN
             IF(
                rec_main.dairinin_atena_no = rec_lock.kojin_no
                AND ln_zeimoku_cd = rec_lock.zeimoku_cd
-               AND get_date_to_num(to_date(rec_main.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd')) <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
-               AND get_date_to_num(to_date(rec_main.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd')) >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd')) <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd')) >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
                AND rec_main.del_flg = '0'
             ) THEN
                ln_kanrinin_cd := 1;
@@ -133,8 +133,8 @@ BEGIN
             IF(
                rec_main2.dairinin_atena_no = rec_lock.kojin_no
                AND ln_zeimoku_cd = rec_lock.zeimoku_cd
-               AND get_date_to_num(to_date(rec_main2.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd'))  <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
-               AND get_date_to_num(to_date(rec_main2.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd'))  >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main2.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd'))  <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main2.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd'))  >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
                AND rec_main2.del_flg = '0'
             ) THEN
                ln_kanrinin_cd := 1;

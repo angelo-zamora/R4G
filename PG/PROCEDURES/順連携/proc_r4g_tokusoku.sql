@@ -141,9 +141,9 @@ BEGIN
          -- 期別明細KEY
          rec_tokusoku.kibetsu_key := get_kibetsu_key(rec_main.fuka_nendo, rec_main.soto_nendo, rec_main.zeimoku_cd, rec_main.kibetsu_cd, rec_main.tokucho_shitei_no);
          -- 督促状発行日
-         rec_tokusoku.tokusoku_ymd := get_date_to_num(to_date(rec_main.tokusoku_hakko_ymd, 'YYYY-MM-DD'));
+         rec_tokusoku.tokusoku_ymd := getdatetonum(to_date(rec_main.tokusoku_hakko_ymd, 'YYYY-MM-DD'));
          -- 督促状返戻日
-         rec_tokusoku.tokusoku_henrei_ymd := get_date_to_num(to_date(rec_main.tokusoku_henrei_ymd, 'YYYY-MM-DD'));
+         rec_tokusoku.tokusoku_henrei_ymd := getdatetonum(to_date(rec_main.tokusoku_henrei_ymd, 'YYYY-MM-DD'));
          -- 督促区分
          rec_tokusoku.tokusoku_kbn := rec_main.tokusoku_kbn::numeric;
          -- 引き抜き（削除）区分
