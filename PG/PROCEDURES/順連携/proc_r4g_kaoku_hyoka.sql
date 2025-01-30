@@ -36,7 +36,6 @@ DECLARE
    lc_err_cd                      character varying;             -- エラーコード用変数
    lc_err_text                    character varying(100):='';    -- エラー内容用変数
    ln_result_cd                   numeric DEFAULT 0;             -- 結果区分更新用変数
-   ln_del_diag_count              numeric DEFAULT 0;
    
    ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
    ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
