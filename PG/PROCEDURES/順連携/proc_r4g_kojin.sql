@@ -268,9 +268,9 @@ BEGIN
             -- 自治体コード
             rec_kojin.jichitai_cd := rec_main.jusho_shikuchoson_cd;
             -- 処理年月日
-            rec_kojin.shori_ymd := getdatetonum(to_date(rec_main.atena_shori_ymd, 'YYYY-MM-DD'));
+            rec_kojin.shori_ymd := get_ymd_str_to_num(rec_main.atena_shori_ymd);
             -- 異動年月日
-            rec_kojin.ido_ymd := getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
+            rec_kojin.ido_ymd := get_ymd_str_to_num(rec_main.ido_ymd);
             -- 異動年月日_不詳フラグ
             rec_kojin.ido_ymd_fusho_flg := get_str_to_num(rec_main.ido_fusho_flg);
             -- 異動年月日_不詳表記
@@ -280,7 +280,7 @@ BEGIN
             -- 異動事由コード
             rec_kojin.ido_jiyu_cd := rec_main.ido_jiyu_cd;
             -- 死亡年月日
-            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD')) ELSE 0 END;
+            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN get_ymd_str_to_num(rec_main.ido_ymd) END;
             -- 住民日
             rec_kojin.jumin_ymd := get_get_ymd_str_to_num(rec_main.jumin_ymd);
             -- 住民日_不詳フラグ
