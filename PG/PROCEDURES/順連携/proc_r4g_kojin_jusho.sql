@@ -13,7 +13,7 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_個人_住所（f_kojin_jusho）の追加／更新／削除を実施する                                                */
+/* 処理概要 : 住民情報（個人番号あり）                                                                                */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
@@ -98,7 +98,6 @@ BEGIN
    -- 2. 連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_kojin_jusho;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_kojin_jusho';
          EXECUTE lc_sql;
       EXCEPTION
@@ -324,6 +323,7 @@ BEGIN
                WHERE kojin_no = lc_kojin_no;
 
                ln_del_count := ln_del_count + 1;
+
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;
                ln_result_cd := ln_result_cd_del;
@@ -621,8 +621,6 @@ BEGIN
    
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
 EXCEPTION
    WHEN OTHERS THEN

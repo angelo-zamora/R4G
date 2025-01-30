@@ -19,7 +19,7 @@ AS $$
 /*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 : CRESS-INFO.Angelo     新規作成     036o012「返戻情報（統合収滞納）」の取込を行う                        */
+/* 履歴　　 : 2025/01/30 CRESS-INFO.Angelo     新規作成     036o012「返戻情報（統合収滞納）」の取込を行う             */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -135,13 +135,13 @@ BEGIN
         -- 返戻物種別コード
         rec_f_henrei_renkei.henrei_shubetsu_cd := rec_main.henrei_syubetsu;
         -- 履歴番号
-        rec_f_henrei_renkei.rireki_no := rec_main.rireki_no::numeric;
+        rec_f_henrei_renkei.rireki_no := get_str_to_num(rec_main.rireki_no);
         -- 賦課年度
-        rec_f_henrei_renkei.fuka_nendo := rec_main.fuka_nendo::numeric;
+        rec_f_henrei_renkei.fuka_nendo := get_str_to_num(rec_main.fuka_nendo);
         -- 相当年度
-        rec_f_henrei_renkei.soto_nendo := rec_main.soto_nendo::numeric;
+        rec_f_henrei_renkei.soto_nendo := get_str_to_num(rec_main.soto_nendo);
         -- 期別
-        rec_f_henrei_renkei.kibetsu_cd := rec_main.kibetsu_cd::numeric;
+        rec_f_henrei_renkei.kibetsu_cd := get_str_to_num(rec_main.kibetsu_cd);
         -- 通知書番号
         rec_f_henrei_renkei.tsuchisho_no := rec_main.tsuchisho_no;
         -- 被保険者番号
@@ -149,29 +149,29 @@ BEGIN
         -- 児童宛名番号
         rec_f_henrei_renkei.jido_kojin_no := rec_main.jido_atena_no;
         -- 返戻調査番号
-        rec_f_henrei_renkei.henrei_chosa_no := rec_main.henrei_chosa_no::numeric;
+        rec_f_henrei_renkei.henrei_chosa_no := get_str_to_num(rec_main.henrei_chosa_no);
         -- 調査・返戻処理段階の区分
-        rec_f_henrei_renkei.chosa_henrei_kbn := rec_main.chosa_henrei_kbn::numeric;
+        rec_f_henrei_renkei.chosa_henrei_kbn := get_str_to_num(rec_main.chosa_henrei_kbn);
         -- 文書番号
         rec_f_henrei_renkei.bunsho_no := rec_main.bunsho_no;
         -- 帳票名
         rec_f_henrei_renkei.list_name := rec_main.list_name;
         -- 返戻登録日
-        rec_f_henrei_renkei.henrei_toroku_ymd := getdatetonum(to_date(rec_main.henrei_toroku_ymd, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.henrei_toroku_ymd := get_ymd_str_to_num(rec_main.henrei_toroku_ymd);
         -- 返戻日
-        rec_f_henrei_renkei.henrei_ymd := getdatetonum(to_date(rec_main.henrei_ymd, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.henrei_ymd := get_ymd_str_to_num(rec_main.henrei_ymd);
         -- 返戻事由コード
         rec_f_henrei_renkei.henrei_jiyu_cd := rec_main.henrei_jiyu;
         -- 再発送日
-        rec_f_henrei_renkei.saihasso_ymd := getdatetonum(to_date(rec_main.rec_main.re_hasso, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.saihasso_ymd := get_ymd_str_to_num(rec_main.rec_main.re_hasso);
         -- 公示日
-        rec_f_henrei_renkei.koji_ymd := getdatetonum(to_date(rec_main.rec_main.kouji_ymd, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.koji_ymd := get_ymd_str_to_num(rec_main.rec_main.kouji_ymd);
         -- 公示送達日
-        rec_f_henrei_renkei.koji_sotatsu_ymd := getdatetonum(to_date(rec_main.rec_main.koji_sotatsu_ymd, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.koji_sotatsu_ymd := get_ymd_str_to_num(rec_main.rec_main.koji_sotatsu_ymd);
         -- 納期限（変更前）
-        rec_f_henrei_renkei.henkomae_noki_ymd := getdatetonum(to_date(rec_main.rec_main.noki_henko_mae, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.henkomae_noki_ymd := get_ymd_str_to_num(rec_main.rec_main.noki_henko_mae);
         -- 納期限（変更後）
-        rec_f_henrei_renkei.henkogo_noki_ymd := getdatetonum(to_date(rec_main.rec_main.noki_henko_ato, 'YYYY-MM-DD'));
+        rec_f_henrei_renkei.henkogo_noki_ymd := get_ymd_str_to_num(rec_main.rec_main.noki_henko_ato);
         -- 返戻担当者コード
         rec_f_henrei_renkei.tantosha_cd_henrei := rec_main.tanto_id;
         -- 返戻担当者
@@ -185,7 +185,7 @@ BEGIN
         -- 更新端末名称
         rec_f_henrei_renkei.upd_tammatsu := 'SERVER';
         -- 削除フラグ
-        rec_f_henrei_renkei.del_flg := rec_main.del_flg::numeric;
+        rec_f_henrei_renkei.del_flg := get_str_to_num(rec_main.del_flg);
 
         OPEN cur_lock;
             FETCH cur_lock INTO rec_lock;
@@ -318,8 +318,8 @@ BEGIN
         END IF;
 
         -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
-        IF rec_main.del_flg::numeric = 1 THEN
-			ln_del_count := ln_del_count + 1;
+        IF get_str_to_num(rec_main.del_flg) = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
         END IF;
 

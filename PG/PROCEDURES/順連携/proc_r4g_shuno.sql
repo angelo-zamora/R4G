@@ -40,7 +40,6 @@ DECLARE
     lc_sql                         character varying;             -- SQL文用変数
     ln_shuno_count                 numeric DEFAULT 0;
     ln_err_kbn                     numeric DEFAULT 0;-- 対象データ 0:エラーなし 1:エラーあり
-    ln_del_count_tmp               numeric DEFAULT 0;
 
 -- メインカーソル
 cur_main CURSOR FOR
@@ -153,57 +152,54 @@ BEGIN
 
         rec_f_shuno.shuno_keshikomi_key := rec_main.shuno_rireki_no;
         rec_f_shuno.nofu_shurui_cd      := rec_main.shuno_kbn;
-        rec_f_shuno.fuka_nendo          := rec_main.fuka_nendo::numeric;
-        rec_f_shuno.soto_nendo          := rec_main.soto_nendo::numeric;
+        rec_f_shuno.fuka_nendo          := get_str_to_num(rec_main.fuka_nendo);
+        rec_f_shuno.soto_nendo          := get_str_to_num(rec_main.soto_nendo);
         rec_f_shuno.zeimoku_cd          := get_r4g_code_conv(0, 3, rec_main.zeimoku_cd, null)::numeric;
-        rec_f_shuno.kibetsu_cd          := rec_main.kibetsu_cd::numeric;
+        rec_f_shuno.kibetsu_cd          := get_str_to_num(rec_main.kibetsu_cd);
         rec_f_shuno.kibetsu             := lc_kibetsu;
         rec_f_shuno.kojin_no            := rec_main.atena_no;
         rec_f_shuno.tsuchisho_no        := rec_main.tsuchisho_no;
-        rec_f_shuno.jigyo_kaishi_ymd    :=  get_get_ymd_str_to_num(rec_main.jigyo_kaishi_ymd);
-        rec_f_shuno.jigyo_shuryo_ymd    :=  get_get_ymd_str_to_num(rec_main.jigyo_shuryo_ymd);
-        rec_f_shuno.shinkoku_cd         := CASE 
-                                                WHEN rec_main.shinkoku_cd = NULL OR rec_main.shinkoku_cd = '' THEN 0
-                                                ELSE rec_main.shinkoku_cd::numeric
-                                            END;
+        rec_f_shuno.jigyo_kaishi_ymd    := get_get_ymd_str_to_num(rec_main.jigyo_kaishi_ymd);
+        rec_f_shuno.jigyo_shuryo_ymd    := get_get_ymd_str_to_num(rec_main.jigyo_shuryo_ymd);
+        rec_f_shuno.shinkoku_cd         := get_str_to_num(rec_main.shinkoku_cd);
         rec_f_shuno.shusei_kaisu        := 0;
         rec_f_shuno.nendo_kbn           := 0;
         rec_f_shuno.kankatsu_cd         := 0;
         rec_f_shuno.kasankin_cd         := 0;
-        rec_f_shuno.kaikei_nendo        := rec_main.kaikei_nendo::numeric;  
-        rec_f_shuno.zeigaku_shuno       := rec_main.zeigaku_shuno::numeric; 
-        rec_f_shuno.tokusoku_shuno      := rec_main.tokusoku_shuno::numeric; 
-        rec_f_shuno.entaikin_shuno      := rec_main.entaikin_shuno::numeric; 
-        rec_f_shuno.kintowari_shuno     := rec_main.kintowari_shuno::numeric; 
-        rec_f_shuno.hojinzeiwari_shuno  := rec_main.hojinzeiwari_shuno::numeric; 
+        rec_f_shuno.kaikei_nendo        := get_str_to_num(rec_main.kaikei_nendo);
+        rec_f_shuno.zeigaku_shuno       := get_str_to_num(rec_main.zeigaku_shuno);
+        rec_f_shuno.tokusoku_shuno      := get_str_to_num(rec_main.tokusoku_shuno);
+        rec_f_shuno.entaikin_shuno      := get_str_to_num(rec_main.entaikin_shuno);
+        rec_f_shuno.kintowari_shuno     := get_str_to_num(rec_main.kintowari_shuno);
+        rec_f_shuno.hojinzeiwari_shuno  := get_str_to_num(rec_main.hojinzeiwari_shuno);
         rec_f_shuno.karikeshi_flg       := CASE
                                                 WHEN rec_main.karikeshi_kbn = '0' THEN 1 
                                                 WHEN rec_main.karikeshi_kbn = '1' THEN 0 
                                                 ELSE 2 
                                             END;
-        rec_f_shuno.nofu_jiyu_cd        := rec_main.nofu_kbn::numeric;
-        rec_f_shuno.nofu_shubetsu_cd    := rec_main.nofu_shubetsu_cd::numeric;
-        rec_f_shuno.kumikae_kbn         := rec_main.kumikae_kbn::numeric;
-        rec_f_shuno.nofu_channel_kbn    := rec_main.nofu_channel_kbn::numeric;
-        rec_f_shuno.shuno_ymd           := getdatetonum(to_date(rec_main.ryoshu_ymd, 'YYYY-MM-DD'));
-        rec_f_shuno.nikkei_ymd          := getdatetonum(to_date(rec_main.shunyu_ymd, 'YYYY-MM-DD'));
+        rec_f_shuno.nofu_jiyu_cd        := get_str_to_num(rec_main.nofu_kbn);
+        rec_f_shuno.nofu_shubetsu_cd    := get_str_to_num(rec_main.nofu_shubetsu_cd);
+        rec_f_shuno.kumikae_kbn         := get_str_to_num(rec_main.kumikae_kbn);
+        rec_f_shuno.nofu_channel_kbn    := get_str_to_num(rec_main.nofu_channel_kbn);
+        rec_f_shuno.shuno_ymd           := get_ymd_str_to_num(rec_main.ryoshu_ymd);
+        rec_f_shuno.nikkei_ymd          := get_ymd_str_to_num(rec_main.shunyu_ymd);
         rec_f_shuno.shotokuwari_shuno   := 0;
         rec_f_shuno.fukakachiwari_shuno := 0;
         rec_f_shuno.shihonwari_shuno    := 0;
         rec_f_shuno.shunyuwari_shuno    := 0;
         rec_f_shuno.doitsunin_kojin_no  := rec_main.atena_no;
-        rec_f_shuno.nenkin_shurui_cd    := rec_main.nenkin_shurui_cd::numeric;
+        rec_f_shuno.nenkin_shurui_cd    := get_str_to_num(rec_main.nenkin_shurui_cd);
         rec_f_shuno.tokutei_key1        := rec_main.tokutei_key1;
         rec_f_shuno.tokutei_key2        := rec_main.tokutei_key2;
         rec_f_shuno.nofuzumi_no         := rec_main.nofuzumi_no;
-        rec_f_shuno.encho_kbn           := rec_main.encho_kbn::numeric;
+        rec_f_shuno.encho_kbn           := get_str_to_num(rec_main.encho_kbn);
         rec_f_shuno.shuno_tenpo_cd      := rec_main.shuno_tenpo_cd;
         rec_f_shuno.shuno_shiten_cd     := rec_main.shuno_shiten_cd;
         rec_f_shuno.ins_datetime        := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
         rec_f_shuno.upd_datetime        := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
         rec_f_shuno.upd_tantosha_cd     := rec_main.upd_tantosha_cd;
         rec_f_shuno.upd_tammatsu        := 'SERVER';
-        rec_f_shuno.del_flg             := rec_main.del_flg::numeric;
+        rec_f_shuno.del_flg             := get_str_to_num(rec_main.del_flg);
 
         IF rec_f_shuno.karikeshi_flg = 2 THEN
             DELETE
@@ -211,8 +207,7 @@ BEGIN
                 WHERE kibetsu_key = rec_f_shuno.kibetsu_key
                     AND shuno_keshikomi_key = rec_f_shuno.shuno_keshikomi_key;
 
-            GET DIAGNOSTICS ln_del_count_tmp := ROW_COUNT;
-            ln_del_count := ln_del_count + ln_del_count_tmp;
+            ln_del_count := ln_del_count + 1;
 
             ln_err_count := ln_err_count + 1;
             lc_err_text := '仮消区分取消';
@@ -249,8 +244,7 @@ BEGIN
                 WHERE kibetsu_key = rec_f_shuno.kibetsu_key
                     AND shuno_keshikomi_key = rec_f_shuno.shuno_keshikomi_key;
 
-                GET DIAGNOSTICS ln_del_count_tmp := ROW_COUNT;
-                ln_del_count := ln_del_count + ln_del_count_tmp;
+                ln_del_count := ln_del_count + 1;
                 
                 lc_err_text := '';
                 lc_err_cd := lc_err_cd_normal;

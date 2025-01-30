@@ -36,7 +36,6 @@ DECLARE
    lc_err_cd                      character varying;             -- エラーコード用変数
    lc_err_text                    character varying(100):='';    -- エラー内容用変数
    ln_result_cd                   numeric DEFAULT 0;             -- 結果区分更新用変数
-   ln_del_diag_count              numeric DEFAULT 0;
    
    ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
    ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
@@ -120,13 +119,13 @@ BEGIN
             -- 物件番号
             rec_f_kaokuhyoka_renkei.bukken_no := rec_main.bukken_no;
             -- 課税年度
-            rec_f_kaokuhyoka_renkei.kazei_nendo := rec_main.kazei_nendo::numeric;
+            rec_f_kaokuhyoka_renkei.kazei_nendo := get_str_to_num(rec_main.kazei_nendo);
             -- 家屋評価額
-            rec_f_kaokuhyoka_renkei.kaoku_hyokagaku := rec_main.kaoku_hyokagaku::numeric;
+            rec_f_kaokuhyoka_renkei.kaoku_hyokagaku := get_str_to_num(rec_main.kaoku_hyokagaku);
             -- 登録年月日
-            rec_f_kaokuhyoka_renkei.toroku_ymd := getdatetonum(to_date(rec_main.toroku_ymd, 'YYYY-MM-DD'));
+            rec_f_kaokuhyoka_renkei.toroku_ymd := get_ymd_str_to_num(rec_main.toroku_ymd);
             -- 家屋評価_履歴番号
-            rec_f_kaokuhyoka_renkei.kaoku_hyoka_no := rec_main.kaoku_hyoka_no::numeric;
+            rec_f_kaokuhyoka_renkei.kaoku_hyoka_no := get_str_to_num(rec_main.kaoku_hyoka_no);
             -- データ作成日時
             rec_f_kaokuhyoka_renkei.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
             -- データ更新日時
@@ -212,7 +211,7 @@ BEGIN
          END IF;
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF rec_f_kaokuhyoka_renkei.del_flg = 1 THEN
             ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;

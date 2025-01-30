@@ -38,7 +38,6 @@ DECLARE
    ln_para02                      numeric DEFAULT 0;
    ln_para09                      numeric DEFAULT 0;
    ln_para12                      numeric DEFAULT 0;
-   ln_del_diag_count              numeric DEFAULT 0;
    
    ln_result_cd_add               numeric DEFAULT 1;             -- 追加フラグ
    ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
@@ -179,8 +178,8 @@ BEGIN
             BEGIN
                DELETE FROM f_kojin_number
                WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
-               GET DIAGNOSTICS ln_del_diag_count := ROW_COUNT;
-               ln_del_count := ln_del_count + ln_del_diag_count;
+               
+               ln_del_count := ln_del_count + 1;
 
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;

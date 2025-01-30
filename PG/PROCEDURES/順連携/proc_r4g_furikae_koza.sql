@@ -130,13 +130,13 @@ BEGIN
          -- 税目コード
          rec_furikae.zeimoku_cd              := get_r4g_code_conv(0, 3, rec_main.zeimoku_cd, null)::numeric;
          -- 振替口座区分
-         rec_furikae.koza_kbn                := rec_main.furikae_kbn::numeric;
+         rec_furikae.koza_kbn                := get_ymd_str_to_num(rec_main.furikae_kbn);
          -- 児童_宛名番号
          rec_furikae.jido_kojin_no           := rec_main.jido_atena_no;
          -- 開始日
-         rec_furikae.kaishi_ymd              := getdatetonum(to_date(rec_main.koufuri_kaishi_ymd, 'YYYY-MM-DD'));
+         rec_furikae.kaishi_ymd              := get_ymd_str_to_num(rec_main.koufuri_kaishi_ymd);
          -- 終了日
-         rec_furikae.shuryo_ymd              := getdatetonum(to_date(rec_main.koufuri_shuryo_ymd, 'YYYY-MM-DD'));
+         rec_furikae.shuryo_ymd              := get_ymd_str_to_num(rec_main.koufuri_shuryo_ymd);
          -- 金融機関コード
          rec_furikae.kinyu_kikan_cd          := rec_main.kinyukikan_cd;
          -- 金融機関支店コード
@@ -146,9 +146,9 @@ BEGIN
          -- ゆうちょ銀行番号
          rec_furikae.yucho_no                := rec_main.yucho_no;
          -- 金融機関種別
-         rec_furikae.kinyu_kikan_shubetsu_kbn := rec_main.kinyukikan_shubetsu::numeric;
+         rec_furikae.kinyu_kikan_shubetsu_kbn := get_ymd_str_to_num(rec_main.kinyukikan_shubetsu);
          -- 口座種別コード
-         rec_furikae.koza_shubetsu_cd        := rec_main.koza_shubtsu::numeric;
+         rec_furikae.koza_shubetsu_cd        := get_ymd_str_to_num(rec_main.koza_shubtsu);
          -- 口座番号
          rec_furikae.koza_no                 := rec_main.koza_no;
          -- 口座名義人カナ
@@ -156,17 +156,17 @@ BEGIN
          --- 口座名義人
          rec_furikae.koza_meiginin           := get_trimmed_space(rec_main.koza_meigi_kanji);
          -- 口座振替停止開始年月日
-         rec_furikae.teishi_kaishi_ymd       := getdatetonum(to_date(rec_main.koza_teishi_kaishi_ymd, 'YYYY-MM-DD'));
+         rec_furikae.teishi_kaishi_ymd       := get_ymd_str_to_num(rec_main.koza_teishi_kaishi_ymd);
          -- 口座振替停止終了年月日
-         rec_furikae.teishi_shuryo_ymd       := getdatetonum(to_date(rec_main.koza_teishi_shuryo_ymd, 'YYYY-MM-DD'));
+         rec_furikae.teishi_shuryo_ymd       := get_ymd_str_to_num(rec_main.koza_teishi_shuryo_ymd);
          -- 口座振替廃止年月日
-         rec_furikae.haishi_ymd              := getdatetonum(to_date(rec_main.koza_haishi_ymd, 'YYYY-MM-DD'));
+         rec_furikae.haishi_ymd              := get_ymd_str_to_num(rec_main.koza_haishi_ymd);
          -- 納付方法
-         rec_furikae.nofuhoho_kbn            := rec_main.nofuhoho::numeric;
+         rec_furikae.nofuhoho_kbn            := get_ymd_str_to_num(rec_main.nofuhoho);
          -- メモ
          rec_furikae.memo                    := rec_main.memo;
          -- 口座履歴番号
-         rec_furikae.koza_rireki_no          := rec_main.koza_rireki_no::numeric;
+         rec_furikae.koza_rireki_no          := get_ymd_str_to_num(rec_main.koza_rireki_no);
          -- データ作成日時
          rec_furikae.ins_datetime            := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- データ更新日時
@@ -176,7 +176,7 @@ BEGIN
          -- 更新端末名称
          rec_furikae.upd_tammatsu            := 'SERVER';
          -- 削除フラグ
-         rec_furikae.del_flg                 := rec_main.del_flg::numeric;
+         rec_furikae.del_flg                 := get_ymd_str_to_num(rec_main.del_flg);
 
          OPEN cur_lock;
            FETCH cur_lock INTO rec_lock; 
@@ -298,7 +298,7 @@ BEGIN
               END IF;
 
             -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
-            IF rec_main.del_flg::numeric = 1 THEN
+            IF rec_furikae.del_flg = 1 THEN
                ln_del_count := ln_del_count + 1;
                ln_result_cd := ln_result_cd_del;
             END IF;

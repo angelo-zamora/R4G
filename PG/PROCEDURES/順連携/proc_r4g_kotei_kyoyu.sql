@@ -128,27 +128,27 @@ BEGIN
 
          ln_shori_count               := ln_shori_count + 1;
 
-         rec_kotei.kazei_nendo := rec_main.kazei_nendo::numeric;
+         rec_kotei.kazei_nendo := get_str_to_num(rec_main.kazei_nendo);
          rec_kotei.kyoyusha_gimusha_kojin_no := rec_main.kyoyu_atena_no;
          rec_kotei.kyoyu_shisan_no := rec_main.kyoyu_shisan_no;
-         rec_kotei.koseiin_renba := rec_main.koseiin_renban::numeric;
+         rec_kotei.koseiin_renba := get_str_to_num(rec_main.koseiin_renban);
          rec_kotei.koseiin_gimusha_kojin_no := rec_main.koseiin_gimusha_atena_no;
          rec_kotei.kyoyu_kbn := rec_main.kyoyu_kbn::numeric;
          -- rec_kotei.kyoyu_mochibun_kbn := rec_main.kyoyu_kbn; TO BE CONFIRMED
-         rec_kotei.daihyosha_flg := rec_main.daihyo_flg::numeric;
-         rec_kotei.ido_ymd := getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
-         rec_kotei.ido_jiyu_cd := rec_main.ido_jiyu::numeric;
-         rec_kotei.kyoyusha_ninzu := rec_main.kyoyu_ninzu::numeric;
+         rec_kotei.daihyosha_flg := get_str_to_num(rec_main.daihyo_flg);
+         rec_kotei.ido_ymd :=  get_ymd_str_to_num(rec_main.ido_ymd);
+         rec_kotei.ido_jiyu_cd := get_str_to_num(rec_main.ido_jiyu);
+         rec_kotei.kyoyusha_ninzu := get_str_to_num(rec_main.kyoyu_ninzu);
          rec_kotei.toki_mochibun_bunshi := get_trimmed_space(rec_main.toki_bunshi);
          rec_kotei.toki_mochibun_bunbo := get_trimmed_space(rec_main.toki_bunbo);
          rec_kotei.genkyo_mochibun_bunshi := get_trimmed_space(rec_main.genkyo_bunshi);
          rec_kotei.genkyo_mochibun_bunbo := get_trimmed_space(rec_main.genkyo_bunbo);
-         rec_kotei.kyoyusha_rireki_no := rec_main.kyoyu_rireki_no::numeric;
+         rec_kotei.kyoyusha_rireki_no := get_str_to_num(rec_main.kyoyu_rireki_no);
          rec_kotei.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          rec_kotei.upd_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          rec_kotei.upd_tantosha_cd := rec_main.upd_tantosha_cd;
          rec_kotei.upd_tammatsu := 'SERVER';
-         rec_kotei.del_flg := rec_main.del_flg::numeric;
+         rec_kotei.del_flg := get_str_to_num(rec_main.del_flg);
 
          OPEN cur_lock;
             FETCH cur_lock INTO rec_lock;
@@ -253,7 +253,7 @@ BEGIN
 
          BEGIN
             -- 中間テーブル更新
-            IF rec_main.del_flg::numeric = 1 THEN
+            IF rec_kotei.del_flg = 1 THEN
                ln_del_count := ln_del_count + 1;
                ln_result_cd := ln_result_cd_del;
             END IF;

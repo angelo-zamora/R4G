@@ -141,17 +141,17 @@ BEGIN
          -- 期別明細KEY
          rec_tokusoku.kibetsu_key := get_kibetsu_key(rec_main.fuka_nendo, rec_main.soto_nendo, rec_main.zeimoku_cd, rec_main.kibetsu_cd, rec_main.tokucho_shitei_no);
          -- 督促状発行日
-         rec_tokusoku.tokusoku_ymd := getdatetonum(to_date(rec_main.tokusoku_hakko_ymd, 'YYYY-MM-DD'));
+         rec_tokusoku.tokusoku_ymd := get_ymd_str_to_num(rec_main.tokusoku_hakko_ymd);
          -- 督促状返戻日
-         rec_tokusoku.tokusoku_henrei_ymd := getdatetonum(to_date(rec_main.tokusoku_henrei_ymd, 'YYYY-MM-DD'));
+         rec_tokusoku.tokusoku_henrei_ymd := get_ymd_str_to_num(rec_main.tokusoku_henrei_ymd);
          -- 督促区分
-         rec_tokusoku.tokusoku_kbn := rec_main.tokusoku_kbn::numeric;
+         rec_tokusoku.tokusoku_kbn := get_str_to_num(rec_main.tokusoku_kbn);
          -- 引き抜き（削除）区分
-         rec_tokusoku.hikinuki_kbn := rec_main.hikinuki_del_kbn::numeric;
+         rec_tokusoku.hikinuki_kbn := get_str_to_num(rec_main.hikinuki_del_kbn);
          -- 引き抜き（削除）事由
-         rec_tokusoku.hikinuki_jiyu_cd := rec_main.hikinuki_del_jiyu_cd::numeric;
+         rec_tokusoku.hikinuki_jiyu_cd :=  get_str_to_num(rec_main.hikinuki_del_jiyu_cd);
          -- 履歴番号
-         rec_tokusoku.rireki_no := rec_main.shinkoku_rireki_no::numeric;
+         rec_tokusoku.rireki_no := get_str_to_num(rec_main.shinkoku_rireki_no);
          -- データ作成日時
          rec_tokusoku.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- データ更新日時
@@ -161,7 +161,7 @@ BEGIN
          -- 更新端末名称
          rec_tokusoku.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_tokusoku.del_flg := rec_main.del_flg::numeric;
+         rec_tokusoku.del_flg := get_str_to_num(rec_main.del_flg);
 
          OPEN cur_lock;
             FETCH cur_lock INTO rec_lock;
@@ -239,7 +239,7 @@ BEGIN
          END IF;
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF rec_tokusoku.del_flg = 1 THEN
             ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
