@@ -160,14 +160,8 @@ BEGIN
         rec_f_shuno.kibetsu             := lc_kibetsu;
         rec_f_shuno.kojin_no            := rec_main.atena_no;
         rec_f_shuno.tsuchisho_no        := rec_main.tsuchisho_no;
-        rec_f_shuno.jigyo_kaishi_ymd    :=  CASE 
-                                                WHEN ymd_null_check(rec_main.jigyo_kaishi_ymd) THEN 0
-                                                ELSE getdatetonum(to_date(rec_main.jigyo_kaishi_ymd, 'YYYY-MM-DD'))
-                                            END;
-        rec_f_shuno.jigyo_shuryo_ymd    :=  CASE 
-                                                WHEN ymd_null_check(rec_main.jigyo_shuryo_ymd) THEN 0
-                                                ELSE getdatetonum(to_date(rec_main.jigyo_shuryo_ymd, 'YYYY-MM-DD'))
-                                            END;
+        rec_f_shuno.jigyo_kaishi_ymd    :=  get_ymd_null_check(rec_main.jigyo_kaishi_ymd);
+        rec_f_shuno.jigyo_shuryo_ymd    :=  get_ymd_null_check(rec_main.jigyo_shuryo_ymd);
         rec_f_shuno.shinkoku_cd         := CASE 
                                                 WHEN rec_main.shinkoku_cd = NULL OR rec_main.shinkoku_cd = '' THEN 0
                                                 ELSE rec_main.shinkoku_cd::numeric
