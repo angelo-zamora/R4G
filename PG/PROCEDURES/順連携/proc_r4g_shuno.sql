@@ -10,7 +10,7 @@ CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_shuno(
 LANGUAGE plpgsql
 AS $$
 /**********************************************************************************************************************/
-/* 処理概要 : f_収納（f_shuno）の追加／更新／削除を実施する                                                               */
+/* 処理概要 : 収納履歴情報（統合収滞納）                                                                                 */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                    */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                   */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                 */
@@ -98,14 +98,8 @@ BEGIN
     -- ２．連携先データの削除
     IF ln_para01 = 1 THEN
         BEGIN
-            SELECT COUNT(*)
-            INTO ln_del_count
-            FROM f_shuno;
-
             lc_sql := 'TRUNCATE TABLE dlgmain.f_shuno';
-
             EXECUTE lc_sql;
-
             EXCEPTION
                 WHEN OTHERS THEN
                 io_c_err_code := SQLSTATE;
@@ -478,9 +472,7 @@ BEGIN
 
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-
+   
 EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;

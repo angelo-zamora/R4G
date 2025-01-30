@@ -12,7 +12,7 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_家屋評価_連携（f_kaokuhyoka_renkei）の追加／更新／削除を実施する）                                         */
+/* 処理概要 : 家屋評価情報                                                                                              */
 /* 引数 IN  :  in_n_renkei_data_cd … 連携データコード                                                                   */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                */
@@ -90,7 +90,6 @@ BEGIN
    --連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_kaokuhyoka_renkei;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_kaokuhyoka_renkei';
          EXECUTE lc_sql;
       EXCEPTION
@@ -214,6 +213,7 @@ BEGIN
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
          IF rec_main.del_flg::numeric = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
 
@@ -223,6 +223,8 @@ BEGIN
                SET result_cd = ln_result_cd
                , error_cd = lc_err_cd
                , error_text = lc_err_text
+               , seq_no_renkei = in_n_renkei_seq
+               , shori_ymd     = in_n_shori_ymd
             WHERE  shikuchoson_cd = rec_main.shikuchoson_cd
                AND bukken_no = rec_main.bukken_no
                AND kazei_nendo = rec_main.kazei_nendo
@@ -244,8 +246,6 @@ BEGIN
 
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
 EXCEPTION
    WHEN OTHERS THEN

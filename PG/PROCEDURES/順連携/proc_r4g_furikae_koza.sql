@@ -12,14 +12,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_口座情報（f_kozajoho）の追加／更新／削除を実施する                                                        */
+/* 処理概要 : 振替口座情報（統合収滞納）                                                                                 */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                   */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                  */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                */
 /*      OUT : io_c_err_code     … 例外エラー発生時のエラーコード                                                        */
 /*            io_c_err_text      … 例外エラー発生時のエラー内容                                                         */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/28  CRESS-INFO.Drexler     新規作成     001o006「住民情報（個人番号あり）」の取込を行う              */
+/* 履歴     : 2025/01/28  CRESS-INFO.Drexler     新規作成     036o010「振替口座情報（統合収滞納）」の取込を行う            */
 /**********************************************************************************************************************/
 DECLARE
 
@@ -98,7 +98,6 @@ BEGIN
    --2. 連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_kozajoho;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_kozajoho';
          EXECUTE lc_sql;
       EXCEPTION WHEN OTHERS THEN
@@ -298,6 +297,12 @@ BEGIN
                  END;      
               END IF;
 
+            -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
+            IF rec_main.del_flg::numeric = 1 THEN
+               ln_del_count := ln_del_count + 1;
+               ln_result_cd := ln_result_cd_del;
+            END IF;
+
             -- 中間テーブル更新
             BEGIN
                 UPDATE i_r4g_furikae_koza
@@ -327,9 +332,7 @@ BEGIN
    
    --更新内容は連携ツールの連携処理クラス（RenkeiProcess）の処理：insertRenkeiKekkaを参照
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-
+   
    EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;

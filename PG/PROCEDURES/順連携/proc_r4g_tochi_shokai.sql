@@ -13,14 +13,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_照会_不動産（f_shokai_fudosan）の追加／更新／削除を実施する                                                */
+/* 処理概要 : 土地基本情報                                                                                              */
 /* 引数 IN  : in_n_renkei_data_cd   … 連携データコード                                                                  */
 /*            in_n_renkei_seq      … 連携SEQ（処理単位で符番されるSEQ）                                                  */
 /*            in_n_shori_ymd       … 処理日 （処理単位で設定される処理日）                                                */
 /*      OUT : io_c_err_code        … 例外エラー発生時のエラーコード                                                      */
 /*            io_c_err_text        … 例外エラー発生時のエラー内容                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/24  CRESS-INFO.Drexler     新規作成     012o004土地基本情報                                       */
+/* 履歴     : 2025/01/24  CRESS-INFO.Drexler     新規作成     012o004「土地基本情報」の取込を行う                         */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -113,15 +113,12 @@ BEGIN
    -- 2. 連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count_f_shokai_fudosan FROM f_shokai_fudosan;
+
          lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan';
          EXECUTE lc_sql;
-
-         SELECT COUNT(*) INTO ln_del_count_f_shokai_fudosan_kaiso FROM f_shokai_fudosan_kaiso;
+         
          lc_sql := 'TRUNCATE TABLE dlgmain.f_shokai_fudosan_kaiso';
          EXECUTE lc_sql;
-      
-         ln_del_count := ln_del_count_f_shokai_fudosan + ln_del_count_f_shokai_fudosan_kaiso;
 
       EXCEPTION
          WHEN OTHERS THEN
@@ -145,10 +142,6 @@ BEGIN
          EXIT WHEN NOT FOUND;
          
          ln_shori_count                 := ln_shori_count + 1;
-         lc_err_cd                      := '0';
-         ln_result_cd                   := 0;
-         lc_err_text                    := NULL;
-         rec_lock                       := NULL;
 
          OPEN cur_busho;
             LOOP
@@ -440,6 +433,7 @@ BEGIN
       
       -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
       IF rec_main.del_flg::numeric = 1 THEN
+          ln_del_count := ln_del_count + 1;
           ln_result_cd := ln_result_cd_del;
       END IF;
 
@@ -478,8 +472,6 @@ BEGIN
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
 
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
-   
 EXCEPTION
    WHEN OTHERS THEN
       io_c_err_code := SQLSTATE;

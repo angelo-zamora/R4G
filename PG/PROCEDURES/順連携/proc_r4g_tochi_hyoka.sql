@@ -100,7 +100,6 @@ BEGIN
    --連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_tochihyoka_renkei;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_tochihyoka_renkei';
          EXECUTE lc_sql;
       EXCEPTION
@@ -227,6 +226,7 @@ BEGIN
 
             -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
             IF rec_main.del_flg::numeric = 1 THEN
+               ln_del_count := ln_del_count + 1;
                ln_result_cd := ln_result_cd_del;
             END IF;
 
@@ -259,8 +259,6 @@ BEGIN
 
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
    EXCEPTION
    WHEN OTHERS THEN
