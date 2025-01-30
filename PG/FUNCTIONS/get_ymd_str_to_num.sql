@@ -8,8 +8,10 @@ RETURNS NUMERIC AS $$
 /* 履歴     : 2025/01/30  CRESS-INFO.Drexler     新規作成     日付文字列から数値の変換を行う                                  */
 /**********************************************************************************************************************/
 BEGIN
+
+    in_ymd := TRIM(in_ymd);
     -- null または 0 または "0000-00-00" の場合チェック
-    IF rec_main.birth_ymd IS NULL OR rec_main.birth_ymd = '' OR rec_main.birth_ymd = '0000-00-00' THEN
+    IF in_ymd IS NULL OR in_ymd = '' OR rec_main.birth_ymd = '0000-00-00' THEN
         RETURN 0;
     END IF;
 
