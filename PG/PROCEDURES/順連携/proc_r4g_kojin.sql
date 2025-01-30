@@ -148,9 +148,9 @@ BEGIN
             -- 住民区分
             rec_kojin.jumin_kbn := 1;
             -- 住民種別
-            rec_kojin.jumin_shubetsu_cd := rec_main.jumin_shubetsu_cd::numeric;
+            rec_kojin.jumin_shubetsu_cd := get_str_to_num(rec_main.jumin_shubetsu_cd);
             -- 住民状態
-            rec_kojin.jumin_jotai_cd := rec_main.jumin_jotai_cd::numeric;
+            rec_kojin.jumin_jotai_cd := get_str_to_num(rec_main.jumin_jotai_cd);
             -- 連携氏名
             rec_kojin.renkei_shimei := get_trimmed_space(rec_main.shimei);
             -- 連携氏名カタカナ
@@ -160,7 +160,7 @@ BEGIN
             -- 連携通称名カタカナ
             rec_kojin.renkei_tsushomei_kana := get_trimmed_space(rec_main.tsushomei_kana);
             -- 連携通称名_フリガナ確認状況
-            rec_kojin.renkei_tsushomei_kana_flg := CASE WHEN rec_main.tsushomei_kana_flg IS NULL OR rec_main.tsushomei_kana_flg = '' THEN 0 ELSE rec_main.tsushomei_kana_flg::numeric END;
+            rec_kojin.renkei_tsushomei_kana_flg := get_str_to_num(rec_main.tsushomei_kana_flg);
             -- 氏名
             rec_kojin.shimei := get_trimmed_space(rec_main.shimei);
             -- 氏_日本人
@@ -170,7 +170,7 @@ BEGIN
             -- 氏名カタカナ
             rec_kojin.shimei_kana := get_trimmed_space(rec_main.shimei_kana);
             -- 氏名_フリガナ公証確認状況
-            rec_kojin.shimei_kana_kosho_kakunin_kbn := rec_main.shimei_kana_kosho_kakunin_kbn::numeric;
+            rec_kojin.shimei_kana_kosho_kakunin_kbn := get_str_to_num(rec_main.shimei_kana_kosho_kakunin_kbn);
             -- 氏名カタカナ(検索用)
             rec_kojin.shimei_kensaku_kana := get_trimmed_space(get_kensaku_kana(rec_main.tsushomei_kana_flg, 2));
             -- 氏_日本人_フリガナ
@@ -242,9 +242,9 @@ BEGIN
             -- 戸籍_筆頭者_名
             rec_kojin.koseki_hittosha_mei := get_trimmed_space(rec_main.koseki_hitto_mei);
             -- 生年月日
-            rec_kojin.birth_ymd := CASE WHEN ymd_NULL_check(rec_main.birth_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.birth_ymd, 'YYYY-MM-DD'))END;
+            rec_kojin.birth_ymd := get_ymd_str_to_num(rec_main.birth_ymd);
             -- 生年月日_不詳フラグ
-            rec_kojin.birth_fusho_flg := rec_main.birth_fusho_flg::numeric;
+            rec_kojin.birth_fusho_flg := get_str_to_num(rec_main.birth_fusho_flg);
             -- 生年月日_不詳表記
             rec_kojin.birth_fusho := rec_main.birth_fusho;
             -- 続柄１
@@ -258,7 +258,7 @@ BEGIN
             -- 続柄表記
             rec_kojin.zokugara := rec_main.zokugara;
             -- 性別コード
-            rec_kojin.seibetsu_cd := rec_main.seibetsu_cd::numeric;
+            rec_kojin.seibetsu_cd := get_str_to_num(rec_main.seibetsu_cd);
             -- 性別表記
             rec_kojin.seibetsu := rec_main.seibetsu;
             -- 地区コード
@@ -268,45 +268,45 @@ BEGIN
             -- 自治体コード
             rec_kojin.jichitai_cd := rec_main.jusho_shikuchoson_cd;
             -- 処理年月日
-            rec_kojin.shori_ymd := getdatetonum(to_date(rec_main.atena_shori_ymd, 'YYYY-MM-DD'));
+            rec_kojin.shori_ymd := get_ymd_str_to_num(rec_main.atena_shori_ymd);
             -- 異動年月日
-            rec_kojin.ido_ymd := getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD'));
+            rec_kojin.ido_ymd := get_ymd_str_to_num(rec_main.ido_ymd);
             -- 異動年月日_不詳フラグ
-            rec_kojin.ido_ymd_fusho_flg := rec_main.ido_fusho_flg::numeric;
+            rec_kojin.ido_ymd_fusho_flg := get_str_to_num(rec_main.ido_fusho_flg);
             -- 異動年月日_不詳表記
             rec_kojin.ido_ymd_fusho := rec_main.ido_fusho;
             -- 異動届出年月日
-            rec_kojin.ido_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.ido_todoke_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.ido_todoke_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.ido_todoke_ymd := get_get_ymd_str_to_num(rec_main.ido_todoke_ymd);
             -- 異動事由コード
             rec_kojin.ido_jiyu_cd := rec_main.ido_jiyu_cd;
             -- 死亡年月日
-            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN getdatetonum(to_date(rec_main.ido_ymd, 'YYYY-MM-DD')) ELSE 0 END;
+            rec_kojin.shibo_ymd := CASE WHEN rec_main.ido_jiyu_cd  = '23' THEN get_ymd_str_to_num(rec_main.ido_ymd) END;
             -- 住民日
-            rec_kojin.jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.jumin_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.jumin_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.jumin_ymd := get_get_ymd_str_to_num(rec_main.jumin_ymd);
             -- 住民日_不詳フラグ
-            rec_kojin.jumin_ymd_fusho_flg := CASE WHEN rec_main.jumin_fusho_flg IS NULL OR rec_main.jumin_fusho_flg = '' THEN 0 ELSE rec_main.jumin_fusho_flg::numeric END;
+            rec_kojin.jumin_ymd_fusho_flg := get_str_to_num(rec_main.jumin_fusho_flg);
             -- 住民日_不詳表記
             rec_kojin.jumin_ymd_fusho := rec_main.jumin_fusho;
             -- 外国人住民日
-            rec_kojin.gaikokujin_jumin_ymd := CASE WHEN ymd_NULL_check(rec_main.gaikokujin_jumin_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.gaikokujin_jumin_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.gaikokujin_jumin_ymd := get_get_ymd_str_to_num(rec_main.gaikokujin_jumin_ymd);
             -- 外国人住民日_不詳フラグ
-            rec_kojin.gaikokujin_jumin_ymd_fusho_flg := CASE WHEN rec_main.gaikokujin_jumin_fusho_flg IS NULL OR rec_main.gaikokujin_jumin_fusho_flg = '' THEN 0 ELSE rec_main.gaikokujin_jumin_fusho_flg::numeric END;
+            rec_kojin.gaikokujin_jumin_ymd_fusho_flg := get_str_to_num(rec_main.gaikokujin_jumin_fusho_flg);
             -- 外国人住民日_不詳表記
             rec_kojin.gaikokujin_jumin_ymd_fusho := rec_main.gaikokujin_jumin_fusho;
             -- 住定日
-            rec_kojin.jutei_ymd := CASE WHEN ymd_NULL_check(rec_main.jutei_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.jutei_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.jutei_ymd := get_get_ymd_str_to_num(rec_main.jutei_ymd);
             -- 住定日_不詳フラグ
             rec_kojin.jutei_ymd_fusho_flg := rec_main.jutei_fusho_flg;
             -- 住定日_不詳表記
             rec_kojin.jutei_ymd_fusho := rec_main.jutei_fusho;
             -- 転入通知年月日
-            rec_kojin.tennyu_tsuchi_ymd := CASE WHEN ymd_NULL_check(rec_main.tennyu_tsuchi_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tennyu_tsuchi_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tennyu_tsuchi_ymd := get_get_ymd_str_to_num(rec_main.tennyu_tsuchi_ymd);
             -- 転出届出年月日
-            rec_kojin.tenshutsu_todoke_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_todoke_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tenshutsu_todoke_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tenshutsu_todoke_ymd := get_get_ymd_str_to_num(rec_main.tenshutsu_todoke_ymd); 
             -- 転出予定年月日
-            rec_kojin.tenshutsu_yotei_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_yotei_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tenshutsu_yotei_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tenshutsu_yotei_ymd := get_get_ymd_str_to_num(rec_main.tenshutsu_yotei_ymd);
             -- 転出年月日（確定）
-            rec_kojin.tenshutsu_ymd := CASE WHEN ymd_NULL_check(rec_main.tenshutsu_ymd) = TRUE THEN 0 ELSE getdatetonum(to_date(rec_main.tenshutsu_ymd, 'YYYY-MM-DD')) END;
+            rec_kojin.tenshutsu_ymd := get_get_ymd_str_to_num(rec_main.tenshutsu_ymd); 
             -- 通称名カタカナ(検索用)
             rec_kojin.tsushomei_kensaku_kana := get_kensaku_kana(rec_main.tsushomei_kana, 2);
             -- 旧氏カタカナ(検索用)
@@ -316,27 +316,27 @@ BEGIN
             -- 在留カード等番号区分コード
             rec_kojin.zairyu_card_no_kbn_cd := rec_main.zairyu_card_no_kbn_cd;
             -- 国籍コード
-            rec_kojin.kokuseki_cd := rec_main.kokumei_cd::numeric;
+            rec_kojin.kokuseki_cd := get_str_to_num(rec_main.kokumei_cd);
             -- 国籍名等
             rec_kojin.kokusekimeito := rec_main.kokusekimeito;
             -- 第30条45規定区分コード
-            rec_kojin.zairyu_kitei_kbn_cd := rec_main.zairyu_kitei_kbn_cd::numeric;
+            rec_kojin.zairyu_kitei_kbn_cd := get_str_to_num(rec_main.zairyu_kitei_kbn_cd);
             -- 在留資格コード
             rec_kojin.zairyu_shikaku_cd := rec_main.zairyu_shikaku_cd;
             -- 在留資格等名称
             rec_kojin.zairyu_shikaku := NULL;
             -- 在留期間等年コード
-            rec_kojin.zairyu_kikan_nen_cd := rec_main.zairyu_kikan_nen_cd::numeric;
+            rec_kojin.zairyu_kikan_nen_cd := get_str_to_num(rec_main.zairyu_kikan_nen_cd);
             -- 在留期間等月コード
-            rec_kojin.zairyu_kikan_tsuki_cd := rec_main.zairyu_kikan_tsuki_cd::numeric;
+            rec_kojin.zairyu_kikan_tsuki_cd := get_str_to_num(rec_main.zairyu_kikan_tsuki_cd);
             -- 在留期間等日コード
-            rec_kojin.zairyu_kikan_hi_cd := rec_main.zairyu_kikan_hi_cd::numeric;
+            rec_kojin.zairyu_kikan_hi_cd := get_str_to_num(rec_main.zairyu_kikan_hi_cd);
             -- 在留期間等満了年月日
-            rec_kojin.zairyu_manryo_ymd := getdatetonum(to_date(rec_main.zairyu_manryo_ymd, 'YYYY-MM-DD'));
+            rec_kojin.zairyu_manryo_ymd := get_ymd_str_to_num(rec_main.zairyu_manryo_ymd);
             -- 記載順位
-            rec_kojin.kisai_juni := rec_main.kisai_juni::numeric;
+            rec_kojin.kisai_juni := get_str_to_num(rec_main.kisai_juni);
             -- 法第30条46又は47区分
-            rec_kojin.zairyu_todoke_kbn_cd := rec_main.zairyu_todoke_kbn_cd::numeric;
+            rec_kojin.zairyu_todoke_kbn_cd := get_str_to_num(rec_main.zairyu_todoke_kbn_cd);
             -- 業務コード
             rec_kojin.gyomu_cd := 0;
             -- 予備項目１
@@ -369,7 +369,7 @@ BEGIN
          CLOSE cur_lock;
          
          -- 削除フラグが「1」の場合は対象データを物理削除する
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF get_str_to_num(rec_main.del_flg) = 1 THEN
             BEGIN 
                DELETE FROM f_kojin
                WHERE kojin_no = rec_kojin.kojin_no;

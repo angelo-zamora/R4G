@@ -2,7 +2,7 @@
 --  DDL for Procedure proc_error_check
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE proc_error_check1 ( in_n_renkei_data_cd IN numeric, in_n_renkei_seq IN numeric, in_n_shori_ymd IN numeric, io_c_error_cd INOUT character varying, io_c_error_text INOUT character varying )
+CREATE OR REPLACE PROCEDURE proc_error_check( in_n_renkei_data_cd IN numeric, in_n_renkei_seq IN numeric, in_n_shori_ymd IN numeric, io_c_error_cd INOUT character varying, io_c_error_text INOUT character varying )
 LANGUAGE plpgsql
 AS $$
 
