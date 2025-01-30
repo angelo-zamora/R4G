@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_str_to_num(in_str_num NUMERIC)
+CREATE OR REPLACE FUNCTION get_str_to_num(in_str_num character varying)
 RETURNS NUMERIC AS $$
 /**********************************************************************************************************************/
 /* 処理概要 : 文字列を数値型変換する                                                                                     */
@@ -10,9 +10,8 @@ RETURNS NUMERIC AS $$
 
 BEGIN
    
-   in_str_num := TRIM(in_str_num);
-
-  　-- NULL、かつ空文字の場合は0を返す
+    in_str_num := TRIM(in_str_num);
+    -- NULLまたは空文字の場合は0を返却
     CASE WHEN in_str_num IS NULL OR in_str_num = '' THEN
         RETURN 0;
     ELSE
