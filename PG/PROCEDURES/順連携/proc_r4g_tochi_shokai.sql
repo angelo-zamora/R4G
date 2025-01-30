@@ -268,7 +268,7 @@ BEGIN
                -- 更新端末名称
                rec_shokai_fudosan.upd_tammatsu := 'SERVER';
                -- 削除フラグ
-               rec_shokai_fudosan.del_flg := rec_main.del_flg::numeric;
+               rec_shokai_fudosan.del_flg :=  get_str_to_num(rec_main.del_flg);
 
                -- ロック情報取得
                OPEN cur_lock;
@@ -432,7 +432,7 @@ BEGIN
       CLOSE cur_busho;
       
       -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定する
-      IF rec_main.del_flg::numeric = 1 THEN
+      IF rec_shokai_fudosan.del_flg = 1 THEN
           ln_del_count := ln_del_count + 1;
           ln_result_cd := ln_result_cd_del;
       END IF;
