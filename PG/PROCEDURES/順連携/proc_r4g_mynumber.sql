@@ -172,10 +172,10 @@ BEGIN
          -- 更新端末名称
          rec_f_kojin_mynumber.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_f_kojin_mynumber.del_flg := rec_main.del_flg::numeric;
+         rec_f_kojin_mynumber.del_flg := get_str_to_num(rec_main.del_flg);
          
          -- 削除フラグが「1」の場合は対象データを物理削除する。
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF rec_f_kojin_mynumber.del_flg = 1 THEN
             BEGIN
                DELETE FROM f_kojin_number
                WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
