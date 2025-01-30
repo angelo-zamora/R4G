@@ -12,14 +12,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_土地基本_連携（f_tochikihon_renkei）の追加／更新／削除を実施する                                      */
+/* 処理概要 : 土地基本情報                                                                                            */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
 /*      OUT : io_c_err_code      …例外エラー発生時のエラーコード                                                     */
 /*            io_c_err_text    … 例外エラー発生時のエラー内容                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/23  CRESS-INFO.Angelo     新規作成     012o004「土地基本情報」の取込を行う                      */
+/* 履歴     : 2025/01/24  CRESS-INFO.Angelo     新規作成     012o004「土地基本情報」の取込を行う                      */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -46,7 +46,7 @@ DECLARE
    lc_err_cd_err                       character varying = '9'; -- エラー
 
    lc_bukken_no                        character varying;
-   ln_kazeinendo                       numeric;
+   ln_kazei_nendo                       numeric;
    ln_rireki_no                        numeric;
 
    rec_log                             dlgrenkei.f_renkei_log%ROWTYPE;
@@ -70,7 +70,7 @@ DECLARE
    SELECT *
    FROM f_tochikihon_renkei
    WHERE bukken_no = lc_bukken_no
-   AND kazeinendo = ln_kazeinendo
+   AND kazei_nendo = ln_kazei_nendo
    AND rireki_no = ln_rireki_no;
 
    rec_lock                            f_tochikihon_renkei%ROWTYPE;
@@ -93,7 +93,6 @@ BEGIN
    --連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_tochikihon_renkei;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_tochikihon_renkei';
          EXECUTE lc_sql;
       EXCEPTION
@@ -120,14 +119,14 @@ BEGIN
          EXIT WHEN NOT FOUND;
 
          lc_bukken_no := rec_main.bukken_no;
-         ln_kazeinendo := rec_main.kazei_nendo::numeric;
-         ln_rireki_no := rec_main.tochi_kihon_rireki_no::numeric;
+         ln_kazei_nendo := get_str_to_num(rec_main.kazei_nendo);
+         ln_rireki_no := get_str_to_num(rec_main.tochi_kihon_rireki_no);
          ln_shori_count   := ln_shori_count + 1;
 
          -- 物件番号
          rec_f_tochikihon_renkei.bukken_no := lc_bukken_no;
          -- 課税年度
-         rec_f_tochikihon_renkei.kazei_nendo := ln_kazeinendo;
+         rec_f_tochikihon_renkei.kazei_nendo := ln_kazei_nendo;
          -- 土地基本_履歴番号
          rec_f_tochikihon_renkei.rireki_no := ln_rireki_no;
          -- 土地_登記所在地
@@ -135,7 +134,7 @@ BEGIN
          -- 登記地目
          rec_f_tochikihon_renkei.chimoku := rec_main.toki_chimoku;
          -- 登記地積
-         rec_f_tochikihon_renkei.chiseki := rec_main.toki_chiseki::numeric;
+         rec_f_tochikihon_renkei.chiseki := get_str_to_num(rec_main.toki_chiseki);
          -- 登記地積
          rec_f_tochikihon_renkei.gimusha_kojin_no := rec_main.gimusha_atena_no;
          -- 土地_現況所在地
@@ -143,9 +142,9 @@ BEGIN
          -- 現況地目
          rec_f_tochikihon_renkei.genkyo_chimoku := rec_main.genkyo_chimoku;
          -- 現況地積
-         rec_f_tochikihon_renkei.genkyo_chiseki := rec_main.genkyo_chiseki::numeric;
+         rec_f_tochikihon_renkei.genkyo_chiseki := get_str_to_num(rec_main.genkyo_chiseki);
          -- 課税地積
-         rec_f_tochikihon_renkei.kazei_chiseki := rec_main.kazei_chiseki::numeric;
+         rec_f_tochikihon_renkei.kazei_chiseki := get_str_to_num(rec_main.kazei_chiseki);
          -- 現況用途コード１
          rec_f_tochikihon_renkei.yoto_cd1 := rec_main.yoto_cd1;
          -- 現況用途コード２
@@ -153,11 +152,11 @@ BEGIN
          -- 現況用途コード３
          rec_f_tochikihon_renkei.yoto_cd3 := rec_main.yoto_cd3;
          -- 分筆・合筆原因区分
-         rec_f_tochikihon_renkei.genin_kbn := rec_main.bunhitsu_gapptsu_kbn::numeric;
+         rec_f_tochikihon_renkei.genin_kbn := get_str_to_num(rec_main.bunhitsu_gapptsu_kbn);
          -- 分筆元・合筆先_物件番号
          rec_f_tochikihon_renkei.hitsu_bukken_no := rec_main.bun_gap_bukken_no;
          -- 分筆元・合筆先_履歴番号
-         rec_f_tochikihon_renkei.hitsu_rireki_no := rec_main.bun_gap_bukken_rireki_no::numeric;
+         rec_f_tochikihon_renkei.hitsu_rireki_no := get_str_to_num(rec_main.bun_gap_bukken_rireki_no);
          --画地番号
          rec_f_tochikihon_renkei.kakuchi_no := rec_main.kakuchi_no;
          -- データ作成日時
@@ -169,7 +168,7 @@ BEGIN
          -- 更新端末名称
          rec_f_tochikihon_renkei.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_f_tochikihon_renkei.del_flg := rec_main.del_flg::numeric;
+         rec_f_tochikihon_renkei.del_flg := get_str_to_num(rec_main.del_flg);
 
             OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
@@ -265,7 +264,7 @@ BEGIN
                      , upd_tammatsu = rec_f_tochikihon_renkei.upd_tammatsu
                      , del_flg = rec_f_tochikihon_renkei.del_flg
                   WHERE bukken_no = lc_bukken_no
-                     AND kazei_nendo = ln_kazeinendo
+                     AND kazei_nendo = ln_kazei_nendo
                      AND rireki_no = ln_rireki_no;
 
                   ln_upd_count := ln_upd_count + 1;
@@ -283,7 +282,8 @@ BEGIN
             END IF;
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
-         IF rec_main.del_flg::numeric = 1 THEN
+         IF get_str_to_num(rec_main.del_flg) = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
 

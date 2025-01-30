@@ -12,14 +12,14 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : f_支援措置（f_shiensochi）の追加／更新／削除を実施する                                                  */
+/* 処理概要 : 支援措置対象者情報                                                                                      */
 /* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
 /*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 :  CRESS-INFO.Angelo     新規作成     001o009「支援措置対象者情報」の取込を行う                           */
+/* 履歴　　 :  2025/01/24 CRESS-INFO.Angelo     新規作成     001o009「支援措置対象者情報」の取込を行う                */
 /**********************************************************************************************************************/
 
 DECLARE
@@ -102,7 +102,6 @@ BEGIN
    -- 連携先データの削除
    IF ln_para01 = 1 THEN
       BEGIN
-         SELECT COUNT(*) INTO ln_del_count FROM f_shiensochi;
          lc_sql := 'TRUNCATE TABLE dlgmain.f_shiensochi';
          EXECUTE lc_sql;
 
@@ -136,7 +135,7 @@ BEGIN
          rec_lock                       := NULL;
 
          lc_kojin_no := rec_main.atena_no::character varying;
-         ln_kaishi_ymd := getdatetonum(to_date(rec_main.shiensochi_kaishi_ymd, 'YYYY-MM-DD'));
+         ln_kaishi_ymd := get_ymd_str_to_num(rec_main.shiensochi_kaishi_ymd);
 
          -- 個人番号
          rec_f_shiensochi.kojin_no := lc_kojin_no;
@@ -145,7 +144,7 @@ BEGIN
          -- 支援措置区分
          rec_f_shiensochi.shiensochi_kbn := rec_main.sochi_jkn;
          -- 期間終了日
-         rec_f_shiensochi.shuryo_ymd := CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE getdatetonum(to_date(rec_main.shiensochi_shuryo_ymd, 'yyyy-mm-dd')) END;
+         rec_f_shiensochi.shuryo_ymd := CASE WHEN rec_main.shiensochi_shuryo_ymd IS NULL OR rec_main.shiensochi_shuryo_ymd = '' THEN 99999999 ELSE get_ymd_str_to_num(rec_main.shiensochi_shuryo_ymd) END;
          -- 一時解除（照会）フラグ
          rec_f_shiensochi.kaijo_shokai_flg := 0;
          -- 一時解除（照会）開始日時
@@ -167,7 +166,7 @@ BEGIN
          -- 備考
          rec_f_shiensochi.biko := NULL;
          -- 履歴番号
-         rec_f_shiensochi.rireki_no := rec_main.rireki_no::numeric;
+         rec_f_shiensochi.rireki_no := get_str_to_num(rec_main.rireki_no);
          -- データ作成日時
          rec_f_shiensochi.ins_datetime := concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp;
          -- データ更新日時
@@ -177,7 +176,7 @@ BEGIN
          -- 更新端末名称
          rec_f_shiensochi.upd_tammatsu := 'SERVER';
          -- 削除フラグ
-         rec_f_shiensochi.del_flg := rec_main.del_flg::numeric;
+         rec_f_shiensochi.del_flg := get_str_to_num(rec_main.del_flg);
 
          OPEN cur_lock;
                FETCH cur_lock INTO rec_lock;
@@ -311,7 +310,7 @@ BEGIN
                         , upd_tammatsu
                         , del_flg
                      ) VALUES (
-                        CASE WHEN rec_busho.busho_cd IS NOT NULL OR rec_busho.busho_cd <> '' THEN rec_busho.busho_cd::numeric ELSE 0 END
+                        rec_busho.busho_cd
                         , nextval('dlgmain.seq_no_kiji')
                         , rec_main.atena_no
                         , 1
@@ -351,7 +350,8 @@ BEGIN
          END IF;
 
          -- 中間テーブルの「削除フラグ」が「1」のデータは「3：削除」を指定
-         IF rec_main.del_flg = 1 THEN
+         IF get_str_to_num(rec_main.del_flg) = 1 THEN
+            ln_del_count := ln_del_count + 1;
             ln_result_cd := ln_result_cd_del;
          END IF;
 
@@ -388,8 +388,6 @@ BEGIN
    
    -- データ連携ログ更新
    CALL dlgrenkei.proc_upd_log(rec_log, io_c_err_code, io_c_err_text);
-
-   RAISE NOTICE 'レコード数: % | 登録数: % | 更新数: % | 削除数: % | エラー数: % ', ln_shori_count, ln_ins_count, ln_upd_count, ln_del_count, ln_err_count;
 
 EXCEPTION
    WHEN OTHERS THEN
