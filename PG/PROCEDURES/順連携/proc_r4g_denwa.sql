@@ -133,7 +133,6 @@ BEGIN
    END IF;
 
    --連携データの作成・更新
-
    OPEN cur_main;
       LOOP
          FETCH cur_main INTO rec_main;
@@ -243,8 +242,9 @@ BEGIN
 
                IF rec_main.del_flg = 1 THEN
                   BEGIN
-                     DELETE FROM f_denwa
-                     WHERE busho_cd = ln_busho_cd.atena_no
+                     UPDATE f_denwa
+                     SET del_flg = 1
+                     WHERE busho_cd = ln_busho_cd
                      AND  kojin_no = rec_main.atena_no
                      AND remban = rec_f_denwa.remban;
 
