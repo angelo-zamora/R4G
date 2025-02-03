@@ -464,7 +464,7 @@ BEGIN
        END LOOP;
     CLOSE cur_main;
 
-    CALL proc_kojin_sofu_chofuku_upd(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
+    CALL proc_kojin_sofu_chofuku_upd(io_c_err_code, io_c_err_text);
     CALL proc_r4g_sofu_zeimoku(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
     CALL proc_r4g_denwa(in_n_renkei_data_cd, in_n_renkei_seq, in_n_shori_ymd, io_c_err_code, io_c_err_text);
 
