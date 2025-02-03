@@ -2,9 +2,6 @@
 --  DDL for Procedure proc_kojin_sofu_chofuku_upd
 --------------------------------------------------------
 CREATE OR REPLACE PROCEDURE dlgrenkei.proc_kojin_sofu_chofuku_upd( 
-    in_n_renkei_data_cd IN numeric, 
-    in_n_renkei_seq IN numeric, 
-    in_n_shori_ymd IN numeric, 
     io_c_err_code INOUT character varying, 
     io_c_err_text INOUT character varying 
 )
@@ -16,10 +13,7 @@ AS $$
 /* 処理概要 : 送付先・連絡先情報（統合収滞納）                                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* 履歴　　 : 新規作成                                                                                                */
-/* 引数 IN  : in_n_renkei_data_cd … 連携データコード                                                                 */
-/*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                               */
-/*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                            */
-/*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
+/* 引数 OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                   */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                     */
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* 履歴　　 : 2025/02/03 CRESS-INFO.Angelo     新規作成     036o014「送付先・連絡先情報（統合収滞納）」の取込を行う。 */
