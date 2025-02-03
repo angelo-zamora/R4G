@@ -94,6 +94,15 @@ DECLARE
                                                 FROM t_saikoku_reibun
                                                 WHERE jiko_encho_flg = 1 );
 
+   cur_main03 CURSOR FOR
+        SELECT kibetsu_key
+        FROM dlgrenkei.i_r4g_shuno
+        WHERE error_cd = '0'
+        UNION
+        SELECT kibetsu_key
+        FROM dlgrenkei.i_r4g_shuno_rireki
+        WHERE error_cd = '0';
+    
    rec_main                       f_taino%ROWTYPE;
 
    cur_parameter CURSOR FOR
@@ -121,7 +130,6 @@ BEGIN
          EXIT WHEN NOT FOUND;
 
          IF rec_parameter.parameter_no =  1 THEN ln_para01 := rec_parameter.parameter_value; END IF;
-         IF rec_parameter.parameter_no =  2 THEN ln_para02 := rec_parameter.parameter_value; END IF;
     
       END LOOP;
    CLOSE cur_parameter;
@@ -150,6 +158,19 @@ BEGIN
 
          END LOOP;
       CLOSE cur_main02;
+   ELSIF ln_para01 = 2 THEN
+      OPEN cur_main03;
+         LOOP
+            FETCH cur_main03 INTO rec_main;
+            EXIT WHEN NOT FOUND;
+
+             ln_shori_count := ln_shori_count + 1;
+
+            CALL dlgrenkei.jiko_upd(rec_main);
+
+         END LOOP;
+   ELSIF ln_para01 = 3 THEN
+      RETURN; -- 確認中
    END IF;
 
    ld_shuryo_datetime := CURRENT_TIMESTAMP(0);
