@@ -1,7 +1,12 @@
-CREATE OR REPLACE PROCEDURE jiko_upd(IN rec_main f_taino)
+CREATE OR REPLACE PROCEDURE dlgrenkei.jiko_upd(IN rec_main f_taino)
 LANGUAGE plpgsql
 AS $jiko_upd$
-
+/**********************************************************************************************************************/
+/* 機能概要 : 時効予定日更新のサブ処理                                                                                   */
+/* 入力 IN  : rec_main  メインカーソル                                                                                  */
+/*--------------------------------------------------------------------------------------------------------------------*/
+/* 履歴     : 2025/02/03  CRESS-INFO.Drexler     新規作成     036o014「送付先・連絡先情報（統合収滞納）」の取込を行う      */
+/**********************************************************************************************************************/
 DECLARE
    cur_lock CURSOR FOR
    SELECT kibetsu_key
@@ -11,9 +16,9 @@ DECLARE
 
    rec_lock                       f_taino%ROWTYPE;
 	
-   ln_jiko_ymd                    integer;
-   ln_shometsu_ymd                integer;
-   ln_jiko_kisan_ymd              integer;
+   ln_jiko_ymd                    NUMERIC DEFAULT 0;
+   ln_shometsu_ymd                NUMERIC DEFAULT 0;
+   ln_jiko_kisan_ymd              NUMERIC DEFAULT 0;
    
    rec_get_jiko_handan            rec_jiko[];
 
