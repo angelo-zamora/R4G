@@ -24,7 +24,8 @@ AS $$
 
 DECLARE
    rec_f_sofu_zeimoku             f_sofu_zeimoku%ROWTYPE;
-   
+   ln_para01                      numeric DEFAULT 0;
+   ln_para06                      numeric DEFAULT 0;
    ln_shori_count                 numeric DEFAULT 0;
    ln_ins_count                   numeric DEFAULT 0;
    ln_upd_count                   numeric DEFAULT 0;
@@ -45,8 +46,6 @@ DECLARE
    lc_err_cd_err                  character varying = '9'; -- エラー
    
    rec_log                        dlgrenkei.f_renkei_log%ROWTYPE;
-
-   ln_para01                      numeric DEFAULT 0;
 
    cur_parameter CURSOR FOR
    SELECT *
@@ -114,6 +113,9 @@ BEGIN
       IF rec_parameter.parameter_no = 1 THEN
          ln_para01 := rec_parameter.parameter_value;
       END IF;
+      IF rec_parameter.parameter_no = 6 THEN 
+         ln_para06 := rec_parameter.parameter_value;
+      END IF;
    END LOOP;
    CLOSE cur_parameter;
 
@@ -148,8 +150,26 @@ BEGIN
          rec_f_sofu_zeimoku.zeimoku_cd := get_str_to_num(get_r4g_code_conv(0, 3, rec_main.zeimoku_cd, NULL));
          -- 軽自管理番号
          rec_f_sofu_zeimoku.keiji_kanri_no := get_str_to_num(rec_main.keiji_kanri_no);
+
+         IF ln_para06 = 1 THEN
+            ln_yusen_flg := 1;
+         ELSE
+            BEGIN
+               SELECT yusen_flg
+               INTO ln_yusen_flg
+               FROM f_sofu
+               WHERE kojin_no = rec_f_sofu_zeimoku.kojin_no
+                  AND zeimoku_cd = rec_f_sofu_zeimoku.zeimoku_cd 
+                  AND keiji_kanri_no = rec_f_sofu_zeimoku.keiji_kanri_no
+                  AND del_flg = 0;
+            EXCEPTION
+               WHEN OTHERS THEN
+               ln_yusen_flg := 0;
+            END;
+         END IF;
+
          -- 優先フラグ
-         rec_f_sofu_zeimoku.yusen_flg := ;
+         rec_f_sofu_zeimoku.yusen_flg := ln_yusen_flg;
          -- 送付先氏名カナ
          rec_f_sofu_zeimoku.sofu_shimei_kana := get_trimmed_space(rec_main.simei_meisho_katakana);
          -- 送付先氏名
