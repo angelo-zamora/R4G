@@ -240,6 +240,7 @@ BEGIN
                rec_f_denwa.biko_denwa        := NULL;
                rec_f_denwa.renkei_flg        := 1;
 
+            -- 処理対象データの削除フラグが「1」の場合はdlgmain：f_電話（f_denwa）の削除フラグを「1」で更新する
                IF rec_main.del_flg = 1 THEN
                   BEGIN
                      UPDATE f_denwa
@@ -260,83 +261,51 @@ BEGIN
                      lc_err_cd := lc_err_cd_err;
                      ln_result_cd := ln_result_cd_err;
                   END;
-               END IF;
-
-               IF ln_rec_count = 0 THEN
-                  BEGIN
-                  -- 登録処理
-                  INSERT INTO f_denwa(
-                  busho_cd
-                  , kojin_no
-                  , remban
-                  , yusen_flg
-                  , denwa_no
-                  , denwa_bunrui_kbn
-                  , biko_denwa
-                  , gyomu_cd
-                  , zeimoku_cd
-                  , renkei_flg
-                  , sofu_rireki_no
-                  , ins_datetime
-                  , upd_datetime
-                  , upd_tantosha_cd
-                  , upd_tammatsu
-                  , del_flg
-                  )
-                  VALUES (
-                  ln_busho_cd 
-                  , rec_main.atena_no
-                  , rec_f_denwa.remban 
-                  , get_str_to_num(rec_f_denwa.yusen_flg)
-                  , lc_denwa
-                  , get_str_to_num(rec_f_denwa.denwa_bunrui_kbn)
-                  , rec_f_denwa.biko_denwa
-                  , get_str_to_num(rec_f_denwa.gyomu_id)
-                  , ln_zeimoku_cd
-                  , rec_f_denwa.renkei_flg 
-                  , get_str_to_num(rec_f_denwa.sofu_rireki_no)
-                  , concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp
-                  , concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp
-                  , rec_main.sosasha_cd
-                  , 'SERVER'
-                  , get_str_to_num(rec_f_denwa.del_flg)
-                  );
-
-                  ln_ins_count := ln_ins_count + 1;
-                  lc_err_text := '';
-                  lc_err_cd := lc_err_cd_normal;
-                  ln_result_cd := ln_result_cd_add;
-
-                  EXCEPTION
-                     WHEN OTHERS THEN
-                        ln_err_count := ln_err_count + 1;
-                        lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                        lc_err_cd := lc_err_cd_err;
-                        ln_result_cd := ln_result_cd_err;
-                  END;
-                  
-                  ELSE
-                     -- 連携データの作成・更新
+               ELSE
+                  IF ln_rec_count = 0 THEN
                      BEGIN
-                        UPDATE f_denwa
-                           SET  yusen_flg = get_str_to_num(rec_f_denwa.yusen_flg)
-                           , denwa_no = lc_denwa
-                           , denwa_bunrui_kbn = get_str_to_num(rec_f_denwa.denwa_bunrui_kbn)
-                           , gyomu_cd = get_str_to_num(rec_f_denwa.gyomu_id)
-                           , zeimoku_cd = ln_zeimoku_cd
-                           , sofu_rireki_no = get_str_to_num(rec_f_denwa.sofu_rireki_no)
-                           , upd_datetime = CURRENT_TIMESTAMP
-                           , upd_tantosha_cd = rec_main.sosasha_cd
-                           , upd_tammatsu = 'SERVER'
-                           , del_flg = get_str_to_num(rec_f_denwa.del_flg)
-                           WHERE busho_cd = ln_busho_cd 
-                           AND kojin_no = CASE WHEN rec_main.sofu_rireki_no IS NOT NULL OR rec_main.sofu_rireki_no <> '' THEN rec_main.sofu_rireki_no::numeric ELSE 0 END
-                           AND remban = rec_f_denwa.remban;
+                     -- 登録処理
+                     INSERT INTO f_denwa(
+                     busho_cd
+                     , kojin_no
+                     , remban
+                     , yusen_flg
+                     , denwa_no
+                     , denwa_bunrui_kbn
+                     , biko_denwa
+                     , gyomu_cd
+                     , zeimoku_cd
+                     , renkei_flg
+                     , sofu_rireki_no
+                     , ins_datetime
+                     , upd_datetime
+                     , upd_tantosha_cd
+                     , upd_tammatsu
+                     , del_flg
+                     )
+                     VALUES (
+                     ln_busho_cd 
+                     , rec_main.atena_no
+                     , rec_f_denwa.remban 
+                     , get_str_to_num(rec_f_denwa.yusen_flg)
+                     , lc_denwa
+                     , get_str_to_num(rec_f_denwa.denwa_bunrui_kbn)
+                     , rec_f_denwa.biko_denwa
+                     , get_str_to_num(rec_f_denwa.gyomu_id)
+                     , ln_zeimoku_cd
+                     , rec_f_denwa.renkei_flg 
+                     , get_str_to_num(rec_f_denwa.sofu_rireki_no)
+                     , concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp
+                     , concat(rec_main.sosa_ymd, ' ', rec_main.sosa_time)::timestamp
+                     , rec_main.sosasha_cd
+                     , 'SERVER'
+                     , get_str_to_num(rec_f_denwa.del_flg)
+                     );
 
-                        ln_upd_count := ln_upd_count + 1;
-                        lc_err_text := '';
-                        lc_err_cd := lc_err_cd_normal;
-                        ln_result_cd := ln_result_cd_upd;
+                     ln_ins_count := ln_ins_count + 1;
+                     lc_err_text := '';
+                     lc_err_cd := lc_err_cd_normal;
+                     ln_result_cd := ln_result_cd_add;
 
                      EXCEPTION
                         WHEN OTHERS THEN
@@ -345,6 +314,38 @@ BEGIN
                            lc_err_cd := lc_err_cd_err;
                            ln_result_cd := ln_result_cd_err;
                      END;
+                     
+                     ELSE
+                        -- 連携データの作成・更新
+                        BEGIN
+                           UPDATE f_denwa
+                              SET  yusen_flg = get_str_to_num(rec_f_denwa.yusen_flg)
+                              , denwa_no = lc_denwa
+                              , denwa_bunrui_kbn = get_str_to_num(rec_f_denwa.denwa_bunrui_kbn)
+                              , gyomu_cd = get_str_to_num(rec_f_denwa.gyomu_id)
+                              , zeimoku_cd = ln_zeimoku_cd
+                              , sofu_rireki_no = get_str_to_num(rec_f_denwa.sofu_rireki_no)
+                              , upd_datetime = CURRENT_TIMESTAMP
+                              , upd_tantosha_cd = rec_main.sosasha_cd
+                              , upd_tammatsu = 'SERVER'
+                              , del_flg = get_str_to_num(rec_f_denwa.del_flg)
+                              WHERE busho_cd = ln_busho_cd 
+                              AND kojin_no = CASE WHEN rec_main.sofu_rireki_no IS NOT NULL OR rec_main.sofu_rireki_no <> '' THEN rec_main.sofu_rireki_no::numeric ELSE 0 END
+                              AND remban = rec_f_denwa.remban;
+
+                           ln_upd_count := ln_upd_count + 1;
+                           lc_err_text := '';
+                           lc_err_cd := lc_err_cd_normal;
+                           ln_result_cd := ln_result_cd_upd;
+
+                        EXCEPTION
+                           WHEN OTHERS THEN
+                              ln_err_count := ln_err_count + 1;
+                              lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+                              lc_err_cd := lc_err_cd_err;
+                              ln_result_cd := ln_result_cd_err;
+                        END;
+                  END IF;
                END IF;
            
                BEGIN 
