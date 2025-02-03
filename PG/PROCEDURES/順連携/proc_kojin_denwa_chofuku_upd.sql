@@ -1,7 +1,7 @@
 --------------------------------------------------------
 --  DDL for Procedure proc_kojin_denwa_chofuku_upd
 --------------------------------------------------------
-CREATE OR REPLACE PROCEDURE proc_kojin_denwa_chofuku_upd  (
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_kojin_denwa_chofuku_upd  (
     in_n_renkei_data_cd IN numeric, 
     in_n_renkei_seq IN numeric, 
     in_n_shori_ymd IN numeric, 
@@ -12,9 +12,9 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : 個人宛名情報（電話番号）_重複データ更新                                                                     */
+/* 処理概要 : 送付先・連絡先情報（統合収滞納）                                                                           */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴　　 :                                                                                                         */
+/* 履歴     : 2025/02/03  CRESS-INFO.Drexler     新規作成     036o014「送付先・連絡先情報（統合収滞納）」の取込を行う      */
 /**********************************************************************************************************************/
 DECLARE
 
@@ -52,20 +52,8 @@ BEGIN
         )
         WHERE del_flg = 0;
 
-			ln_upd_count := ln_upd_count + 1;
-			lc_err_text := '';
-			lc_err_cd := '0';
-			ln_result_cd := 2;
-
-		EXCEPTION
-		WHEN OTHERS THEN
-		ln_err_count := ln_err_count + 1;
-		lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-		lc_err_cd := '9';
-		ln_result_cd := 9;
-
-        RAISE NOTICE '結果コード: % | エラーコード: % | エラー内容: % ', ln_result_cd, lc_err_cd, lc_err_text;
-
+        EXCEPTION
+            WHEN OTHERS THEN NULL;
         END;
 
 EXCEPTION
