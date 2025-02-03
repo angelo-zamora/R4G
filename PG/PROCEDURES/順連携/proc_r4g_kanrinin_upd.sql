@@ -2,7 +2,7 @@
 --  DDL for Procedure  proc_r4g_kanrinin_upd
 --------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE proc_r4g_kanrinin_upd (
+CREATE OR REPLACE PROCEDURE dlgrenkei.proc_r4g_kanrinin_upd (
    in_n_renkei_data_cd IN numeric,
    in_n_renkei_seq IN numeric,
    in_n_shori_ymd IN numeric,
@@ -13,48 +13,51 @@ LANGUAGE plpgsql
 AS $$
 
 /**********************************************************************************************************************/
-/* 処理概要 : 代理人情報（統合収滞納）」                                                                                 */
+/* 処理概要 : 代理人情報（統合収滞納                                                                                     */
 /* 引数 IN  : in_n_renkei_data_cd  … 連携データコード                                                                   */
 /*            in_n_renkei_seq     … 連携SEQ（処理単位で符番されるSEQ）                                                   */
 /*            in_n_shori_ymd      … 処理日 （処理単位で設定される処理日）                                                 */
 /*      OUT : io_c_err_code       … 例外エラー発生時のエラーコード                                                       */
 /*            io_c_err_text       … 例外エラー発生時のエラー内容                                                         */
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* 履歴     : 2025/01/27  CRESS-INFO.Drexler     新規作成     036o006「収納履歴情報（統合収滞納）」の取込を行う            */
+/* 履歴     : 2025/01/30  CRESS-INFO.Drexler     新規作成     036o006「収納履歴情報（統合収滞納）」の取込を行う            */
 /**********************************************************************************************************************/
 
 DECLARE
-   ln_shori_count                      numeric DEFAULT 0;
-   ln_upd_count                        numeric DEFAULT 0;
-   ln_err_count                        numeric DEFAULT 0;
-   ln_result_cd                        numeric DEFAULT 0;
-   lc_err_text                         character varying;
-   lc_sql                              character varying;
-   lc_err_cd                           character varying;
+   ln_shori_count                 numeric DEFAULT 0;             -- 処理件数用変数
+   ln_ins_count                   numeric DEFAULT 0;             -- 追加件数用変数
+   ln_upd_count                   numeric DEFAULT 0;             -- 更新件数用変数
+   ln_del_count                   numeric DEFAULT 0;             -- 削除件数用変数
+   ln_err_count                   numeric DEFAULT 0;             -- エラー件数用変数
+   lc_err_cd                      character varying;             -- エラーコード用変数
+   lc_err_text                    character varying(100):='';    -- エラー内容用変数
+   ln_result_cd                   numeric DEFAULT 0;             -- 結果区分更新用変数
+   ln_result_cd_upd               numeric DEFAULT 2;             -- 更新フラグ
+   lc_sql                         character varying;             -- SQL文用変数
 
-   ln_kanrinin_cd			               numeric;
-   lc_kanrinin_kojin_no		            character varying;
-   ln_zeimoku_cd                       numeric;
+   ln_kanrinin_cd                 numeric;
+   lc_kanrinin_kojin_no           character varying;
+   ln_zeimoku_cd                  numeric;
 
    cur_main CURSOR FOR
    SELECT *
-   FROM i_r4g_dairinin
+   FROM dlgrenkei.i_r4g_dairinin
    WHERE saishin_flg = '1'
       AND katagaki = '09'
       AND zeimoku_cd = '00'
       AND result_cd < 8;
 
-   rec_main                            i_r4g_dairinin%ROWTYPE;
+   rec_main                            dlgrenkei.i_r4g_dairinin%ROWTYPE;
 
    cur_main2 CURSOR FOR
    SELECT *
-   FROM i_r4g_dairinin
+   FROM dlgrenkei.i_r4g_dairinin
    WHERE saishin_flg = '1'
       AND katagaki = '09'
       AND zeimoku_cd <> '00'
       AND result_cd < 8;
 
-   rec_main2                           i_r4g_dairinin%ROWTYPE;
+   rec_main2                           dlgrenkei.i_r4g_dairinin%ROWTYPE;
 
    cur_taino_lock CURSOR (p_kojin_no VARCHAR, p_zeimoku_cd NUMERIC) FOR
    SELECT *
@@ -82,8 +85,8 @@ BEGIN
             IF(
                rec_main.dairinin_atena_no = rec_lock.kojin_no
                AND ln_zeimoku_cd = rec_lock.zeimoku_cd
-               AND getdatetonum(to_date(rec_main.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd')) <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
-               AND getdatetonum(to_date(rec_main.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd')) >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main.dairinin_yukokikan_kaishi_ymd, 'YYYY-MM-DD')) <= to_number(to_char(CURRENT_DATE,'YYYYMMDD'), '99999999')
+               AND getdatetonum(to_date(rec_main.dairinin_yukokikan_shuryo_ymd, 'YYYY-MM-DD')) >= to_number(to_char(CURRENT_DATE,'YYYYMMDD'), '99999999')
                AND rec_main.del_flg = '0'
             ) THEN
                ln_kanrinin_cd := 1;
@@ -102,14 +105,16 @@ BEGIN
             WHERE kibetsu_key = rec_lock.kibetsu_key;
 
             ln_upd_count := ln_upd_count + 1;
+            lc_err_text := '';
+            lc_err_cd := lc_err_cd_normal;
+            ln_result_cd := ln_result_cd_upd;
 
-		   EXCEPTION
+           EXCEPTION
             WHEN OTHERS THEN
-                ln_err_count := ln_err_count + 1;
-                lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                lc_err_cd := '9';
-                ln_result_cd := 9;
-				RAISE NOTICE '% === %', SQLSTATE, SQLERRM;
+               ln_err_count := ln_err_count + 1;
+               lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+               lc_err_cd := lc_err_cd_err;
+               ln_result_cd := ln_result_cd_err;
          END;
       END IF;
 
@@ -123,7 +128,7 @@ BEGIN
 
       ln_shori_count := ln_shori_count + 1;
       ln_zeimoku_cd  := get_r4g_code_conv(1, 3, null, rec_main.zeimoku_cd::character varying);
-	  	  	  
+                  
       OPEN cur_taino_lock(rec_main2.atena_no, ln_zeimoku_cd);
       FETCH cur_taino_lock INTO rec_lock;
       CLOSE cur_taino_lock;
@@ -133,8 +138,8 @@ BEGIN
             IF(
                rec_main2.dairinin_atena_no = rec_lock.kojin_no
                AND ln_zeimoku_cd = rec_lock.zeimoku_cd
-               AND getdatetonum(to_date(rec_main2.dairinin_yukokikan_kaishi_ymd, 'yyyy-mm-dd'))  <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
-               AND getdatetonum(to_date(rec_main2.dairinin_yukokikan_shuryo_ymd, 'yyyy-mm-dd'))  >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main2.dairinin_yukokikan_kaishi_ymd, 'YYYY-MM-DD'))  <= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
+               AND getdatetonum(to_date(rec_main2.dairinin_yukokikan_shuryo_ymd, 'YYYY-MM-DD'))  >= to_number(to_char(CURRENT_DATE,'yyyymmdd'), '99999999')
                AND rec_main2.del_flg = '0'
             ) THEN
                ln_kanrinin_cd := 1;
@@ -143,7 +148,7 @@ BEGIN
                ln_kanrinin_cd := 0;
                lc_kanrinin_kojin_no := LPAD( '0', 15, '0' );
             END IF;
-			
+            
             UPDATE f_taino
             SET kanrinin_cd = ln_kanrinin_cd,
                kanrinin_kojin_no = lc_kanrinin_kojin_no,
@@ -153,14 +158,16 @@ BEGIN
             WHERE kibetsu_key = rec_lock.kibetsu_key;
 
             ln_upd_count := ln_upd_count + 1;
+            lc_err_text := '';
+            lc_err_cd := lc_err_cd_normal;
+            ln_result_cd := ln_result_cd_upd;
 
-		   EXCEPTION
+           EXCEPTION
             WHEN OTHERS THEN
-                ln_err_count := ln_err_count + 1;
-                lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
-                lc_err_cd := '9';
-                ln_result_cd := 9;
-            RAISE NOTICE '% === %', SQLSTATE, SQLERRM;
+               ln_err_count := ln_err_count + 1;
+               lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
+               lc_err_cd := lc_err_cd_err;
+               ln_result_cd := ln_result_cd_err;
          END;
       END IF;
 

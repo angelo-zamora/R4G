@@ -131,7 +131,7 @@ BEGIN
         -- 業務コード
         rec_f_henrei_renkei.gyomu_cd := rec_main.gyomu_id;
         -- 税目コード
-        rec_f_henrei_renkei.zeimoku_cd := get_r4g_code_conv(0, 3, rec_f_henrei_renkei.zeimoku_cd, NULL)::numeric;
+        rec_f_henrei_renkei.zeimoku_cd := get_r4g_code_conv(0, 3, rec_main.zeimoku_cd, NULL)::numeric;
         -- 返戻物種別コード
         rec_f_henrei_renkei.henrei_shubetsu_cd := rec_main.henrei_syubetsu;
         -- 履歴番号
