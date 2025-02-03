@@ -180,7 +180,6 @@ BEGIN
                WHERE kojin_no = rec_f_kojin_mynumber.atena_no;
                
                ln_del_count := ln_del_count + 1;
-
                lc_err_text := '';
                lc_err_cd := lc_err_cd_normal;
                ln_result_cd := ln_result_cd_del; 
@@ -224,7 +223,7 @@ BEGIN
                         ln_result_cd := ln_result_cd_add;
 
                   EXCEPTION WHEN OTHERS THEN
-                     ln_ins_count := ln_ins_count + 1;
+                     ln_err_count := ln_err_count + 1;
                      lc_err_text := SUBSTRING( SQLERRM, 1, 100 );
                      lc_err_cd := lc_err_cd_err;
                      ln_result_cd := ln_result_cd_err;
